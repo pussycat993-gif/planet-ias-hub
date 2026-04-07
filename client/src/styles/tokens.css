@@ -1,0 +1,45 @@
+/* IAS Hub — Design Tokens (matches PLANet Contact IAS) */
+:root {
+  --blue-primary: #1976d2;
+  --blue-dark:    #1565c0;
+  --blue-light:   #e3f2fd;
+  --blue-xlight:  #f0f7ff;
+
+  --green:        #2e7d32;
+  --green-light:  #e8f5e9;
+
+  --red:          #c62828;
+  --orange:       #e65100;
+  --purple:       #6a1b9a;
+
+  --border:       #dde1e7;
+  --bg:           #f0f2f5;
+  --surface:      #ffffff;
+
+  --text:         #1a1a2e;
+  --text2:        #555555;
+  --text3:        #888888;
+
+  /* Activity status (same as PCI Activity List) */
+  --status-active:   #1565c0;
+  --status-complete: #2e7d32;
+  --status-canceled: #c62828;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--bg);
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
