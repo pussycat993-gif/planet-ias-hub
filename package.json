@@ -1,8 +1,9 @@
 {
   "name": "planet-ias-hub",
   "version": "1.0.0",
-  "description": "IAS Hub — Real-time communication add-on for PLANet Contact IAS",
+  "description": "IAS Hub — Real-Time Communication Platform for PLANet Contact IAS",
   "private": true,
+  "main": "electron/main.js",
   "workspaces": [
     "client",
     "server"
@@ -11,36 +12,95 @@
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\" \"npm run dev:electron\"",
     "dev:server": "npm run dev --workspace=server",
     "dev:client": "npm run dev --workspace=client",
-    "dev:electron": "wait-on http://localhost:5173 && electron electron/main.js",
-    "build": "npm run build --workspace=client && npm run build --workspace=server",
-    "package": "electron-builder"
+    "dev:electron": "wait-on http://localhost:5173 && cross-env NODE_ENV=development electron .",
+    "build": "npm run build:client && npm run build:server",
+    "build:client": "npm run build --workspace=client",
+    "build:server": "npm run build --workspace=server",
+    "package": "npm run build && electron-builder",
+    "package:mac": "npm run build && electron-builder --mac",
+    "package:win": "npm run build && electron-builder --win",
+    "package:linux": "npm run build && electron-builder --linux",
+    "migrate": "npm run migrate --workspace=server",
+    "seed": "npm run seed --workspace=server",
+    "db:setup": "npm run migrate && npm run seed"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
     "electron": "^29.0.0",
     "electron-builder": "^24.9.1",
+    "electron-updater": "^6.1.8",
     "wait-on": "^7.2.0"
   },
   "build": {
     "appId": "com.planetsystemsgroup.iashub",
     "productName": "IAS Hub",
+    "copyright": "© 2026 PLANet Systems Group",
     "directories": {
-      "output": "dist"
+      "output": "dist-electron",
+      "buildResources": "assets"
     },
     "files": [
       "electron/**/*",
       "client/dist/**/*",
-      "server/dist/**/*"
+      "server/dist/**/*",
+      "package.json"
     ],
+    "extraMetadata": {
+      "main": "electron/main.js"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "pussycat993-gif",
+      "repo": "planet-ias-hub"
+    },
     "mac": {
-      "target": "dmg",
-      "category": "public.app-category.business"
+      "target": [
+        { "target": "dmg", "arch": ["x64", "arm64"] },
+        { "target": "zip", "arch": ["x64", "arm64"] }
+      ],
+      "category": "public.app-category.business",
+      "icon": "assets/icon.icns",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "assets/entitlements.mac.plist",
+      "entitlementsInherit": "assets/entitlements.mac.plist"
     },
     "win": {
-      "target": "nsis"
+      "target": [
+        { "target": "nsis", "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] }
+      ],
+      "icon": "assets/icon.ico"
     },
     "linux": {
-      "target": "AppImage"
-    }
+      "target": [
+        { "target": "AppImage", "arch": ["x64"] },
+        { "target": "deb", "arch": ["x64"] }
+      ],
+      "icon": "assets/icon.png",
+      "category": "Office"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "dmg": {
+      "title": "IAS Hub",
+      "contents": [
+        { "x": 130, "y": 220 },
+        { "x": 410, "y": 220, "type": "link", "path": "/Applications" }
+      ]
+    },
+    "protocols": [
+      {
+        "name": "IAS Hub",
+        "schemes": ["iashub"]
+      }
+    ]
   }
 }
