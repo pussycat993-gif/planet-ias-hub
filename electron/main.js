@@ -1,9 +1,18 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, protocol } = require('electron');
 const path = require('path');
 
 const isDev = process.env.NODE_ENV === 'development';
 
 let mainWindow;
+
+// Register iashub:// deep link protocol
+if (process.defaultApp) {
+  if (process.argv.length >= 2) {
+    app.setAsDefaultProtocolClient('iashub', process.execPath, [path.resolve(process.argv[1])]);
+  }
+} else {
+  app.setAsDefaultProtocolClient('iashub');
+}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -29,6 +38,42 @@ function createWindow() {
   }
 
   mainWindow.on('closed', () => { mainWindow = null; });
+}
+
+// Handle SSO deep link on macOS
+app.on('open-url', (event, url) => {
+  event.preventDefault();
+  handleDeepLink(url);
+});
+
+// Handle SSO deep link on Windows/Linux (second instance)
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock) {
+  app.quit();
+} else {
+  app.on('second-instance', (event, commandLine) => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+    // Extract URL from command line args (Windows/Linux)
+    const url = commandLine.find(arg => arg.startsWith('iashub://'));
+    if (url) handleDeepLink(url);
+  });
+}
+
+function handleDeepLink(url) {
+  try {
+    const parsed = new URL(url);
+    if (parsed.pathname === '//auth' || parsed.hostname === 'auth') {
+      const token = parsed.searchParams.get('token');
+      if (token && mainWindow) {
+        mainWindow.webContents.send('auth:sso-token', token);
+      }
+    }
+  } catch (err) {
+    console.error('Deep link parse error:', err);
+  }
 }
 
 app.whenReady().then(createWindow);
