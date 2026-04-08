@@ -1,54 +1,89 @@
 version: '3.9'
 
 services:
+
   app:
     build:
       context: ..
       dockerfile: docker/Dockerfile.server
+    container_name: ias-hub-app
     ports:
-      - "3001:3001"
+      - "${PORT:-3001}:3001"
     environment:
-      - NODE_ENV=production
-      - DB_HOST=postgres
-      - REDIS_HOST=redis
-    env_file:
-      - ../.env
+      NODE_ENV: production
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-ias_hub}
+      DB_USER: ${DB_USER:-ias_hub_user}
+      DB_PASS: ${DB_PASS}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET}
+      PCI_API_URL: ${PCI_API_URL}
+      WHISPER_API_URL: http://whisper:9000
+      MEDIASOUP_LISTEN_IP: 0.0.0.0
+      MEDIASOUP_ANNOUNCED_IP: ${MEDIASOUP_ANNOUNCED_IP:-127.0.0.1}
+      TENANT_ID: ${TENANT_ID:-default}
     depends_on:
       postgres:
         condition: service_healthy
       redis:
-        condition: service_started
+        condition: service_healthy
+    restart: unless-stopped
     networks:
       - ias-hub-network
 
   postgres:
     image: postgres:16-alpine
+    container_name: ias-hub-postgres
     environment:
-      POSTGRES_DB: ias_hub
-      POSTGRES_USER: ias_hub_user
+      POSTGRES_DB: ${DB_NAME:-ias_hub}
+      POSTGRES_USER: ${DB_USER:-ias_hub_user}
       POSTGRES_PASSWORD: ${DB_PASS}
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ias_hub_user -d ias_hub"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-ias_hub_user} -d ${DB_NAME:-ias_hub}"]
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
     networks:
       - ias-hub-network
 
   redis:
     image: redis:7-alpine
+    container_name: ias-hub-redis
     volumes:
       - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - ias-hub-network
+
+  whisper:
+    image: onerahmet/openai-whisper-asr-webservice:latest
+    container_name: ias-hub-whisper
+    environment:
+      ASR_MODEL: base
+      ASR_ENGINE: openai_whisper
+    ports:
+      - "9000:9000"
+    restart: unless-stopped
     networks:
       - ias-hub-network
 
   coturn:
     image: coturn/coturn:latest
+    container_name: ias-hub-coturn
     network_mode: host
     volumes:
       - ./turnserver.conf:/etc/coturn/turnserver.conf
+    restart: unless-stopped
 
 volumes:
   postgres-data:

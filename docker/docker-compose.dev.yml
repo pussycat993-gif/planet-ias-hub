@@ -1,0 +1,38 @@
+version: '3.9'
+
+# Development override — mounts source code for live reload
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.dev
+    container_name: ias-hub-app-dev
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: development
+      DB_HOST: postgres
+      REDIS_HOST: redis
+      WHISPER_API_URL: http://whisper:9000
+    volumes:
+      - ../server:/app/server
+      - /app/server/node_modules
+    command: npm run dev --workspace=server
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ias-hub-network
+
+  postgres:
+    ports:
+      - "5432:5432"
+
+  redis:
+    ports:
+      - "6379:6379"
