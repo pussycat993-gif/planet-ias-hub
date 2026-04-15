@@ -1,6 +1,7 @@
 import { Server, Socket } from 'socket.io';
 import pool from '../db/auth';
 import { processNotification } from '../automation/smartNotifications';
+import { registerMediasoupHandlers } from '../mediasoup/handlers';
 
 export function registerSocketHandlers(io: Server) {
 
@@ -20,6 +21,9 @@ export function registerSocketHandlers(io: Server) {
     );
     socket.broadcast.emit('presence:update', { userId, status: 'online' });
 
+    // ── mediasoup WebRTC handlers ─────────────────────────
+    registerMediasoupHandlers(io, socket, userId);
+
     // ── Channel events ────────────────────────────────────
     socket.on('channel:join', (channelId: string) => {
       socket.join(`channel:${channelId}`);
@@ -37,7 +41,6 @@ export function registerSocketHandlers(io: Server) {
       replyToId?: number;
     }) => {
       try {
-        // Save to DB
         const { rows } = await pool.query(
           `INSERT INTO messages (channel_id, sender_id, body, message_type, reply_to_id)
            VALUES ($1, $2, $3, $4, $5) RETURNING *`,
@@ -45,13 +48,11 @@ export function registerSocketHandlers(io: Server) {
         );
         const message = rows[0];
 
-        // Broadcast to channel
         io.to(`channel:${data.channelId}`).emit('message:receive', {
           ...message,
           senderId: userId,
         });
 
-        // Smart notifications — get channel members
         const { rows: members } = await pool.query(
           'SELECT user_id FROM channel_members WHERE channel_id = $1',
           [data.channelId]
@@ -83,7 +84,7 @@ export function registerSocketHandlers(io: Server) {
       socket.to(`channel:${channelId}`).emit('typing:update', { userId, typing: false });
     });
 
-    // ── Call signaling ────────────────────────────────────
+    // ── Call signaling (basic — join/leave notifications) ─
     socket.on('call:start', (data: { channelId: string; type: 'audio' | 'video' }) => {
       socket.to(`channel:${data.channelId}`).emit('call:incoming', {
         callerId: userId,

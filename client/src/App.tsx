@@ -2,13 +2,16 @@ import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuthStore } from './store/authStore';
+import { useCallStore } from './store/callStore';
 import Layout from './components/layout/Layout';
 import LoginPage from './pages/LoginPage';
+import VideoCallModal from './components/calls/VideoCallModal';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 export default function App() {
   const { user, token, loginSSO } = useAuthStore();
+  const { active: callActive } = useCallStore();
 
   // Restore session token on load
   useEffect(() => {
@@ -39,6 +42,9 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      {/* Full-screen call overlay — rendered above everything */}
+      {callActive && <VideoCallModal />}
+
       <Layout />
     </BrowserRouter>
   );

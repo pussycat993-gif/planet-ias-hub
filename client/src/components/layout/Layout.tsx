@@ -6,33 +6,28 @@ import Sidebar from './Sidebar';
 import MessageList from '../chat/MessageList';
 import MessageInput from '../chat/MessageInput';
 import CallBar from '../calls/CallBar';
+import AIPanel from '../ai/AIPanel';
+import AutoPanel from '../automation/AutoPanel';
 import { useChatStore } from '../../store/chatStore';
 import { useUIStore } from '../../store/uiStore';
 import { useSocket } from '../../hooks/useSocket';
-import { useAuthStore } from '../../store/authStore';
 
 export default function Layout({ children }: { children?: React.ReactNode }) {
   const { fetchChannels, receiveMessage, setTyping } = useChatStore();
-  const { rightPanelOpen, activeModal } = useUIStore();
-  const { user } = useAuthStore();
+  const { rightPanelOpen, aiPanelOpen, autoPanelOpen } = useUIStore();
   const socket = useSocket();
 
-  // Fetch channels on mount
   useEffect(() => { fetchChannels(); }, []);
 
-  // Register socket event listeners
   useEffect(() => {
     if (!socket) return;
-
     socket.on('message:receive', receiveMessage);
     socket.on('typing:update', ({ userId, typing }: { userId: number; typing: boolean }) => {
       setTyping(userId, typing);
     });
     socket.on('call:incoming', (data: any) => {
       console.log('Incoming call:', data);
-      // TODO: show incoming call UI
     });
-
     return () => {
       socket.off('message:receive', receiveMessage);
       socket.off('typing:update');
@@ -51,23 +46,40 @@ export default function Layout({ children }: { children?: React.ReactNode }) {
 
         {/* Center */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, background: '#f0f2f5' }}>
-          {/* Chat title bar */}
           <ChatTitleBar />
           <CallBar />
           <MessageList />
           <MessageInput />
         </div>
 
-        {/* Right panel */}
+        {/* PCI Context panel */}
         {rightPanelOpen && (
           <div style={{ width: 280, borderLeft: '1px solid #dde1e7', background: '#fff', flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
             <RightPanelTabs />
           </div>
         )}
+
+        {/* AI Assistant panel */}
+        {aiPanelOpen && (
+          <div style={{ width: 300, borderLeft: '1px solid #dde1e7', background: '#fff', flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
+            <AIPanel />
+          </div>
+        )}
+
+        {/* Automations panel */}
+        {autoPanelOpen && (
+          <div style={{ width: 260, borderLeft: '1px solid #dde1e7', background: '#fff', flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
+            <AutoPanel />
+          </div>
+        )}
       </div>
 
       {/* Footer */}
-      <div style={{ background: '#1565c0', color: '#fff', padding: '0 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 24, flexShrink: 0 }}>
+      <div style={{
+        background: '#1565c0', color: '#fff', padding: '0 14px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        height: 24, flexShrink: 0,
+      }}>
         <div style={{ display: 'flex', gap: 14 }}>
           {['Channels', 'Calls', 'Notifications', 'Help'].map(l => (
             <span key={l} style={{ fontSize: 10, color: 'rgba(255,255,255,.8)', cursor: 'pointer', textDecoration: 'underline' }}>{l}</span>
@@ -80,9 +92,8 @@ export default function Layout({ children }: { children?: React.ReactNode }) {
 }
 
 function ChatTitleBar() {
-  const { activeChannel } = useChatStore();
+  const { activeChannel, activeChannelId } = useChatStore();
   const { startCall } = require('../../store/callStore').useCallStore();
-  const { activeChannelId } = useChatStore();
 
   if (!activeChannel) return null;
 

@@ -14,6 +14,7 @@ import pciRoutes from './routes/pci';
 import fileRoutes from './routes/files';
 import notificationRoutes from './routes/notifications';
 import automationRoutes from './automation/routes';
+import aiRoutes from './routes/ai';
 
 import { registerSocketHandlers } from './socket/handlers';
 import { authMiddleware } from './middleware/auth';
@@ -34,31 +35,32 @@ app.use(express.json());
 // ── Public routes ─────────────────────────────────────────
 app.use('/api/auth', authRoutes);
 
-// ── PCI webhook routes (JWT_SECRET header auth, not session) ──
+// ── PCI webhook routes (no session auth) ──────────────────
 app.use('/api/pci/scheduled-meeting', pciRoutes);
 app.use('/api/automation/dwm-trigger', automationRoutes);
 app.use('/api/automation/auto-channel', automationRoutes);
 
 // ── Protected routes ──────────────────────────────────────
-app.use('/api/users', authMiddleware, userRoutes);
-app.use('/api/channels', authMiddleware, channelRoutes);
-app.use('/api/channels', authMiddleware, fileRoutes);   // file upload per channel
-app.use('/api/messages', authMiddleware, messageRoutes);
-app.use('/api/files', authMiddleware, fileRoutes);       // file download/delete
-app.use('/api/calls', authMiddleware, callRoutes);
-app.use('/api/pci', authMiddleware, pciRoutes);
+app.use('/api/users',         authMiddleware, userRoutes);
+app.use('/api/channels',      authMiddleware, channelRoutes);
+app.use('/api/channels',      authMiddleware, fileRoutes);
+app.use('/api/messages',      authMiddleware, messageRoutes);
+app.use('/api/files',         authMiddleware, fileRoutes);
+app.use('/api/calls',         authMiddleware, callRoutes);
+app.use('/api/pci',           authMiddleware, pciRoutes);
 app.use('/api/notifications', authMiddleware, notificationRoutes);
-app.use('/api/automation', authMiddleware, automationRoutes);
+app.use('/api/automation',    authMiddleware, automationRoutes);
+app.use('/api/ai',            authMiddleware, aiRoutes);
 
 // ── Static uploads ────────────────────────────────────────
 const uploadPath = process.env.UPLOAD_PATH || path.join(__dirname, '../../uploads');
 app.use('/uploads', express.static(uploadPath));
 
-// ── Socket.io ─────────────────────────────────────────────
-registerSocketHandlers(io);
-
 // ── Health check ──────────────────────────────────────────
 app.get('/health', (_, res) => res.json({ status: 'ok', version: '1.0.0' }));
+
+// ── Socket.io ─────────────────────────────────────────────
+registerSocketHandlers(io);
 
 const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
