@@ -1,16 +1,54 @@
 import { Router, Request, Response } from 'express';
-import axios from 'axios';
+import { transcribeBuffer, generateSummary, isWhisperAvailable } from '../whisper/client';
 import pool from '../db/auth';
-import { logActivityToPCI } from '../pci/client';
+import { AuthRequest } from '../middleware/auth';
+import axios from 'axios';
 
 const router = Router();
 
+// GET /calls/history
+router.get('/history', async (req: Request, res: Response) => {
+  const userId = (req as AuthRequest).userId;
+  try {
+    const { rows } = await pool.query(
+      `SELECT cl.*,
+        json_agg(json_build_object('id', u.id, 'name', u.name, 'avatar_url', u.avatar_url)) AS participants
+       FROM call_logs cl
+       JOIN call_participants cp ON cp.call_id = cl.id
+       JOIN users u ON u.id = cp.user_id
+       WHERE cl.id IN (SELECT call_id FROM call_participants WHERE user_id = $1)
+       GROUP BY cl.id
+       ORDER BY cl.started_at DESC LIMIT 50`,
+      [userId]
+    );
+    return res.json({ success: true, data: rows });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: 'Failed to fetch history' });
+  }
+});
+
+// GET /calls/:id
+router.get('/:id', async (req: Request, res: Response) => {
+  try {
+    const { rows } = await pool.query('SELECT * FROM call_logs WHERE id = $1', [req.params.id]);
+    if (!rows[0]) return res.status(404).json({ success: false, error: 'Call not found' });
+    const { rows: participants } = await pool.query(
+      `SELECT u.id, u.name, u.avatar_url, cp.pci_person_id
+       FROM call_participants cp JOIN users u ON u.id = cp.user_id WHERE cp.call_id = $1`,
+      [req.params.id]
+    );
+    return res.json({ success: true, data: { ...rows[0], participants } });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: 'Failed to fetch call' });
+  }
+});
+
 // POST /calls/start
 router.post('/start', async (req: Request, res: Response) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthRequest).userId;
   const { channel_id, call_type } = req.body;
   if (!channel_id || !call_type) {
-    return res.status(422).json({ success: false, error: 'channel_id and call_type are required' });
+    return res.status(422).json({ success: false, error: 'channel_id and call_type required' });
   }
   try {
     const { rows } = await pool.query(
@@ -18,20 +56,11 @@ router.post('/start', async (req: Request, res: Response) => {
        VALUES ($1, $2, NOW(), $3) RETURNING *`,
       [channel_id, call_type, userId]
     );
-    const call = rows[0];
-    // Add initiator as participant
     await pool.query(
       'INSERT INTO call_participants (call_id, user_id) VALUES ($1, $2)',
-      [call.id, userId]
+      [rows[0].id, userId]
     );
-    return res.status(201).json({
-      success: true,
-      data: {
-        call_id: call.id,
-        call_type: call.call_type,
-        started_at: call.started_at,
-      }
-    });
+    return res.status(201).json({ success: true, data: { call_id: rows[0].id, call_type: rows[0].call_type } });
   } catch (err) {
     return res.status(500).json({ success: false, error: 'Failed to start call' });
   }
@@ -39,7 +68,7 @@ router.post('/start', async (req: Request, res: Response) => {
 
 // POST /calls/:id/join
 router.post('/:id/join', async (req: Request, res: Response) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthRequest).userId;
   try {
     await pool.query(
       'INSERT INTO call_participants (call_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
@@ -53,7 +82,7 @@ router.post('/:id/join', async (req: Request, res: Response) => {
 
 // POST /calls/:id/end
 router.post('/:id/end', async (req: Request, res: Response) => {
-  const userId = (req as any).userId;
+  const userId = (req as AuthRequest).userId;
   try {
     const { rows } = await pool.query(
       `UPDATE call_logs
@@ -62,7 +91,6 @@ router.post('/:id/end', async (req: Request, res: Response) => {
        WHERE id = $1 RETURNING *`,
       [req.params.id]
     );
-    // Mark participant as left
     await pool.query(
       'UPDATE call_participants SET left_at = NOW() WHERE call_id = $1 AND user_id = $2',
       [req.params.id, userId]
@@ -73,67 +101,77 @@ router.post('/:id/end', async (req: Request, res: Response) => {
   }
 });
 
-// GET /calls/:id
-router.get('/:id', async (req: Request, res: Response) => {
-  try {
-    const { rows: callRows } = await pool.query('SELECT * FROM call_logs WHERE id = $1', [req.params.id]);
-    if (!callRows[0]) return res.status(404).json({ success: false, error: 'Call not found' });
-    const { rows: participants } = await pool.query(
-      `SELECT u.id, u.name, u.avatar_url, cp.joined_at, cp.left_at, cp.pci_person_id
-       FROM call_participants cp JOIN users u ON u.id = cp.user_id WHERE cp.call_id = $1`,
-      [req.params.id]
-    );
-    return res.json({ success: true, data: { ...callRows[0], participants } });
-  } catch (err) {
-    return res.status(500).json({ success: false, error: 'Failed to fetch call' });
-  }
-});
-
-// GET /calls/history
-router.get('/history', async (req: Request, res: Response) => {
-  const userId = (req as any).userId;
-  try {
-    const { rows } = await pool.query(
-      `SELECT cl.*, 
-        json_agg(json_build_object('id', u.id, 'name', u.name)) AS participants
-       FROM call_logs cl
-       JOIN call_participants cp ON cp.call_id = cl.id
-       JOIN users u ON u.id = cp.user_id
-       WHERE cl.id IN (
-         SELECT call_id FROM call_participants WHERE user_id = $1
-       )
-       GROUP BY cl.id
-       ORDER BY cl.started_at DESC LIMIT 50`,
-      [userId]
-    );
-    return res.json({ success: true, data: rows });
-  } catch (err) {
-    return res.status(500).json({ success: false, error: 'Failed to fetch call history' });
-  }
-});
-
-// POST /calls/:id/transcribe
+// POST /calls/:id/transcribe — Whisper AI transcription
 router.post('/:id/transcribe', async (req: Request, res: Response) => {
+  const callId = req.params.id;
+
+  // Check Whisper availability
+  const available = await isWhisperAvailable();
+  if (!available) {
+    return res.status(503).json({
+      success: false,
+      error: 'Whisper AI service unavailable',
+      hint: 'Start Whisper service: docker compose up -d whisper',
+    });
+  }
+
   try {
-    // Call local Whisper AI service
-    const whisperUrl = process.env.WHISPER_API_URL || 'http://localhost:9000';
-    const { data: whisperResult } = await axios.post(`${whisperUrl}/transcribe`, req.body);
-    // Save transcript to call log
-    await pool.query(
-      'UPDATE call_logs SET transcript = $1 WHERE id = $2',
-      [whisperResult.transcript, req.params.id]
+    // Get participants for speaker labels
+    const { rows: participants } = await pool.query(
+      'SELECT u.name FROM call_participants cp JOIN users u ON u.id = cp.user_id WHERE cp.call_id = $1',
+      [callId]
     );
-    return res.json({ success: true, data: { transcript: whisperResult.transcript, ai_summary: whisperResult.summary } });
-  } catch (err) {
-    return res.status(500).json({ success: false, error: 'Transcription failed' });
+    const participantNames = participants.map((p: any) => p.name);
+
+    let result;
+
+    if (req.file) {
+      // Audio file uploaded directly
+      result = await transcribeBuffer(
+        req.file.buffer,
+        req.file.originalname,
+        participantNames
+      );
+    } else if (req.body.audio_url) {
+      // Download from URL
+      const audioResp = await axios.get(req.body.audio_url, { responseType: 'arraybuffer' });
+      const buffer = Buffer.from(audioResp.data);
+      result = await transcribeBuffer(buffer, 'call.webm', participantNames);
+    } else {
+      return res.status(400).json({ success: false, error: 'Provide audio file or audio_url' });
+    }
+
+    // Generate AI summary
+    const summary = await generateSummary(result.transcript, participantNames);
+
+    // Save to DB
+    await pool.query(
+      'UPDATE call_logs SET transcript = $1, ai_summary = $2 WHERE id = $3',
+      [result.transcript, summary.full_summary, callId]
+    );
+
+    return res.json({
+      success: true,
+      data: {
+        transcript: result.transcript,
+        lines: result.lines,
+        language: result.language,
+        duration: result.duration,
+        ai_summary: summary,
+      },
+    });
+  } catch (err: any) {
+    console.error('Transcription error:', err.message);
+    return res.status(500).json({ success: false, error: 'Transcription failed', details: err.message });
   }
 });
 
 // POST /calls/:id/log-to-pci
 router.post('/:id/log-to-pci', async (req: Request, res: Response) => {
-  const { activity_type, subject, started_at, ended_at, participant_pci_ids, entity_pci_ids, file_names, note } = req.body;
+  const { activity_type, subject, started_at, ended_at, participant_pci_ids, entity_pci_ids, note } = req.body;
   try {
     const duration = Math.round((new Date(ended_at).getTime() - new Date(started_at).getTime()) / 60000);
+    const { logActivityToPCI } = await import('../pci/client');
     const { data: pciResult } = await logActivityToPCI({
       activity_type,
       Activity_Subject: subject,
@@ -142,16 +180,15 @@ router.post('/:id/log-to-pci', async (req: Request, res: Response) => {
       Status: 'Complete',
       People: participant_pci_ids || [],
       Entities: entity_pci_ids || [],
-      Documents: file_names,
+      Note: note,
     });
-    // Mark as logged in DB
     await pool.query(
-      'UPDATE call_logs SET logged_to_pci = TRUE, pci_activity_id = $1, pci_subject = $2, ai_summary = $3 WHERE id = $4',
-      [pciResult.activity_id, subject, note, req.params.id]
+      'UPDATE call_logs SET logged_to_pci = TRUE, pci_activity_id = $1, pci_subject = $2 WHERE id = $3',
+      [pciResult.activity_id, subject, req.params.id]
     );
     return res.json({ success: true, data: { pci_activity_id: pciResult.activity_id } });
   } catch (err) {
-    return res.status(500).json({ success: false, error: 'Failed to log to PCI' });
+    return res.status(502).json({ success: false, error: 'Failed to log to PCI' });
   }
 });
 
