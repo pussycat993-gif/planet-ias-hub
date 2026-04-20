@@ -6,3 +6,4 @@ dist/
 client/dist/
 server/dist/
 docker/data/
+uploads/
