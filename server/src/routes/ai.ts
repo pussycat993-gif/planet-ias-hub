@@ -1,13 +1,91 @@
 import { Router, Request, Response } from 'express';
 import { AuthRequest } from '../middleware/auth';
 import pool from '../db/auth';
-import pciClient from '../pci/client';
+import pciClient, { logActivityToPCI } from '../pci/client';
 import axios from 'axios';
+import { askIAS, type AskResponse } from '../ai/askService';
+import { invalidateUserContext } from '../ai/contextAssembly';
 
 const router = Router();
 
 const JIRA_CLOUD_ID = process.env.JIRA_CLOUD_ID || '016ccab4-41b8-4069-b389-0e6f7385b912';
 const JIRA_BASE = `https://api.atlassian.com/ex/jira/${JIRA_CLOUD_ID}/rest/api/3`;
+
+// ── POST /ai/ask ──────────────────────────────
+// New Ask IAS endpoint. Accepts a question + optional multi-turn history,
+// returns a typed response (list | summary | table) built by askService.
+router.post('/ask', async (req: Request, res: Response) => {
+  const userId = (req as AuthRequest).userId;
+  const { question, history } = req.body;
+
+  if (!question || typeof question !== 'string' || !question.trim()) {
+    return res.status(400).json({ success: false, error: 'Question required' });
+  }
+  if (question.length > 1000) {
+    return res.status(400).json({ success: false, error: 'Question too long (max 1000 chars)' });
+  }
+
+  // Validate history shape if provided
+  const validatedHistory = Array.isArray(history)
+    ? history
+        .filter((h: any) => h && (h.role === 'user' || h.role === 'assistant') && typeof h.content === 'string')
+        .slice(-10) // cap at last 10 turns to keep prompt budget in check
+    : [];
+
+  try {
+    const response: AskResponse = await askIAS(userId, question.trim(), validatedHistory);
+    return res.json({ success: true, data: response });
+  } catch (err: any) {
+    console.error('Ask IAS error:', err);
+    return res.status(500).json({ success: false, error: 'Ask IAS failed', details: err.message });
+  }
+});
+
+// ── POST /ai/mark-done ───────────────────────────
+// Called when the user clicks Done on an Ask IAS list item. We log a
+// Complete activity to PCI referencing the source item in the Note field,
+// and invalidate the user's context cache so the item stops showing up on
+// their next question. PCI-side handling of "marking the original activity
+// complete" is out of scope here — this just records the signal.
+//
+// Body: { source_id: string, title: string, type_badge: string }
+router.post('/mark-done', async (req: Request, res: Response) => {
+  const userId = (req as AuthRequest).userId;
+  const { source_id, title, type_badge } = req.body || {};
+
+  if (!source_id || !title) {
+    return res.status(400).json({ success: false, error: 'source_id and title required' });
+  }
+
+  // Look up the user's PCI id so we can attribute the log correctly.
+  let pciPersonId: number | null = null;
+  try {
+    const { rows } = await pool.query('SELECT pci_id FROM users WHERE id = $1', [userId]);
+    pciPersonId = rows[0]?.pci_id || null;
+  } catch { /* non-fatal */ }
+
+  // Best-effort PCI log. If PCI is unreachable we still invalidate cache so
+  // the UI is consistent; the client sees success and can move on.
+  let pciOk = false;
+  try {
+    await logActivityToPCI({
+      activity_type: 'Task',
+      Activity_Subject: `Completed via Ask IAS: ${String(title).slice(0, 180)}`,
+      Activity_DateTime: new Date().toISOString(),
+      Duration: 0,
+      Status: 'Complete',
+      People: pciPersonId ? [pciPersonId] : [],
+      Entities: [],
+      Note: `Source: ${source_id} | Type: ${type_badge || 'unknown'} | Marked done from IAS Hub.`,
+    });
+    pciOk = true;
+  } catch (err: any) {
+    console.warn('Ask IAS mark-done: PCI log failed (continuing)', err.message);
+  }
+
+  invalidateUserContext(userId);
+  return res.json({ success: true, data: { source_id, pci_ok: pciOk } });
+});
 
 // ── POST /ai/query ────────────────────────────────────────
 router.post('/query', async (req: Request, res: Response) => {
