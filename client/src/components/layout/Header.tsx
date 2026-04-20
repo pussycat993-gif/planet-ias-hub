@@ -439,7 +439,7 @@ interface HeaderProps {
 
 export default function Header({ onSearch, searchQuery }: HeaderProps) {
   const { user } = useAuthStore();
-  const { myStatus, myStatusMessage, toggleAIPanel, dnd, toggleDnd } = useUIStore();
+  const { myStatus, myStatusMessage, dnd, toggleDnd } = useUIStore();
   const { selectChannel } = useChatStore();
 
   const [localSearch, setLocalSearch] = useState('');
@@ -605,15 +605,6 @@ export default function Header({ onSearch, searchQuery }: HeaderProps) {
         }>
           {close => <NotifDropdown onClose={close} onUnreadChange={setUnreadNotifs} />}
         </Popup>
-
-        {/* AI toggle */}
-        <div title="AI Assistant" onClick={toggleAIPanel}
-          style={{ display: 'flex', alignItems: 'center', gap: 4, height: 30, padding: '0 10px', borderRadius: 15, cursor: 'pointer', fontSize: 12, color: 'rgba(255,255,255,.95)', background: 'rgba(255,255,255,.12)', border: '1px solid rgba(255,255,255,.2)', fontWeight: 600, transition: 'background .15s' }}
-          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,.22)')}
-          onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,.12)')}>
-          <span style={{ fontSize: 14 }}>🤖</span>
-          <span>AI</span>
-        </div>
 
         {/* Profile chip */}
         <Popup trigger={

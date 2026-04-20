@@ -17,7 +17,6 @@ import PinnedPanel from '../channel/PinnedPanel';
 import HelpPanel from '../help/HelpPanel';
 import LogActivityModal from '../modals/LogActivityModal';
 import UpcomingMeetingBanner from '../meetings/UpcomingMeetingBanner';
-import QuickCompose from './QuickCompose';
 import AskIASModal from '../ai/AskIASModal';
 import { useChatStore } from '../../store/chatStore';
 import { useUIStore } from '../../store/uiStore';
@@ -57,13 +56,12 @@ export function Avatar({ name, avatarUrl, size = 32, logoColor, logoAbbr, logoUr
 
 export default function Layout() {
   const { fetchChannels, receiveMessage, setTyping, channels, activeChannelId, activeChannel } = useChatStore();
-  const { rightPanelOpen, aiPanelOpen, autoPanelOpen, activeThreadId } = useUIStore();
+  const { rightPanelOpen, aiPanelOpen, autoPanelOpen, activeThreadId, activeModal, closeModal } = useUIStore();
   const { user } = useAuthStore();
   const socket = useSocket();
   const [replyContext, setReplyContext] = useState<ReplyContext | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showHelp, setShowHelp] = useState(false);
-  const [showQuickSchedule, setShowQuickSchedule] = useState(false);
 
   // Auto-detected meeting suggestion from incoming messages
   const [autoDetected, setAutoDetected] = useState<{
@@ -195,9 +193,8 @@ export default function Layout() {
         <span style={{ fontSize: 10, opacity: .7 }}>Design by PLANet Systems Group | © IAS Hub 2026. All rights reserved.</span>
       </div>
 
-      {/* Quick-compose floating "+" — schedule modal mounted here too */}
-      <QuickCompose onScheduleMeeting={() => setShowQuickSchedule(true)} />
-      {showQuickSchedule && activeChannelId && activeChannel && (
+      {/* Schedule Meeting modal — triggered from Toolbar's "+ New" dropdown */}
+      {activeModal === 'scheduleMeeting' && activeChannelId && activeChannel && (
         <ScheduleMeetModal
           channelId={activeChannelId}
           channelName={
@@ -205,7 +202,7 @@ export default function Layout() {
               ? activeChannel.other_user?.name || activeChannel.name
               : activeChannel.name
           }
-          onClose={() => setShowQuickSchedule(false)}
+          onClose={closeModal}
         />
       )}
       {/* Ask IAS modal — global, toggled by Cmd+K or the header button */}
