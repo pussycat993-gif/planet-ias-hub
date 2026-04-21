@@ -89,6 +89,16 @@ export const useCallStore = create<CallState>((set, get) => ({
         localStream: null,
         remoteStreams: new Map(),
       });
+
+      // Auto-set presence to 'in_call' so teammates see "In a call" badge
+      // on the caller's avatar until they hang up. Fire-and-forget — a
+      // network hiccup here should never break the call itself.
+      try {
+        const authState = (await import('./authStore')).useAuthStore.getState();
+        if (authState.user) {
+          await authState.setAutoStatus('in_call', null);
+        }
+      } catch { /* ignore */ }
     } catch (err) {
       console.error('startCall error:', err);
     }
@@ -101,6 +111,18 @@ export const useCallStore = create<CallState>((set, get) => ({
     try {
       if (callId) await axios.post(`${API}/calls/${callId}/end`);
     } catch { /* ignore */ }
+
+    // Clear the 'in_call' auto-status. If the user has Focus mode active,
+    // callStore shouldn't touch it — Focus is set by SetStatusModal only,
+    // so we check before clearing.
+    try {
+      const authModule = await import('./authStore');
+      const authState = authModule.useAuthStore.getState();
+      if (authState.user?.auto_status === 'in_call') {
+        await authState.setAutoStatus(null, null);
+      }
+    } catch { /* ignore */ }
+
     set({
       active: false,
       callId: null,

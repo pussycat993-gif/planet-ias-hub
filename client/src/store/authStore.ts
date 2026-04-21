@@ -10,6 +10,11 @@ interface User {
   avatar_url?: string;
   status: string;
   status_message?: string;
+  status_emoji?: string | null;
+  auto_status?: 'in_call' | 'in_meeting' | 'focus' | 'away_auto' | null;
+  auto_status_until?: string | null;
+  timezone?: string | null;
+  last_seen_at?: string | null;
 }
 
 interface AuthState {
@@ -24,6 +29,9 @@ interface AuthState {
   clearError: () => void;
   setStatus: (status: string) => Promise<void>;
   setStatusMessage: (message: string) => Promise<void>;
+  setStatusEmoji: (emoji: string | null) => Promise<void>;
+  setAutoStatus: (auto: 'in_call' | 'in_meeting' | 'focus' | 'away_auto' | null, until?: string | null) => Promise<void>;
+  setTimezone: (tz: string | null) => Promise<void>;
 }
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
@@ -89,6 +97,33 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       await axios.patch(`${API}/users/${user.id}/status-message`, { status_message: message });
       set({ user: { ...user, status_message: message } });
+    } catch { /* ignore */ }
+  },
+
+  setStatusEmoji: async (emoji: string | null) => {
+    const { user, token } = get();
+    if (!user || !token) return;
+    try {
+      await axios.patch(`${API}/users/${user.id}/status-emoji`, { status_emoji: emoji });
+      set({ user: { ...user, status_emoji: emoji } });
+    } catch { /* ignore */ }
+  },
+
+  setAutoStatus: async (auto, until) => {
+    const { user, token } = get();
+    if (!user || !token) return;
+    try {
+      await axios.patch(`${API}/users/${user.id}/auto-status`, { auto_status: auto, until: until || null });
+      set({ user: { ...user, auto_status: auto, auto_status_until: until || null } });
+    } catch { /* ignore */ }
+  },
+
+  setTimezone: async (tz: string | null) => {
+    const { user, token } = get();
+    if (!user || !token) return;
+    try {
+      await axios.patch(`${API}/users/${user.id}/timezone`, { timezone: tz });
+      set({ user: { ...user, timezone: tz } });
     } catch { /* ignore */ }
   },
 }));

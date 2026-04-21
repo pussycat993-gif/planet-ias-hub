@@ -9,7 +9,10 @@ const router = Router();
 router.get('/', async (req: Request, res: Response) => {
   try {
     const { rows } = await pool.query(
-      `SELECT id, name, email, avatar_url, role, user_type, status, status_message, last_seen_at
+      `SELECT id, name, email, avatar_url, role, user_type,
+              status, status_message, status_emoji,
+              auto_status, auto_status_until,
+              timezone, last_seen_at
        FROM users ORDER BY name ASC`
     );
     return res.json({ success: true, data: rows });
@@ -79,7 +82,11 @@ router.put('/me/preferences', async (req: Request, res: Response) => {
 router.get('/:id', async (req: Request, res: Response) => {
   try {
     const { rows } = await pool.query(
-      'SELECT id, name, email, avatar_url, role, user_type, status, status_message FROM users WHERE id = $1',
+      `SELECT id, name, email, avatar_url, role, user_type,
+              status, status_message, status_emoji,
+              auto_status, auto_status_until,
+              timezone, last_seen_at
+       FROM users WHERE id = $1`,
       [req.params.id]
     );
     if (!rows[0]) return res.status(404).json({ success: false, error: 'User not found' });
@@ -118,6 +125,58 @@ router.patch('/:id/status-message', async (req: Request, res: Response) => {
     return res.json({ success: true, data: { status_message } });
   } catch (err) {
     return res.status(500).json({ success: false, error: 'Failed to update status message' });
+  }
+});
+
+// PATCH /users/:id/status-emoji — custom emoji next to the user's name
+router.patch('/:id/status-emoji', async (req: Request, res: Response) => {
+  const { status_emoji } = req.body;
+  // Keep it short: a single emoji grapheme, up to 10 bytes (covers ZWJ sequences).
+  const clean = typeof status_emoji === 'string' && status_emoji.trim() ? status_emoji.trim().slice(0, 10) : null;
+  try {
+    await pool.query(
+      'UPDATE users SET status_emoji = $1, updated_at = NOW() WHERE id = $2',
+      [clean, req.params.id]
+    );
+    return res.json({ success: true, data: { status_emoji: clean } });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: 'Failed to update status emoji' });
+  }
+});
+
+// PATCH /users/:id/auto-status — set or clear an automatic status
+// Body: { auto_status: 'in_call' | 'in_meeting' | 'focus' | 'away_auto' | null,
+//         until?: ISO datetime string }
+router.patch('/:id/auto-status', async (req: Request, res: Response) => {
+  const { auto_status, until } = req.body;
+  const validAutos = ['in_call', 'in_meeting', 'focus', 'away_auto', null];
+  if (auto_status !== null && auto_status !== undefined && !validAutos.includes(auto_status)) {
+    return res.status(422).json({ success: false, error: 'Invalid auto_status' });
+  }
+  const untilIso = until ? new Date(until).toISOString() : null;
+  try {
+    await pool.query(
+      'UPDATE users SET auto_status = $1, auto_status_until = $2, updated_at = NOW() WHERE id = $3',
+      [auto_status || null, untilIso, req.params.id]
+    );
+    return res.json({ success: true, data: { auto_status: auto_status || null, auto_status_until: untilIso } });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: 'Failed to update auto-status' });
+  }
+});
+
+// PATCH /users/:id/timezone
+router.patch('/:id/timezone', async (req: Request, res: Response) => {
+  const { timezone } = req.body;
+  const clean = typeof timezone === 'string' && timezone.trim() ? timezone.trim().slice(0, 60) : null;
+  try {
+    await pool.query(
+      'UPDATE users SET timezone = $1, updated_at = NOW() WHERE id = $2',
+      [clean, req.params.id]
+    );
+    return res.json({ success: true, data: { timezone: clean } });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: 'Failed to update timezone' });
   }
 });
 

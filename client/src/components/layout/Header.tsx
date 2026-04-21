@@ -95,21 +95,28 @@ function HelpModal({ onClose }: { onClose: () => void }) {
 
 // ── Profile dropdown ──────────────────────────────────────
 function ProfileDropdown({ onClose, onOpenHelp }: { onClose: () => void; onOpenHelp: () => void }) {
-  const { user, logout } = useAuthStore();
-  const { myStatus, myStatusMessage, setMyStatus, setMyStatusMessage, dnd, toggleDnd } = useUIStore();
-  const [statusMsg, setStatusMsg] = useState(myStatusMessage || '');
-  const [editingStatus, setEditingStatus] = useState(false);
+  const { user, logout, setAutoStatus } = useAuthStore();
+  const { myStatus, myStatusMessage, setMyStatus, setMyStatusMessage, dnd, toggleDnd, openModal } = useUIStore();
 
-  const statusColor = myStatus === 'online' ? '#4caf50' : myStatus === 'away' ? '#ff9800' : '#bbb';
+  // Auto-status takes precedence over the manual status.
+  const autoStatus = user?.auto_status;
+  const manualColor = myStatus === 'online' ? '#4caf50' : myStatus === 'away' ? '#ff9800' : '#bbb';
+  const statusColor = autoStatus === 'focus' ? '#e65100'
+    : autoStatus === 'in_call' ? '#2e7d32'
+    : manualColor;
+  const autoLabel = autoStatus === 'focus' ? '🎯 Focus mode'
+    : autoStatus === 'in_call' ? '📞 In a call'
+    : autoStatus === 'in_meeting' ? '🎥 In a meeting'
+    : null;
 
   const applyStatus = (s: 'online' | 'away' | 'offline') => {
     setMyStatus(s);
     if (user) axios.patch(`${API}/users/${user.id}/status`, { status: s }).catch(() => {});
   };
-  const applyMsg = (m: string) => {
-    setMyStatusMessage(m);
-    if (user) axios.patch(`${API}/users/${user.id}/status-message`, { status_message: m }).catch(() => {});
-    setEditingStatus(false);
+
+  const clearAutoStatus = async () => {
+    await setAutoStatus(null, null);
+    if (autoStatus === 'focus' && dnd) toggleDnd();
   };
 
   const initials = (user?.name || 'U').split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2);
@@ -122,10 +129,24 @@ function ProfileDropdown({ onClose, onOpenHelp }: { onClose: () => void; onOpenH
           {user?.avatar_url ? (
             <img src={user.avatar_url} alt={user.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           ) : initials}
-          <div style={{ position: 'absolute', bottom: 3, right: 3, width: 14, height: 14, borderRadius: '50%', background: statusColor, border: '2.5px solid #fff' }} />
+          {/* Emoji overlay if set, else status dot */}
+          {user?.status_emoji ? (
+            <div style={{ position: 'absolute', bottom: -2, right: -2, width: 26, height: 26, borderRadius: '50%', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, boxShadow: '0 1px 3px rgba(0,0,0,.2)' }}>
+              {user.status_emoji}
+            </div>
+          ) : (
+            <div style={{ position: 'absolute', bottom: 3, right: 3, width: 14, height: 14, borderRadius: '50%', background: statusColor, border: '2.5px solid #fff' }} />
+          )}
         </div>
         <div style={{ fontWeight: 700, fontSize: 16, color: '#1a1a2e', marginBottom: 3 }}>{user?.name || 'User'}</div>
-        <div style={{ fontSize: 12, color: '#888' }}>{user?.email || 'ivana.vrtunic@planetsg.com'}</div>
+        <div style={{ fontSize: 12, color: '#888' }}>{user?.email || ''}</div>
+
+        {(autoLabel || myStatusMessage) && (
+          <div style={{ marginTop: 8, display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 10px', background: autoStatus === 'focus' ? '#fff3e0' : '#f0f7ff', border: `1px solid ${autoStatus === 'focus' ? '#ffcc80' : '#c5def9'}`, borderRadius: 12, fontSize: 11, color: autoStatus === 'focus' ? '#e65100' : BLUE_DARK, fontWeight: 600 }}>
+            {autoLabel ? <span>{autoLabel}</span> : <span>💬 {myStatusMessage}</span>}
+          </div>
+        )}
+
         <button style={{ marginTop: 12, width: '100%', padding: '8px 12px', border: '1px solid #dde1e7', borderRadius: 8, background: '#fff', cursor: 'pointer', fontSize: 13, fontFamily: 'inherit', fontWeight: 600, color: '#1a1a2e' }}
           onMouseEnter={e => (e.currentTarget.style.background = '#f5f5f5')}
           onMouseLeave={e => (e.currentTarget.style.background = '#fff')}>
@@ -135,29 +156,37 @@ function ProfileDropdown({ onClose, onOpenHelp }: { onClose: () => void; onOpenH
 
       {/* Status section */}
       <div style={{ borderBottom: '1px solid #f0f0f0' }}>
-        <div onClick={() => setEditingStatus(e => !e)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', cursor: 'pointer' }}
+        <div
+          onClick={() => { openModal('setStatus'); onClose(); }}
+          style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', cursor: 'pointer' }}
           onMouseEnter={e => (e.currentTarget.style.background = '#f5f5f5')}
           onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-          <span style={{ fontSize: 18, width: 22, textAlign: 'center' }}>😊</span>
-          <span style={{ fontSize: 14, color: '#1a1a2e' }}>Update your status</span>
+          <span style={{ fontSize: 18, width: 22, textAlign: 'center' }}>
+            {user?.status_emoji || '😊'}
+          </span>
+          <span style={{ fontSize: 14, color: '#1a1a2e', flex: 1 }}>
+            {user?.status_emoji || myStatusMessage ? 'Update status & emoji' : 'Set a status & emoji'}
+          </span>
+          <span style={{ fontSize: 12, color: '#bbb' }}>›</span>
         </div>
-        {editingStatus && (
-          <div style={{ padding: '0 16px 10px' }}>
-            <input value={statusMsg} onChange={e => setStatusMsg(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') applyMsg(statusMsg); if (e.key === 'Escape') setEditingStatus(false); }}
-              placeholder="What's your status?" autoFocus
-              style={{ width: '100%', padding: '7px 10px', border: '1px solid #dde1e7', borderRadius: 7, fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
-            <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
-              <button onClick={() => applyMsg(statusMsg)} style={{ flex: 1, padding: '6px', background: BLUE, color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 12, fontFamily: 'inherit', fontWeight: 600 }}>Save</button>
-              <button onClick={() => setEditingStatus(false)} style={{ padding: '6px 10px', background: '#fff', border: '1px solid #dde1e7', borderRadius: 6, cursor: 'pointer', fontSize: 12, fontFamily: 'inherit' }}>Cancel</button>
-            </div>
+
+        {autoLabel && (
+          <div
+            onClick={clearAutoStatus}
+            style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', cursor: 'pointer', background: '#fff8e1' }}
+            onMouseEnter={e => (e.currentTarget.style.background = '#fff3e0')}
+            onMouseLeave={e => (e.currentTarget.style.background = '#fff8e1')}>
+            <span style={{ fontSize: 18, width: 22, textAlign: 'center' }}>{autoStatus === 'focus' ? '🎯' : autoStatus === 'in_call' ? '📞' : '🎥'}</span>
+            <span style={{ fontSize: 12, color: '#e65100', flex: 1, fontWeight: 600 }}>{autoLabel}</span>
+            <span style={{ fontSize: 11, color: '#888' }}>Clear</span>
           </div>
         )}
+
         <div onClick={() => applyStatus(myStatus === 'away' ? 'online' : 'away')} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', cursor: 'pointer' }}
           onMouseEnter={e => (e.currentTarget.style.background = '#f5f5f5')}
           onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
           <span style={{ width: 22, textAlign: 'center' }}>
-            <span style={{ width: 12, height: 12, borderRadius: '50%', background: statusColor, display: 'inline-block' }} />
+            <span style={{ width: 12, height: 12, borderRadius: '50%', background: manualColor, display: 'inline-block' }} />
           </span>
           <span style={{ fontSize: 14, color: '#1a1a2e' }}>Set yourself as <strong>{myStatus === 'away' ? 'online' : 'away'}</strong></span>
         </div>
@@ -448,8 +477,18 @@ export default function Header({ onSearch, searchQuery }: HeaderProps) {
   const [unreadNotifs, setUnreadNotifs] = useState(0);
   const searchRef = useRef<HTMLDivElement>(null);
 
-  const statusColor = myStatus === 'online' ? '#4caf50' : myStatus === 'away' ? '#ff9800' : '#bbb';
-  const statusLabel = myStatus === 'online' ? '● Online' : myStatus === 'away' ? '● Away' : '● Offline';
+  // Auto-status takes precedence in the header chip (like ProfileDropdown does).
+  const autoStatus = user?.auto_status;
+  const manualColor = myStatus === 'online' ? '#4caf50' : myStatus === 'away' ? '#ff9800' : '#bbb';
+  const statusColor = autoStatus === 'focus' ? '#e65100'
+    : autoStatus === 'in_call' ? '#2e7d32'
+    : manualColor;
+  const statusLine = autoStatus === 'focus' ? 'Focus mode'
+    : autoStatus === 'in_call' ? 'In a call'
+    : autoStatus === 'in_meeting' ? 'In a meeting'
+    : myStatusMessage
+      ? myStatusMessage
+      : myStatus === 'online' ? '● Online' : myStatus === 'away' ? '● Away' : '● Offline';
 
   // Load initial unread count
   useEffect(() => {
@@ -615,11 +654,18 @@ export default function Header({ onSearch, searchQuery }: HeaderProps) {
               {user?.avatar_url ? (
                 <img src={user.avatar_url} alt={user.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : user?.name?.charAt(0)}
-              <div style={{ position: 'absolute', bottom: 0, right: 0, width: 9, height: 9, borderRadius: '50%', background: statusColor, border: `2px solid ${BLUE_DARK}` }} />
+              {/* Corner indicator: custom emoji > status dot */}
+              {user?.status_emoji ? (
+                <div style={{ position: 'absolute', bottom: -2, right: -2, width: 16, height: 16, borderRadius: '50%', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, boxShadow: '0 0 0 1.5px rgba(0,0,0,.1)' }}>
+                  {user.status_emoji}
+                </div>
+              ) : (
+                <div style={{ position: 'absolute', bottom: 0, right: 0, width: 9, height: 9, borderRadius: '50%', background: statusColor, border: `2px solid ${BLUE_DARK}` }} />
+              )}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <span style={{ fontSize: 12, color: '#fff', fontWeight: 500 }}>{user?.name}</span>
-              <span style={{ fontSize: 10, color: 'rgba(255,255,255,.7)' }}>{myStatusMessage || statusLabel}</span>
+              <span style={{ fontSize: 10, color: autoStatus === 'focus' ? '#ffcc80' : autoStatus === 'in_call' ? '#a5d6a7' : 'rgba(255,255,255,.7)', fontWeight: autoStatus ? 600 : 400 }}>{statusLine}</span>
             </div>
             <span style={{ color: 'rgba(255,255,255,.5)', fontSize: 10 }}>▾</span>
           </div>

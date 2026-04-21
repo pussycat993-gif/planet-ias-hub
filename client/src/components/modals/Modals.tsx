@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useUIStore } from '../../store/uiStore';
 import { useChatStore } from '../../store/chatStore';
+import SetStatusModal from './SetStatusModal';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 const BLUE = '#1976d2';
@@ -284,5 +285,6 @@ export default function Modals() {
   if (activeModal === 'newChannel') return <NewChannelModal onClose={closeModal} />;
   if (activeModal === 'newGroup') return <NewGroupModal onClose={closeModal} />;
   if (activeModal === 'newMessage') return <NewMessageModal onClose={closeModal} />;
+  if (activeModal === 'setStatus') return <SetStatusModal onClose={closeModal} />;
   return null;
 }
