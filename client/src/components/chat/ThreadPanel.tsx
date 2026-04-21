@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useChatStore, Message } from '../../store/chatStore';
 import { useAuthStore } from '../../store/authStore';
 import { useUIStore } from '../../store/uiStore';
+import { useThreadLastViewed } from '../../hooks/useThreadLastViewed';
 import { getSocket } from '../../hooks/useSocket';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
@@ -72,13 +73,16 @@ export default function ThreadPanel() {
   const { activeThreadId, closeThread } = useUIStore();
   const { activeChannelId } = useChatStore();
   const { user } = useAuthStore();
+  const { markViewed } = useThreadLastViewed();
 
   const [parent, setParent] = useState<Message | null>(null);
   const [replies, setReplies] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [text, setText] = useState('');
   const [sending, setSending] = useState(false);
+  const [alsoSendToChannel, setAlsoSendToChannel] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Fetch thread on open
   useEffect(() => {
@@ -92,6 +96,22 @@ export default function ThreadPanel() {
       .catch(err => console.error('Fetch thread error:', err))
       .finally(() => setLoading(false));
   }, [activeThreadId]);
+
+  // Auto-focus composer when thread opens (after loading settles)
+  useEffect(() => {
+    if (!loading && activeThreadId) {
+      // Small delay to let the panel layout settle
+      const t = setTimeout(() => textareaRef.current?.focus(), 120);
+      return () => clearTimeout(t);
+    }
+  }, [loading, activeThreadId]);
+
+  // Mark thread as viewed whenever we see new replies (or open the panel)
+  useEffect(() => {
+    if (!activeThreadId || loading) return;
+    const newest = replies.length > 0 ? replies[replies.length - 1].created_at : parent?.created_at;
+    if (newest) markViewed(activeThreadId, newest);
+  }, [activeThreadId, loading, replies.length, parent?.created_at, markViewed]);
 
   // Listen for new replies via socket
   useEffect(() => {
@@ -122,9 +142,11 @@ export default function ThreadPanel() {
   const handleSend = async () => {
     if (!text.trim() || !activeThreadId || !activeChannelId) return;
     setSending(true);
+    const body = text.trim();
     try {
+      // 1) Send as a thread reply
       const { data } = await axios.post(`${API}/messages/${activeChannelId}/messages`, {
-        body: text.trim(),
+        body,
         reply_to_id: activeThreadId,
       });
       // Optimistically append — socket echo will be deduped
@@ -132,7 +154,15 @@ export default function ThreadPanel() {
         if (prev.some(r => r.id === data.data.id)) return prev;
         return [...prev, data.data];
       });
+
+      // 2) If "Also send to channel" is checked, post as a top-level message too.
+      //    This mirrors Slack's behavior so a reply can surface in the main channel.
+      if (alsoSendToChannel) {
+        axios.post(`${API}/messages/${activeChannelId}/messages`, { body }).catch(() => {});
+      }
+
       setText('');
+      setAlsoSendToChannel(false);
     } catch (err) {
       console.error('Thread send error:', err);
     }
@@ -191,34 +221,60 @@ export default function ThreadPanel() {
       </div>
 
       {/* Composer */}
-      <div style={{ borderTop: '1px solid #eee', padding: '10px 12px', flexShrink: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          {user && <Avatar name={user.name} avatarUrl={user.avatar_url} size={28} />}
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', border: '1px solid #dde1e7', borderRadius: 10, padding: '5px 10px', background: '#f8f9fa' }}>
-            <input
-              type="text"
+      <div style={{ borderTop: '1px solid #eee', padding: '10px 12px', flexShrink: 0, background: '#fff' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+          {user && <div style={{ paddingTop: 4 }}><Avatar name={user.name} avatarUrl={user.avatar_url} size={28} /></div>}
+          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <textarea
+              ref={textareaRef}
               value={text}
               onChange={e => setText(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+              onKeyDown={e => {
+                if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
+              }}
               placeholder="Reply in thread…"
               disabled={sending || loading}
-              style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: 13, color: '#1a1a2e', fontFamily: 'inherit' }}
+              rows={Math.max(1, Math.min(6, (text.match(/\n/g) || []).length + 1))}
+              style={{
+                width: '100%', boxSizing: 'border-box',
+                border: '1px solid #dde1e7', borderRadius: 10,
+                padding: '8px 12px',
+                fontSize: 13, fontFamily: 'inherit', outline: 'none',
+                background: '#f8f9fa', color: '#1a1a2e',
+                resize: 'vertical', minHeight: 36,
+                lineHeight: 1.5,
+              }}
+              onFocus={e => (e.currentTarget.style.background = '#fff')}
+              onBlur={e => (e.currentTarget.style.background = '#f8f9fa')}
             />
+
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: '#666', cursor: 'pointer', userSelect: 'none' }}>
+                <input
+                  type="checkbox"
+                  checked={alsoSendToChannel}
+                  onChange={e => setAlsoSendToChannel(e.target.checked)}
+                  style={{ cursor: 'pointer' }}
+                />
+                <span>Also send to channel</span>
+              </label>
+
+              <button
+                onClick={handleSend}
+                disabled={!text.trim() || sending || loading}
+                style={{
+                  padding: '6px 16px',
+                  background: text.trim() && !sending ? BLUE : '#e0e0e0',
+                  color: text.trim() && !sending ? '#fff' : '#aaa',
+                  border: 'none', borderRadius: 8,
+                  cursor: text.trim() && !sending ? 'pointer' : 'not-allowed',
+                  fontSize: 12, fontWeight: 700, fontFamily: 'inherit',
+                }}
+              >
+                {sending ? 'Sending…' : 'Send'}
+              </button>
+            </div>
           </div>
-          <button
-            onClick={handleSend}
-            disabled={!text.trim() || sending || loading}
-            style={{
-              padding: '7px 14px',
-              background: text.trim() && !sending ? BLUE : '#e0e0e0',
-              color: text.trim() && !sending ? '#fff' : '#aaa',
-              border: 'none', borderRadius: 8,
-              cursor: text.trim() && !sending ? 'pointer' : 'not-allowed',
-              fontSize: 12, fontWeight: 700, fontFamily: 'inherit',
-            }}
-          >
-            {sending ? '⏳' : 'Send'}
-          </button>
         </div>
       </div>
     </div>

@@ -4,6 +4,7 @@ import { useChatStore, Message } from '../../store/chatStore';
 import { useAuthStore } from '../../store/authStore';
 import { useUIStore } from '../../store/uiStore';
 import { useLastRead } from '../../hooks/useLastRead';
+import { useThreadLastViewed } from '../../hooks/useThreadLastViewed';
 import UserProfileModal from '../modals/UserProfileModal';
 import TranscriptionModal from '../modals/TranscriptionModal';
 import LogActivityModal from '../modals/LogActivityModal';
@@ -21,6 +22,31 @@ function stringToColor(str: string): string {
 
 function formatTime(dateStr: string) {
   return new Date(dateStr).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+}
+
+// Relative time for thread-reply timestamps: "just now", "5m ago", "2h ago",
+// "yesterday", "Mon 14:23", or full date for older messages.
+function formatRelativeTime(dateStr: string): string {
+  const d = new Date(dateStr);
+  const now = new Date();
+  const diffMs = now.getTime() - d.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  const diffHr = Math.floor(diffMin / 60);
+  const diffDay = Math.floor(diffHr / 24);
+
+  if (diffMin < 1) return 'just now';
+  if (diffMin < 60) return `${diffMin}m ago`;
+  if (diffHr < 24 && d.toDateString() === now.toDateString()) return `${diffHr}h ago`;
+
+  const yest = new Date(now); yest.setDate(now.getDate() - 1);
+  if (d.toDateString() === yest.toDateString()) {
+    return `yesterday at ${d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
+  }
+  if (diffDay < 7) {
+    return d.toLocaleDateString('en-US', { weekday: 'short' }) + ' ' +
+           d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  }
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
 function formatDate(dateStr: string) {
@@ -380,6 +406,7 @@ function MessageRow({ msg, prevMsg, isGroup, onReply, onPin, onProfileClick, pin
   const editMessageAction = useChatStore(s => s.editMessage);
   const deleteMessageAction = useChatStore(s => s.deleteMessage);
   const togglePinMessageAction = useChatStore(s => s.togglePinMessage);
+  const { hasUnread: threadHasUnread } = useThreadLastViewed();
 
   const [hovered, setHovered] = useState(false);
   const [showEmoji, setShowEmoji] = useState(false);
@@ -523,27 +550,51 @@ function MessageRow({ msg, prevMsg, isGroup, onReply, onPin, onProfileClick, pin
           </div>
         )}
 
-        {/* Thread indicator — shows reply count and last-reply time */}
-        {(msg.thread_count || 0) > 0 && (
-          <div onClick={() => useUIStore.getState().openThread(msg.id)}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 4,
-              padding: '3px 9px', borderRadius: 14, cursor: 'pointer',
-              background: '#f0f7ff', border: '1px solid #c5def9',
-              fontSize: 11, color: BLUE_DARK, fontWeight: 600,
-              transition: 'all .15s',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.background = '#e3f2fd'; e.currentTarget.style.borderColor = BLUE; }}
-            onMouseLeave={e => { e.currentTarget.style.background = '#f0f7ff'; e.currentTarget.style.borderColor = '#c5def9'; }}>
-            <span style={{ fontSize: 12 }}>💬</span>
-            <span>{msg.thread_count} {msg.thread_count === 1 ? 'reply' : 'replies'}</span>
-            {msg.thread_last_reply_at && (
-              <span style={{ color: '#888', fontWeight: 400, fontSize: 10 }}>
-                · Last reply {formatTime(msg.thread_last_reply_at)}
-              </span>
-            )}
-          </div>
-        )}
+        {/* Thread indicator — avatars of respondents + reply count + relative time + unread badge */}
+        {(msg.thread_count || 0) > 0 && (() => {
+          const unread = threadHasUnread(msg.id, msg.thread_last_reply_at);
+          const participants = msg.thread_participants || [];
+          return (
+            <div onClick={() => useUIStore.getState().openThread(msg.id)}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 7, marginTop: 4,
+                padding: '3px 10px 3px 4px', borderRadius: 14, cursor: 'pointer',
+                background: unread ? '#e3f2fd' : '#f0f7ff',
+                border: `1px solid ${unread ? BLUE : '#c5def9'}`,
+                fontSize: 11, color: BLUE_DARK, fontWeight: unread ? 700 : 600,
+                transition: 'all .15s',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#e3f2fd'; e.currentTarget.style.borderColor = BLUE; }}
+              onMouseLeave={e => { e.currentTarget.style.background = unread ? '#e3f2fd' : '#f0f7ff'; e.currentTarget.style.borderColor = unread ? BLUE : '#c5def9'; }}>
+              {/* Overlapping participant avatars */}
+              {participants.length > 0 ? (
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  {participants.map((p, i) => (
+                    <div key={p.id} style={{ marginLeft: i === 0 ? 0 : -6, border: '1.5px solid #fff', borderRadius: '50%', width: 20, height: 20, flexShrink: 0 }}>
+                      <Avatar name={p.name} avatarUrl={p.avatar_url || undefined} size={17} />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <span style={{ fontSize: 12, marginLeft: 2 }}>💬</span>
+              )}
+              <span>{msg.thread_count} {msg.thread_count === 1 ? 'reply' : 'replies'}</span>
+              {msg.thread_last_reply_at && (
+                <span style={{ color: '#888', fontWeight: 400, fontSize: 10 }}>
+                  · Last reply {formatRelativeTime(msg.thread_last_reply_at)}
+                </span>
+              )}
+              {unread && (
+                <span style={{
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  background: '#ef5350', color: '#fff', fontSize: 9, fontWeight: 700,
+                  borderRadius: 8, padding: '1px 6px', marginLeft: 2,
+                  textTransform: 'uppercase', letterSpacing: '.04em',
+                }}>New</span>
+              )}
+            </div>
+          );
+        })()}
       </div>
 
       {hovered && !editing && (

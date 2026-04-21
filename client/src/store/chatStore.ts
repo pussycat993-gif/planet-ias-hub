@@ -24,6 +24,7 @@ export interface Message {
   reactions: Array<{ emoji: string; user_id: number }>;
   thread_count?: number;
   thread_last_reply_at?: string | null;
+  thread_participants?: Array<{ id: number; name: string; avatar_url: string | null }>;
   created_at: string;
   deleted_at: string | null;
 }

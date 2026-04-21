@@ -79,6 +79,34 @@ router.get('/:channelId/messages', async (req: Request, res: Response) => {
     }
     query += ` GROUP BY m.id, u.id, f.id ORDER BY m.created_at DESC LIMIT $2`;
     const { rows } = await pool.query(query, params);
+
+    // Fetch thread participants for messages that have replies
+    // (up to 3 most recent distinct responders per parent)
+    const parentIdsWithReplies = rows.filter(r => r.thread_count > 0).map(r => r.id);
+    const participantsByParent: Record<number, Array<{ id: number; name: string; avatar_url: string | null }>> = {};
+    if (parentIdsWithReplies.length > 0) {
+      const { rows: partRows } = await pool.query(
+        `SELECT DISTINCT ON (m.reply_to_id, u.id)
+           m.reply_to_id, u.id, u.name, u.avatar_url, m.created_at
+         FROM messages m
+         JOIN users u ON u.id = m.sender_id
+         WHERE m.reply_to_id = ANY($1::int[])
+           AND m.deleted_at IS NULL
+         ORDER BY m.reply_to_id, u.id, m.created_at DESC`,
+        [parentIdsWithReplies]
+      );
+      // Group by parent, keep first 3 distinct participants (ordered by latest activity)
+      for (const p of partRows) {
+        if (!participantsByParent[p.reply_to_id]) participantsByParent[p.reply_to_id] = [];
+        if (participantsByParent[p.reply_to_id].length < 3) {
+          participantsByParent[p.reply_to_id].push({ id: p.id, name: p.name, avatar_url: p.avatar_url });
+        }
+      }
+    }
+    for (const r of rows) {
+      r.thread_participants = participantsByParent[r.id] || [];
+    }
+
     const hasMore = rows.length > parseInt(limit as string);
     const messages = hasMore ? rows.slice(0, -1).reverse() : rows.reverse();
     return res.json({ success: true, data: { messages, has_more: hasMore } });
