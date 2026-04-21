@@ -62,8 +62,13 @@ function ConnectionIndicator() {
 function HelpModal({ onClose }: { onClose: () => void }) {
   const rows: [string, string][] = [
     ['Cmd / Ctrl + K',    'Focus search'],
+    ['Cmd / Ctrl + Shift + F', 'Open global search (filters, messages, files)'],
     ['Cmd / Ctrl + N',    'New direct message'],
     ['Cmd / Ctrl + Shift + M', 'Toggle Do Not Disturb'],
+    ['Cmd / Ctrl + B',     'Bold selection'],
+    ['Cmd / Ctrl + I',     'Italic selection'],
+    ['Cmd / Ctrl + E',     'Inline code'],
+    ['Shift + Enter',      'New line in composer'],
     ['Esc',                'Close modal or dropdown'],
     ['↑ / ↓ in search',   'Navigate results'],
     ['Enter in search',   'Open selected result'],
@@ -515,6 +520,19 @@ export default function Header({ onSearch, searchQuery }: HeaderProps) {
     document.addEventListener('keydown', h);
     return () => document.removeEventListener('keydown', h);
   }, [toggleDnd]);
+
+  // Keyboard: Cmd/Ctrl + Shift + F opens the global search modal.
+  // This is the canonical Slack/Linear shortcut for powerful search.
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.key === 'f' || e.key === 'F')) {
+        e.preventDefault();
+        useUIStore.getState().openGlobalSearch();
+      }
+    };
+    document.addEventListener('keydown', h);
+    return () => document.removeEventListener('keydown', h);
+  }, []);
 
   // Keyboard: Cmd/Ctrl + K toggles Ask IAS. If the modal is already open we
   // just focus its prompt input (via the store's focus token) instead of

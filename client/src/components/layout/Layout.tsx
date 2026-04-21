@@ -18,6 +18,7 @@ import HelpPanel from '../help/HelpPanel';
 import LogActivityModal from '../modals/LogActivityModal';
 import UpcomingMeetingBanner from '../meetings/UpcomingMeetingBanner';
 import AskIASModal from '../ai/AskIASModal';
+import SearchModal from '../modals/SearchModal';
 import { useChatStore } from '../../store/chatStore';
 import { useUIStore } from '../../store/uiStore';
 import { useAuthStore } from '../../store/authStore';
@@ -207,6 +208,9 @@ export default function Layout() {
       )}
       {/* Ask IAS modal — global, toggled by Cmd+K or the header button */}
       <AskIASModal />
+
+      {/* Global search modal — opened by Cmd+Shift+F from anywhere */}
+      <SearchModal />
     </div>
   );
 }

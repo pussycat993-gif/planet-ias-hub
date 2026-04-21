@@ -17,6 +17,7 @@ import transcribeRoutes from './routes/transcribe';
 import meetingRoutes from './routes/meetings';
 import automationRoutes from './automation/routes';
 import aiRoutes from './routes/ai';
+import searchRoutes from './routes/search';
 
 import { registerSocketHandlers } from './socket/handlers';
 import { authMiddleware } from './middleware/auth';
@@ -55,6 +56,7 @@ app.use('/api/transcribe',    authMiddleware, transcribeRoutes);
 app.use('/api/meetings',      authMiddleware, meetingRoutes);
 app.use('/api/automation',    authMiddleware, automationRoutes);
 app.use('/api/ai',            authMiddleware, aiRoutes);
+app.use('/api/search',        authMiddleware, searchRoutes);
 
 // ── Static uploads ────────────────────────────────────────
 const uploadPath = process.env.UPLOAD_PATH || path.join(__dirname, '../../uploads');

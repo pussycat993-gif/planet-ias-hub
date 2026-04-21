@@ -17,6 +17,7 @@ interface UIState {
   activeThreadId: number | null;
   showUnreadOnly: boolean;
   activeModal: Modal;
+  globalSearchOpen: boolean;
   myStatus: 'online' | 'away' | 'offline';
   myStatusMessage: string;
   dnd: boolean;
@@ -36,6 +37,8 @@ interface UIState {
   toggleShowUnreadOnly: () => void;
   openModal: (modal: Modal) => void;
   closeModal: () => void;
+  openGlobalSearch: () => void;
+  closeGlobalSearch: () => void;
   setMyStatus: (status: 'online' | 'away' | 'offline') => void;
   setMyStatusMessage: (msg: string) => void;
   setDnd: (dnd: boolean) => void;
@@ -60,6 +63,7 @@ export const useUIStore = create<UIState>((set) => ({
   activeThreadId: null,
   showUnreadOnly: false,
   activeModal: null,
+  globalSearchOpen: false,
   myStatus: 'online',
   myStatusMessage: '',
   dnd: initialDnd,
@@ -79,6 +83,8 @@ export const useUIStore = create<UIState>((set) => ({
   toggleShowUnreadOnly: () => set(s => ({ showUnreadOnly: !s.showUnreadOnly })),
   openModal: (modal) => set({ activeModal: modal }),
   closeModal: () => set({ activeModal: null }),
+  openGlobalSearch: () => set({ globalSearchOpen: true }),
+  closeGlobalSearch: () => set({ globalSearchOpen: false }),
   setMyStatus: (status) => set({ myStatus: status }),
   setMyStatusMessage: (msg) => set({ myStatusMessage: msg }),
   setDnd: (dnd) => {
