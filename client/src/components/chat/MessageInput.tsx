@@ -121,6 +121,7 @@ export default function MessageInput({ replyContext, onClearReply }: MessageInpu
 
   // Voice / video recording state
   const [recording, setRecording] = useState(false);
+  const [paused, setPaused] = useState(false);
   const [recordKind, setRecordKind] = useState<'audio' | 'video'>('audio');
   const [recordSeconds, setRecordSeconds] = useState(0);
   const recorderRef = useRef<MediaRecorder | null>(null);
@@ -128,6 +129,13 @@ export default function MessageInput({ replyContext, onClearReply }: MessageInpu
   const recordTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const previewVideoRef = useRef<HTMLVideoElement | null>(null);
+
+  // Live-waveform refs: Web Audio analyser + canvas for drawing bars.
+  // Only populated while audio recording is active.
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const waveCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const waveRafRef = useRef<number | null>(null);
 
   // Autocomplete state (@ mention or / command)
   const [autocomplete, setAutocomplete] = useState<{
@@ -349,8 +357,63 @@ export default function MessageInput({ replyContext, onClearReply }: MessageInpu
 
       recorder.start();
       setRecording(true);
+      setPaused(false);
       setRecordSeconds(0);
       recordTimerRef.current = setInterval(() => setRecordSeconds(s => s + 1), 1000);
+
+      // Wire up a live waveform on audio recordings. We tap the same stream
+      // with an AnalyserNode and RAF-paint amplitude bars to a canvas.
+      if (kind === 'audio') {
+        try {
+          const AudioCtx = (window as any).AudioContext || (window as any).webkitAudioContext;
+          if (AudioCtx) {
+            const ctx = new AudioCtx();
+            audioContextRef.current = ctx;
+            const source = ctx.createMediaStreamSource(stream);
+            const analyser = ctx.createAnalyser();
+            analyser.fftSize = 256;
+            source.connect(analyser);
+            analyserRef.current = analyser;
+
+            const buf = new Uint8Array(analyser.frequencyBinCount);
+            const draw = () => {
+              const canvas = waveCanvasRef.current;
+              if (!canvas || !analyserRef.current) return;
+              const rect = canvas.getBoundingClientRect();
+              const dpr = window.devicePixelRatio || 1;
+              if (canvas.width !== rect.width * dpr || canvas.height !== rect.height * dpr) {
+                canvas.width = rect.width * dpr;
+                canvas.height = rect.height * dpr;
+              }
+              const g = canvas.getContext('2d');
+              if (!g) return;
+              g.setTransform(dpr, 0, 0, dpr, 0, 0);
+              g.clearRect(0, 0, rect.width, rect.height);
+
+              analyserRef.current.getByteFrequencyData(buf);
+              const barCount = 36;
+              const step = Math.floor(buf.length / barCount);
+              const barW = (rect.width - 2 * (barCount - 1)) / barCount;
+              const mid = rect.height / 2;
+              for (let i = 0; i < barCount; i++) {
+                // Average a slice of the spectrum for smoother-looking bars
+                let sum = 0;
+                for (let j = 0; j < step; j++) sum += buf[i * step + j];
+                const v = sum / step / 255;
+                const barH = Math.max(3, v * rect.height * 0.9);
+                const x = i * (barW + 2);
+                g.fillStyle = '#e53935';
+                g.fillRect(x, mid - barH / 2, barW, barH);
+              }
+              waveRafRef.current = requestAnimationFrame(draw);
+            };
+            waveRafRef.current = requestAnimationFrame(draw);
+          }
+        } catch (e) {
+          // AudioContext/Analyser not available — silently skip live waveform
+          console.warn('Live waveform init failed:', e);
+        }
+      }
 
       // Wire the stream to the <video> preview element on the next frame,
       // after React mounts it inside the recording bar.
@@ -373,7 +436,16 @@ export default function MessageInput({ replyContext, onClearReply }: MessageInpu
   const stopRecording = (send: boolean) => {
     if (recordTimerRef.current) { clearInterval(recordTimerRef.current); recordTimerRef.current = null; }
     setRecording(false);
+    setPaused(false);
     setRecordSeconds(0);
+
+    // Tear down live-waveform RAF + AudioContext
+    if (waveRafRef.current) { cancelAnimationFrame(waveRafRef.current); waveRafRef.current = null; }
+    if (audioContextRef.current) {
+      try { audioContextRef.current.close(); } catch { /* ignore */ }
+      audioContextRef.current = null;
+    }
+    analyserRef.current = null;
 
     // Detach the preview stream so the video element blanks on next open
     if (previewVideoRef.current) {
@@ -391,9 +463,27 @@ export default function MessageInput({ replyContext, onClearReply }: MessageInpu
     }
   };
 
+  // Pause/resume toggle. Stops the 1s duration counter while paused so the
+  // displayed time matches the actual recorded length.
+  const togglePause = () => {
+    const rec = recorderRef.current;
+    if (!rec) return;
+    if (rec.state === 'recording') {
+      rec.pause();
+      setPaused(true);
+      if (recordTimerRef.current) { clearInterval(recordTimerRef.current); recordTimerRef.current = null; }
+    } else if (rec.state === 'paused') {
+      rec.resume();
+      setPaused(false);
+      recordTimerRef.current = setInterval(() => setRecordSeconds(s => s + 1), 1000);
+    }
+  };
+
   // Cleanup on unmount
   useEffect(() => () => {
     if (recordTimerRef.current) clearInterval(recordTimerRef.current);
+    if (waveRafRef.current) cancelAnimationFrame(waveRafRef.current);
+    if (audioContextRef.current) { try { audioContextRef.current.close(); } catch { /* ignore */ } }
     streamRef.current?.getTracks().forEach(t => t.stop());
   }, []);
 
@@ -552,7 +642,7 @@ export default function MessageInput({ replyContext, onClearReply }: MessageInpu
 
         {/* Recording bar — audio and video variants */}
         {recording && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '8px 14px', background: '#fff5f5', borderBottom: '1px solid #ffcdd2' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '8px 14px', background: paused ? '#fff8e1' : '#fff5f5', borderBottom: `1px solid ${paused ? '#ffe082' : '#ffcdd2'}` }}>
             <style>{`@keyframes ias-rec-pulse { 0%,100%{opacity:1} 50%{opacity:.3} }`}</style>
 
             {recordKind === 'video' && (
@@ -560,15 +650,31 @@ export default function MessageInput({ replyContext, onClearReply }: MessageInpu
                 style={{ width: '100%', maxHeight: 200, borderRadius: 8, background: '#000', objectFit: 'cover' }} />
             )}
 
+            {/* Live waveform (audio only) */}
+            {recordKind === 'audio' && (
+              <div style={{ height: 40, borderRadius: 6, background: '#fff', border: '1px solid #ffcdd2', overflow: 'hidden' }}>
+                <canvas ref={waveCanvasRef} style={{ width: '100%', height: '100%', display: 'block' }} />
+              </div>
+            )}
+
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#e53935', animation: 'ias-rec-pulse 1s infinite', flexShrink: 0 }} />
-              <span style={{ fontSize: 12, color: '#c62828', fontWeight: 600 }}>
-                Recording {recordKind === 'video' ? 'video note' : 'voice note'} — {fmtDuration(recordSeconds)}
+              <span style={{
+                width: 10, height: 10, borderRadius: '50%',
+                background: paused ? '#ff9800' : '#e53935',
+                animation: paused ? 'none' : 'ias-rec-pulse 1s infinite',
+                flexShrink: 0,
+              }} />
+              <span style={{ fontSize: 12, color: paused ? '#e65100' : '#c62828', fontWeight: 600 }}>
+                {paused ? 'Paused' : 'Recording'} {recordKind === 'video' ? 'video note' : 'voice note'} — {fmtDuration(recordSeconds)}
               </span>
               <div style={{ flex: 1 }} />
               <button onClick={() => stopRecording(false)}
                 style={{ padding: '5px 12px', border: '1px solid #dde1e7', background: '#fff', cursor: 'pointer', fontSize: 12, borderRadius: 6, fontFamily: 'inherit' }}>
                 Cancel
+              </button>
+              <button onClick={togglePause} title={paused ? 'Resume recording' : 'Pause recording'}
+                style={{ padding: '5px 12px', border: '1px solid #dde1e7', background: '#fff', cursor: 'pointer', fontSize: 12, borderRadius: 6, fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 4 }}>
+                {paused ? <><span>▶</span> Resume</> : <><span>❚❚</span> Pause</>}
               </button>
               <button onClick={() => stopRecording(true)}
                 style={{ padding: '5px 14px', background: '#c62828', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 12, borderRadius: 6, fontFamily: 'inherit', fontWeight: 600 }}>

@@ -8,6 +8,7 @@ import { useThreadLastViewed } from '../../hooks/useThreadLastViewed';
 import UserProfileModal from '../modals/UserProfileModal';
 import TranscriptionModal from '../modals/TranscriptionModal';
 import LogActivityModal from '../modals/LogActivityModal';
+import VoiceNotePlayer from './VoiceNotePlayer';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 const BLUE = '#1976d2';
@@ -244,29 +245,42 @@ function FileCard({ file, fileName }: { file?: Message['file']; fileName: string
     return (
       <>
         {renderModals()}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: '8px 12px', border: '1px solid #dde1e7', borderRadius: 10, background: isVoiceNote ? '#f0f7ff' : '#f8f9fa', maxWidth: 380 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ fontSize: 20, flexShrink: 0 }}>{isVoiceNote ? '🎙️' : '🔊'}</span>
-            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <div style={{ fontSize: 12, fontWeight: 600, color: BLUE_DARK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
-                  {isVoiceNote ? 'Voice note' : file.name}
-                </div>
-                {downloadUrl && (
-                  <a href={downloadUrl} download={file.name} title="Download"
-                    style={{ color: '#888', textDecoration: 'none', fontSize: 14, padding: '0 4px', cursor: 'pointer' }}
-                    onMouseEnter={e => (e.currentTarget.style.color = BLUE)}
-                    onMouseLeave={e => (e.currentTarget.style.color = '#888')}>
-                    ⬇
-                  </a>
-                )}
-              </div>
-              <audio controls src={streamUrl} preload="metadata" style={{ width: '100%', height: 32 }} />
-              <div style={{ fontSize: 10, color: '#888' }}>{fmtBytes(file.size)}</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxWidth: 420 }}>
+          {/* Custom waveform player with playback speed */}
+          <VoiceNotePlayer src={streamUrl} variant={isVoiceNote ? 'voice' : 'file'} />
+
+          {/* Filename, size, download (only for non-voice-note audio — voice notes
+              don't need this chrome because the label is implicit) */}
+          {!isVoiceNote && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '0 4px', fontSize: 10, color: '#888' }}>
+              <span style={{ fontWeight: 600, color: BLUE_DARK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>🔊 {file.name}</span>
+              <span>{fmtBytes(file.size)}</span>
+              {downloadUrl && (
+                <a href={downloadUrl} download={file.name} title="Download"
+                  style={{ color: '#888', textDecoration: 'none', fontSize: 12 }}
+                  onMouseEnter={e => (e.currentTarget.style.color = BLUE)}
+                  onMouseLeave={e => (e.currentTarget.style.color = '#888')}>⬇</a>
+              )}
             </div>
-          </div>
-          {/* Action row */}
-          <div style={{ display: 'flex', gap: 6, paddingTop: 4, borderTop: '1px solid rgba(0,0,0,.05)' }}>
+          )}
+
+          {/* Voice note label + size + download row */}
+          {isVoiceNote && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '0 4px', fontSize: 10, color: '#888' }}>
+              <span style={{ fontWeight: 600, color: BLUE_DARK }}>🎙️ Voice note</span>
+              <span>· {fmtBytes(file.size)}</span>
+              <div style={{ flex: 1 }} />
+              {downloadUrl && (
+                <a href={downloadUrl} download={file.name} title="Download"
+                  style={{ color: '#888', textDecoration: 'none', fontSize: 12 }}
+                  onMouseEnter={e => (e.currentTarget.style.color = BLUE)}
+                  onMouseLeave={e => (e.currentTarget.style.color = '#888')}>⬇</a>
+              )}
+            </div>
+          )}
+
+          {/* Action row: Transcribe + Log to PCI */}
+          <div style={{ display: 'flex', gap: 6 }}>
             <button onClick={() => setShowTranscription(true)} style={actionBtnStyle}
               onMouseEnter={e => { e.currentTarget.style.background = '#e3f2fd'; e.currentTarget.style.borderColor = '#90caf9'; e.currentTarget.style.color = BLUE; }}
               onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#dde1e7'; e.currentTarget.style.color = '#555'; }}>
