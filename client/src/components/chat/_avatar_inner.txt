@@ -1,0 +1,9 @@
+  const inner = avatarUrl ? (
+    <div style={{ width: size, height: size, borderRadius: '50%', overflow: 'hidden' }}>
+      <img src={avatarUrl} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%' }} />
+    </div>
+  ) : (
+    <div style={{ width: size, height: size, borderRadius: '50%', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: size * 0.35, fontWeight: 700, color: '#fff' }}>
+      {initials}
+    </div>
+  );

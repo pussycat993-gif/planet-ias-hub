@@ -3,6 +3,19 @@ import axios from 'axios';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
+export interface TranscriptLine {
+  speaker: string;
+  text: string;
+  time: string;
+}
+
+export interface PostCallInfo {
+  callType: 'audio' | 'video';
+  duration: number;
+  participants: string[];
+  transcript: TranscriptLine[];
+}
+
 interface CallState {
   active: boolean;
   callId: number | null;
@@ -15,19 +28,20 @@ interface CallState {
   isSharing: boolean;
   isRaisingHand: boolean;
   timerInterval: ReturnType<typeof setInterval> | null;
-
-  // WebRTC streams
   localStream: MediaStream | null;
-  remoteStreams: Map<number, MediaStream>; // userId → stream
+  remoteStreams: Map<number, MediaStream>;
+
+  // Post-call modal — lives OUTSIDE callActive so it survives unmount
+  postCallInfo: PostCallInfo | null;
 
   startCall: (channelId: number, type: 'audio' | 'video') => Promise<void>;
-  endCall: () => Promise<{ callId: number; startedAt: Date } | null>;
+  endCall: () => Promise<void>;
+  setPostCallInfo: (info: PostCallInfo) => void;
+  clearPostCallInfo: () => void;
   toggleMute: () => void;
   toggleCamera: () => void;
   toggleShare: () => void;
   toggleRaiseHand: () => void;
-
-  // Stream management
   setLocalStream: (stream: MediaStream | null) => void;
   addRemoteStream: (userId: number, stream: MediaStream) => void;
   removeRemoteStream: (userId: number) => void;
@@ -48,6 +62,7 @@ export const useCallStore = create<CallState>((set, get) => ({
   timerInterval: null,
   localStream: null,
   remoteStreams: new Map(),
+  postCallInfo: null,
 
   startCall: async (channelId: number, type: 'audio' | 'video') => {
     if (get().active) return;
@@ -56,11 +71,9 @@ export const useCallStore = create<CallState>((set, get) => ({
         channel_id: channelId,
         call_type: type,
       });
-
       const interval = setInterval(() => {
         set(s => ({ elapsedSeconds: s.elapsedSeconds + 1 }));
       }, 1000);
-
       set({
         active: true,
         callId: data.data.call_id,
@@ -82,53 +95,36 @@ export const useCallStore = create<CallState>((set, get) => ({
   },
 
   endCall: async () => {
-    const { callId, startedAt, timerInterval, localStream } = get();
-    if (!callId) return null;
-
+    const { callId, timerInterval, localStream } = get();
     if (timerInterval) clearInterval(timerInterval);
-
-    // Stop local media tracks
     localStream?.getTracks().forEach(t => t.stop());
-
     try {
-      await axios.post(`${API}/calls/${callId}/end`);
+      if (callId) await axios.post(`${API}/calls/${callId}/end`);
     } catch { /* ignore */ }
-
-    const result = { callId, startedAt: startedAt! };
-
     set({
       active: false,
+      callId: null,
+      callType: null,
       timerInterval: null,
       localStream: null,
       remoteStreams: new Map(),
       elapsedSeconds: 0,
     });
-
-    return result;
   },
+
+  setPostCallInfo: (info) => set({ postCallInfo: info }),
+  clearPostCallInfo: () => set({ postCallInfo: null }),
 
   toggleMute: () => set(s => ({ isMuted: !s.isMuted })),
   toggleCamera: () => set(s => ({ isCameraOff: !s.isCameraOff })),
   toggleShare: () => set(s => ({ isSharing: !s.isSharing })),
   toggleRaiseHand: () => set(s => ({ isRaisingHand: !s.isRaisingHand })),
-
   setLocalStream: (stream) => set({ localStream: stream }),
-
   addRemoteStream: (userId, stream) => {
-    set(s => {
-      const updated = new Map(s.remoteStreams);
-      updated.set(userId, stream);
-      return { remoteStreams: updated };
-    });
+    set(s => { const m = new Map(s.remoteStreams); m.set(userId, stream); return { remoteStreams: m }; });
   },
-
   removeRemoteStream: (userId) => {
-    set(s => {
-      const updated = new Map(s.remoteStreams);
-      updated.delete(userId);
-      return { remoteStreams: updated };
-    });
+    set(s => { const m = new Map(s.remoteStreams); m.delete(userId); return { remoteStreams: m }; });
   },
-
   clearRemoteStreams: () => set({ remoteStreams: new Map() }),
 }));

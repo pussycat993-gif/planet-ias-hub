@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import pool from '../db/auth';
 import { AuthRequest } from '../middleware/auth';
+import { io } from '../index';
 
 const router = Router();
 
@@ -40,19 +41,22 @@ router.post('/:channelId/files', upload.single('file'), async (req: Request, res
   try {
     await client.query('BEGIN');
 
-    // Create message record
+    // Store the original file name in messages.body so clients can render
+    // a reasonable label even if they only have the message row
+    const msgBody = message_body || req.file.originalname;
+
     const { rows: msgRows } = await client.query(
       `INSERT INTO messages (channel_id, sender_id, body, message_type)
-       VALUES ($1, $2, $3, 'file') RETURNING *`,
-      [channelId, userId, message_body || null]
+       VALUES ($1, $2, $3, 'file') RETURNING id`,
+      [channelId, userId, msgBody]
     );
+    const messageId = msgRows[0].id;
 
-    // Create file record
     const { rows: fileRows } = await client.query(
       `INSERT INTO files (message_id, channel_id, uploaded_by, file_name, file_size, mime_type, storage_path)
        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
       [
-        msgRows[0].id,
+        messageId,
         channelId,
         userId,
         req.file.originalname,
@@ -62,23 +66,47 @@ router.post('/:channelId/files', upload.single('file'), async (req: Request, res
       ]
     );
 
+    // Re-fetch full message with sender + file joined for a ready-to-render payload
+    const { rows: joined } = await client.query(
+      `SELECT m.*,
+        json_build_object(
+          'id', u.id,
+          'name', u.name,
+          'avatar_url', u.avatar_url,
+          'status', u.status
+        ) AS sender,
+        json_build_object(
+          'id', f.id,
+          'name', f.file_name,
+          'size', f.file_size,
+          'mime_type', f.mime_type,
+          'basename', regexp_replace(f.storage_path, '^.*/', '')
+        ) AS file,
+        '[]'::json AS reactions
+       FROM messages m
+       LEFT JOIN users u ON u.id = m.sender_id
+       LEFT JOIN files f ON f.message_id = m.id
+       WHERE m.id = $1`,
+      [messageId]
+    );
+    const message = joined[0];
+
     await client.query('COMMIT');
+
+    // Broadcast to everyone in the channel room
+    io.to(`channel:${channelId}`).emit('message:receive', message);
 
     return res.status(201).json({
       success: true,
       data: {
         file_id: fileRows[0].id,
-        message_id: msgRows[0].id,
-        file_name: req.file.originalname,
-        file_size: req.file.size,
-        mime_type: req.file.mimetype,
-        storage_path: req.file.path,
+        message,
       },
     });
   } catch (err) {
     await client.query('ROLLBACK');
-    // Delete uploaded file on error
-    if (req.file?.path) fs.unlinkSync(req.file.path);
+    if (req.file?.path && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+    console.error('File upload error:', err);
     return res.status(500).json({ success: false, error: 'File upload failed' });
   } finally {
     client.release();
@@ -102,6 +130,47 @@ router.get('/:channelId/files', async (req: Request, res: Response) => {
     );
     return res.json({ success: true, data: rows });
   } catch (err) {
+    return res.status(500).json({ success: false, error: 'Failed to fetch files' });
+  }
+});
+
+// GET /files/all — list all files across channels (for the sidebar Files tab)
+router.get('/all', async (req: Request, res: Response) => {
+  const { limit = '100', search } = req.query;
+  try {
+    const params: any[] = [parseInt(limit as string)];
+    let whereClause = '';
+    if (search && typeof search === 'string' && search.trim()) {
+      params.push(`%${search.trim().toLowerCase()}%`);
+      whereClause = ` AND LOWER(f.file_name) LIKE $2`;
+    }
+    const { rows } = await pool.query(
+      `SELECT
+         f.id, f.file_name, f.file_size, f.mime_type, f.created_at,
+         regexp_replace(f.storage_path, '^.*/', '') AS basename,
+         json_build_object(
+           'id', u.id,
+           'name', u.name,
+           'avatar_url', u.avatar_url
+         ) AS uploader,
+         json_build_object(
+           'id', c.id,
+           'name', c.name,
+           'type', c.type,
+           'logo_color', c.logo_color,
+           'logo_abbr', c.logo_abbr
+         ) AS channel
+       FROM files f
+       JOIN users u ON u.id = f.uploaded_by
+       JOIN channels c ON c.id = f.channel_id
+       WHERE 1=1 ${whereClause}
+       ORDER BY f.created_at DESC
+       LIMIT $1`,
+      params
+    );
+    return res.json({ success: true, data: rows });
+  } catch (err) {
+    console.error('GET /files/all error:', err);
     return res.status(500).json({ success: false, error: 'Failed to fetch files' });
   }
 });

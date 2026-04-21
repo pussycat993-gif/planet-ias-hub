@@ -6,21 +6,17 @@ import { useCallStore } from './store/callStore';
 import Layout from './components/layout/Layout';
 import LoginPage from './pages/LoginPage';
 import VideoCallModal from './components/calls/VideoCallModal';
-
-const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+import PostCallModal from './components/calls/PostCallModal';
+import Modals from './components/modals/Modals';
 
 export default function App() {
   const { user, token, loginSSO } = useAuthStore();
-  const { active: callActive } = useCallStore();
+  const { active: callActive, postCallInfo, clearPostCallInfo } = useCallStore();
 
-  // Restore session token on load
   useEffect(() => {
-    if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    }
+    if (token) axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   }, [token]);
 
-  // Electron SSO deep link listener
   useEffect(() => {
     const electronAPI = (window as any).electronAPI;
     if (electronAPI?.onSSOToken) {
@@ -29,7 +25,6 @@ export default function App() {
     }
   }, [loginSSO]);
 
-  // Web fallback — SSO token in URL
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const ssoToken = params.get('token');
@@ -42,9 +37,21 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      {/* Full-screen call overlay — rendered above everything */}
+      {/* Video/Audio call — only while active */}
       {callActive && <VideoCallModal />}
 
+      {/* Post-call modal — survives endCall(), shown independently */}
+      {postCallInfo && (
+        <PostCallModal
+          callType={postCallInfo.callType}
+          duration={postCallInfo.duration}
+          participants={postCallInfo.participants}
+          transcript={postCallInfo.transcript}
+          onClose={clearPostCallInfo}
+        />
+      )}
+
+      <Modals />
       <Layout />
     </BrowserRouter>
   );

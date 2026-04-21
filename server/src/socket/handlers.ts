@@ -41,17 +41,40 @@ export function registerSocketHandlers(io: Server) {
       replyToId?: number;
     }) => {
       try {
-        const { rows } = await pool.query(
+        const { rows: inserted } = await pool.query(
           `INSERT INTO messages (channel_id, sender_id, body, message_type, reply_to_id)
-           VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+           VALUES ($1, $2, $3, $4, $5) RETURNING id`,
           [data.channelId, userId, data.body, data.messageType || 'text', data.replyToId || null]
+        );
+        const messageId = inserted[0].id;
+
+        // Re-fetch with sender joined so clients get a ready-to-render payload
+        const { rows } = await pool.query(
+          `SELECT m.*,
+            json_build_object(
+              'id', u.id,
+              'name', u.name,
+              'avatar_url', u.avatar_url,
+              'status', u.status
+            ) AS sender,
+            '[]'::json AS reactions
+           FROM messages m
+           LEFT JOIN users u ON u.id = m.sender_id
+           WHERE m.id = $1`,
+          [messageId]
         );
         const message = rows[0];
 
-        io.to(`channel:${data.channelId}`).emit('message:receive', {
-          ...message,
-          senderId: userId,
-        });
+        io.to(`channel:${data.channelId}`).emit('message:receive', message);
+
+        // Thread reply: broadcast thread:update so open panels append it
+        // and main timeline rows bump their reply counter.
+        if (data.replyToId) {
+          io.to(`channel:${data.channelId}`).emit('thread:update', {
+            parent_id: data.replyToId,
+            reply: message,
+          });
+        }
 
         const { rows: members } = await pool.query(
           'SELECT user_id FROM channel_members WHERE channel_id = $1',

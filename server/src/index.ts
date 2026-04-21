@@ -13,6 +13,8 @@ import callRoutes from './routes/calls';
 import pciRoutes from './routes/pci';
 import fileRoutes from './routes/files';
 import notificationRoutes from './routes/notifications';
+import transcribeRoutes from './routes/transcribe';
+import meetingRoutes from './routes/meetings';
 import automationRoutes from './automation/routes';
 import aiRoutes from './routes/ai';
 
@@ -49,6 +51,8 @@ app.use('/api/files',         authMiddleware, fileRoutes);
 app.use('/api/calls',         authMiddleware, callRoutes);
 app.use('/api/pci',           authMiddleware, pciRoutes);
 app.use('/api/notifications', authMiddleware, notificationRoutes);
+app.use('/api/transcribe',    authMiddleware, transcribeRoutes);
+app.use('/api/meetings',      authMiddleware, meetingRoutes);
 app.use('/api/automation',    authMiddleware, automationRoutes);
 app.use('/api/ai',            authMiddleware, aiRoutes);
 

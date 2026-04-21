@@ -2,21 +2,21 @@ import * as mediasoup from 'mediasoup';
 
 let worker: mediasoup.types.Worker | null = null;
 
-const CODEC_CAPABILITIES: mediasoup.types.RtpCodecCapability[] = [
+const CODEC_CAPABILITIES = [
   {
-    kind: 'audio',
+    kind: 'audio' as const,
     mimeType: 'audio/opus',
     clockRate: 48000,
     channels: 2,
   },
   {
-    kind: 'video',
+    kind: 'video' as const,
     mimeType: 'video/VP8',
     clockRate: 90000,
     parameters: {},
   },
   {
-    kind: 'video',
+    kind: 'video' as const,
     mimeType: 'video/H264',
     clockRate: 90000,
     parameters: {
@@ -25,7 +25,7 @@ const CODEC_CAPABILITIES: mediasoup.types.RtpCodecCapability[] = [
       'level-asymmetry-allowed': 1,
     },
   },
-];
+] as mediasoup.types.RtpCodecCapability[];
 
 export async function getWorker(): Promise<mediasoup.types.Worker> {
   if (!worker) {
@@ -38,7 +38,6 @@ export async function getWorker(): Promise<mediasoup.types.Worker> {
     worker.on('died', (error) => {
       console.error('mediasoup worker died:', error);
       worker = null;
-      // Restart worker after 2s
       setTimeout(() => getWorker(), 2000);
     });
 

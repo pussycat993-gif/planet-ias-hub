@@ -1,0 +1,5 @@
+  const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+  const imgUrl = logoUrl || avatarUrl;
+  if (imgUrl) return <div style={{ width: size, height: size, borderRadius: isGroup ? size * 0.28 : '50%', overflow: 'hidden', flexShrink: 0 }}><img src={imgUrl} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: isGroup ? 'center' : 'center 15%' }} /></div>;
+  if (isGroup) return <div style={{ width: size, height: size, borderRadius: size * 0.28, background: logoColor || BLUE, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: size * 0.3, fontWeight: 800, color: '#fff', flexShrink: 0 }}>{logoAbbr || initials}</div>;
+  return <div style={{ width: size, height: size, borderRadius: '50%', background: stringToColor(name), display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: size * 0.35, fontWeight: 700, color: '#fff', flexShrink: 0 }}>{initials}</div>;
