@@ -9,6 +9,7 @@ import UserProfileModal from '../modals/UserProfileModal';
 import TranscriptionModal from '../modals/TranscriptionModal';
 import LogActivityModal from '../modals/LogActivityModal';
 import VoiceNotePlayer from './VoiceNotePlayer';
+import { renderMarkdown } from '../../utils/markdown';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 const BLUE = '#1976d2';
@@ -548,7 +549,9 @@ function MessageRow({ msg, prevMsg, isGroup, onReply, onPin, onProfileClick, pin
           </div>
         ) : (
           <div style={{ fontSize: 13, color: '#1a1a2e', lineHeight: 1.5, wordBreak: 'break-word' }}>
-            {searchQuery ? highlightText(msg.body || '', searchQuery) : msg.body}
+            {searchQuery
+              ? highlightText(msg.body || '', searchQuery)
+              : renderMarkdown(msg.body || '')}
             {msg.edited && <span style={{ fontSize: 10, color: '#bbb', marginLeft: 5, fontStyle: 'italic' }}>(edited)</span>}
           </div>
         )}

@@ -48,6 +48,40 @@ function stringToColor(str: string): string {
   return colors[Math.abs(hash) % colors.length];
 }
 
+// Small button used in the markdown formatting toolbar. Kept consistent in
+// size and hover behavior so the whole strip reads as one toolbar.
+function FormatBtn({ children, title, onClick, style }: {
+  children: React.ReactNode; title: string; onClick: () => void; style?: React.CSSProperties;
+}) {
+  return (
+    <button
+      type="button"
+      onMouseDown={e => { e.preventDefault(); /* don't steal focus from textarea */ }}
+      onClick={onClick}
+      title={title}
+      style={{
+        minWidth: 26, height: 26, padding: '0 6px',
+        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+        border: '1px solid transparent', borderRadius: 6, background: 'transparent',
+        color: '#555', fontSize: 13, fontFamily: 'inherit', cursor: 'pointer',
+        lineHeight: 1,
+        ...style,
+      }}
+      onMouseEnter={e => { e.currentTarget.style.background = '#eef2f6'; e.currentTarget.style.borderColor = '#dde1e7'; }}
+      onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent'; }}
+    >
+      {children}
+    </button>
+  );
+}
+
+const kbdStyle: React.CSSProperties = {
+  display: 'inline-block', padding: '0 4px',
+  fontSize: 9, fontFamily: 'inherit', fontWeight: 600,
+  background: '#f3f4f6', border: '1px solid #dde1e7', borderRadius: 3,
+  color: '#666', lineHeight: 1.4,
+};
+
 // ── Slash commands catalog ─────────────────────────────────────
 interface CommandDef {
   command: string;
@@ -151,7 +185,8 @@ export default function MessageInput({ replyContext, onClearReply }: MessageInpu
   const { startCall } = useCallStore();
   const { toggleAIPanel, aiPanelOpen } = useUIStore();
   const fileRef = useRef<HTMLInputElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const [composerFocused, setComposerFocused] = useState(false);
   const typingTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Fetch channel members for @ autocomplete
@@ -270,7 +305,58 @@ export default function MessageInput({ replyContext, onClearReply }: MessageInpu
   };
 
   // ── Keyboard handling ───────────────────────────────────────
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  // Wraps the current selection with markdown markers. If nothing is
+  // selected, drops the cursor between them so the user can type formatted.
+  const wrapSelection = (before: string, after: string) => {
+    const ta = inputRef.current;
+    if (!ta) return;
+    const start = ta.selectionStart ?? text.length;
+    const end = ta.selectionEnd ?? text.length;
+    const selected = text.slice(start, end);
+    const newText = text.slice(0, start) + before + selected + after + text.slice(end);
+    setText(newText);
+    requestAnimationFrame(() => {
+      if (start === end) {
+        const pos = start + before.length;
+        ta.setSelectionRange(pos, pos);
+      } else {
+        ta.setSelectionRange(start + before.length, end + before.length);
+      }
+      ta.focus();
+    });
+  };
+
+  // Prompts for a URL and inserts a markdown link around the current selection
+  // (or 'link' if nothing is selected).
+  const insertLink = () => {
+    const ta = inputRef.current;
+    if (!ta) return;
+    const start = ta.selectionStart ?? text.length;
+    const end = ta.selectionEnd ?? text.length;
+    const selected = text.slice(start, end);
+    const url = window.prompt('Enter URL:', 'https://');
+    if (!url || url === 'https://') return;
+    const label = selected || 'link';
+    const insertion = `[${label}](${url})`;
+    const newText = text.slice(0, start) + insertion + text.slice(end);
+    setText(newText);
+    requestAnimationFrame(() => {
+      const pos = start + insertion.length;
+      ta.setSelectionRange(pos, pos);
+      ta.focus();
+    });
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Markdown formatting shortcuts — must run BEFORE the autocomplete logic
+    // so Cmd+B / Cmd+I / Cmd+E never get hijacked to accept a suggestion.
+    if ((e.metaKey || e.ctrlKey) && !e.shiftKey && !e.altKey) {
+      const k = e.key.toLowerCase();
+      if (k === 'b') { e.preventDefault(); wrapSelection('**', '**'); return; }
+      if (k === 'i') { e.preventDefault(); wrapSelection('*',  '*');  return; }
+      if (k === 'e') { e.preventDefault(); wrapSelection('`',  '`');  return; }
+    }
+
     if (autocomplete && autocompleteItems.length > 0) {
       if (e.key === 'ArrowDown') {
         e.preventDefault();
@@ -722,11 +808,29 @@ export default function MessageInput({ replyContext, onClearReply }: MessageInpu
           </div>
         )}
 
+        {/* Formatting toolbar — appears when the composer has focus or content.
+            Kept compact so it never steals visual weight from the message itself. */}
+        {(composerFocused || text.length > 0) && !recording && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 2, padding: '5px 12px 0', fontFamily: 'inherit' }}>
+            <FormatBtn title="Bold  (Cmd/Ctrl+B)"       onClick={() => wrapSelection('**', '**')} style={{ fontWeight: 900 }}>B</FormatBtn>
+            <FormatBtn title="Italic  (Cmd/Ctrl+I)"     onClick={() => wrapSelection('*',  '*')}  style={{ fontStyle: 'italic' }}>I</FormatBtn>
+            <FormatBtn title="Strikethrough"            onClick={() => wrapSelection('~~', '~~')} style={{ textDecoration: 'line-through' }}>S</FormatBtn>
+            <div style={{ width: 1, height: 16, background: '#e0e4e9', margin: '0 4px' }} />
+            <FormatBtn title="Inline code  (Cmd/Ctrl+E)" onClick={() => wrapSelection('`',  '`')} style={{ fontFamily: 'SF Mono, Consolas, Menlo, monospace', fontSize: 11 }}>{'<>'}</FormatBtn>
+            <FormatBtn title="Code block"                onClick={() => wrapSelection('\n```\n', '\n```\n')} style={{ fontFamily: 'SF Mono, Consolas, Menlo, monospace', fontSize: 11 }}>{'{ }'}</FormatBtn>
+            <FormatBtn title="Insert link"               onClick={insertLink}>🔗</FormatBtn>
+            <div style={{ flex: 1 }} />
+            <span style={{ fontSize: 10, color: '#aaa' }}>
+              <kbd style={kbdStyle}>Shift</kbd>+<kbd style={kbdStyle}>Enter</kbd> for newline
+            </span>
+          </div>
+        )}
+
         {/* Input row */}
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '8px 12px 10px', position: 'relative' }}>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', padding: '8px 12px 10px', position: 'relative' }}>
           {user && <Avatar name={user.name} avatarUrl={user.avatar_url} size={30} />}
 
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', border: '1px solid #dde1e7', borderRadius: 10, padding: '5px 10px', gap: 6, background: '#f8f9fa', position: 'relative' }}>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end', border: '1px solid #dde1e7', borderRadius: 10, padding: '7px 10px', gap: 6, background: '#f8f9fa', position: 'relative' }}>
             {autocomplete && autocompleteItems.length > 0 && (
               <ChatAutocomplete
                 kind={autocomplete.kind}
@@ -774,23 +878,31 @@ export default function MessageInput({ replyContext, onClearReply }: MessageInpu
               😊
             </span>
 
-            <input
+            <textarea
               ref={inputRef}
-              type="text"
               value={text}
               onChange={e => handleInput(e.target.value, e.target.selectionStart || 0)}
               onKeyDown={handleKeyDown}
-              onKeyUp={e => checkAutocomplete(text, (e.target as HTMLInputElement).selectionStart || 0)}
-              onClick={e => checkAutocomplete(text, (e.target as HTMLInputElement).selectionStart || 0)}
+              onKeyUp={e => checkAutocomplete(text, (e.target as HTMLTextAreaElement).selectionStart || 0)}
+              onClick={e => checkAutocomplete(text, (e.target as HTMLTextAreaElement).selectionStart || 0)}
+              onFocus={() => setComposerFocused(true)}
+              onBlur={() => setComposerFocused(false)}
               placeholder={
                 recording ? `Recording ${recordKind === 'video' ? 'video' : 'voice'} note…`
                 : attachments.length > 0 ? 'Add a message or press Send…'
                 : replyContext ? `Reply to ${replyContext.senderName}…`
-                : activeChannelId ? 'Write a message…  (try / for commands or @ to mention)'
+                : activeChannelId ? 'Write a message…  (try / for commands, @ to mention, or format with **bold**)'
                 : 'Select a channel first'
               }
               disabled={!activeChannelId || recording}
-              style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: 13, color: '#1a1a2e', fontFamily: 'inherit' }}
+              rows={Math.max(1, Math.min(8, (text.match(/\n/g) || []).length + 1))}
+              style={{
+                flex: 1, border: 'none', background: 'transparent', outline: 'none',
+                fontSize: 13, color: '#1a1a2e', fontFamily: 'inherit',
+                resize: 'none', padding: 0, margin: 0,
+                lineHeight: 1.5,
+                minHeight: 20,
+              }}
             />
 
             {/* Mention shortcut */}

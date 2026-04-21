@@ -5,6 +5,7 @@ import { useAuthStore } from '../../store/authStore';
 import { useUIStore } from '../../store/uiStore';
 import { useThreadLastViewed } from '../../hooks/useThreadLastViewed';
 import { getSocket } from '../../hooks/useSocket';
+import { renderMarkdown } from '../../utils/markdown';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 const BLUE = '#1976d2';
@@ -61,7 +62,7 @@ function ThreadMessageRow({ msg, isParent = false }: { msg: Message; isParent?: 
           <span style={{ fontSize: 10, color: '#bbb' }}>{formatTime(msg.created_at)}</span>
         </div>
         <div style={{ fontSize: 13, color: '#1a1a2e', lineHeight: 1.45, wordBreak: 'break-word' }}>
-          {msg.body}
+          {renderMarkdown(msg.body || '')}
         </div>
       </div>
     </div>
