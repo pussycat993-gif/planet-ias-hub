@@ -1,159 +1,54 @@
 import React, { useState, useRef, useEffect } from 'react';
-import axios from 'axios';
+import { useUIStore } from '../../store/uiStore';
 import { useChatStore } from '../../store/chatStore';
-import { useAuthStore } from '../../store/authStore';
+import axios from 'axios';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
-
+const PURPLE = '#6a1b9a';
 const BLUE = '#1976d2';
-const BLUE_DARK = '#1565c0';
-const BLUE_LIGHT = '#e3f2fd';
 
 interface AIMessage {
-  role: 'user' | 'assistant';
-  content: string;
+  role: 'user' | 'bot' | 'sys';
+  text: string;
   actions?: Array<{ label: string; type: string; url?: string; payload?: any }>;
-  loading?: boolean;
 }
 
 const CHIPS = [
-  { label: '📋 My tasks',       query: 'What are my open tasks?' },
-  { label: '🏃 Sprint status',  query: "What's left in the sprint?" },
-  { label: '📅 Today',          query: "What's on my schedule today?" },
-  { label: '📝 Summarize chat', query: 'Summarize this conversation' },
-  { label: '🔗 Auto-fill log',  query: 'Auto-fill PCI activity log from this conversation' },
+  { label: 'My open tasks', question: 'What are my open tasks?' },
+  { label: 'Sprint status', question: 'What is left in the current sprint?' },
+  { label: "Today's schedule", question: 'What is on my schedule today?' },
+  { label: 'Summarize chat', question: 'Summarize this conversation for PCI log' },
+  { label: 'Auto-fill log', question: 'Auto-fill PCI log from this conversation' },
 ];
 
-function MarkdownText({ text }: { text: string }) {
-  const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`|\n)/g);
-  return (
-    <span style={{ lineHeight: 1.55 }}>
-      {parts.map((part, i) => {
-        if (part.startsWith('**') && part.endsWith('**')) {
-          return <strong key={i}>{part.slice(2, -2)}</strong>;
-        }
-        if (part.startsWith('`') && part.endsWith('`')) {
-          return (
-            <code key={i} style={{
-              background: '#f0f2f5', padding: '1px 4px',
-              borderRadius: 3, fontSize: '0.9em', fontFamily: 'monospace',
-            }}>
-              {part.slice(1, -1)}
-            </code>
-          );
-        }
-        if (part === '\n') return <br key={i} />;
-        return <span key={i}>{part}</span>;
-      })}
-    </span>
-  );
-}
-
-function ActionButton({ action }: { action: { label: string; type: string; url?: string; payload?: any } }) {
-  const handleClick = () => {
-    if (action.type === 'url' && action.url) {
-      window.open(action.url, '_blank');
-    } else if (action.type === 'log_to_pci') {
-      // Trigger PCI log modal — emit custom event for Layout to handle
-      window.dispatchEvent(new CustomEvent('ias-hub:open-pci-log', { detail: action.payload }));
-    }
-  };
-
-  return (
-    <button
-      onClick={handleClick}
-      style={{
-        padding: '3px 10px', border: `1px solid ${BLUE}`,
-        color: BLUE, background: '#fff', cursor: 'pointer',
-        fontSize: 11, borderRadius: 5, fontFamily: 'inherit',
-        marginTop: 4, marginRight: 4, transition: 'all .15s',
-      }}
-      onMouseEnter={e => { e.currentTarget.style.background = BLUE; e.currentTarget.style.color = '#fff'; }}
-      onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = BLUE; }}
-    >
-      {action.label}
-    </button>
-  );
-}
-
-function MessageBubble({ msg }: { msg: AIMessage }) {
-  const isUser = msg.role === 'user';
-
-  return (
-    <div style={{
-      display: 'flex',
-      flexDirection: isUser ? 'row-reverse' : 'row',
-      gap: 6,
-      marginBottom: 10,
-      alignItems: 'flex-start',
-    }}>
-      {/* Avatar */}
-      <div style={{
-        width: 26, height: 26, borderRadius: '50%', flexShrink: 0,
-        background: isUser ? '#1565c0' : '#f3e5f5',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 12, color: isUser ? '#fff' : '#6a1b9a', fontWeight: 700,
-      }}>
-        {isUser ? '👤' : '🤖'}
-      </div>
-
-      {/* Bubble */}
-      <div style={{ maxWidth: '80%' }}>
-        <div style={{
-          background: isUser ? BLUE : '#fff',
-          color: isUser ? '#fff' : '#1a1a2e',
-          border: isUser ? 'none' : '1px solid #dde1e7',
-          borderRadius: isUser ? '12px 12px 4px 12px' : '12px 12px 12px 4px',
-          padding: '7px 10px',
-          fontSize: 12,
-        }}>
-          {msg.loading ? (
-            <span style={{ color: '#888' }}>
-              <span style={{ animation: 'pulse 1s infinite' }}>Thinking</span>
-              <span style={{ display: 'inline-block', marginLeft: 2, letterSpacing: 2 }}>...</span>
-            </span>
-          ) : (
-            <MarkdownText text={msg.content} />
-          )}
-        </div>
-
-        {/* Action buttons */}
-        {!msg.loading && msg.actions && msg.actions.length > 0 && (
-          <div style={{ marginTop: 4 }}>
-            {msg.actions.map((a, i) => <ActionButton key={i} action={a} />)}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
 export default function AIPanel() {
+  const { aiPanelOpen, toggleAIPanel } = useUIStore();
+  const { activeChannelId } = useChatStore();
   const [messages, setMessages] = useState<AIMessage[]>([
     {
-      role: 'assistant',
-      content: 'Hi! I can help you with Jira tasks, sprint status, PCI activities, and more. Use the chips below or ask me anything.',
+      role: 'sys',
+      text: 'Connected to Jira + PLANet IAS · Automations active',
+    },
+    {
+      role: 'bot',
+      text: 'Hi! I have access to your Jira tasks and PCI activities. What would you like to know?',
+      actions: [{ label: '↗ Open tasks', type: 'chip', payload: 'What are my open tasks?' }],
     },
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
-  const { activeChannelId } = useChatStore();
 
-  // Auto-scroll to bottom on new messages
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const sendQuery = async (question: string) => {
+  if (!aiPanelOpen) return null;
+
+  const sendQuestion = async (question: string) => {
     if (!question.trim() || loading) return;
-
-    const userMsg: AIMessage = { role: 'user', content: question };
-    const loadingMsg: AIMessage = { role: 'assistant', content: '', loading: true };
-
-    setMessages(prev => [...prev, userMsg, loadingMsg]);
     setInput('');
+    setMessages(m => [...m, { role: 'user', text: question }]);
     setLoading(true);
 
     try {
@@ -161,183 +56,171 @@ export default function AIPanel() {
         question,
         channel_id: activeChannelId,
       });
-
-      const assistantMsg: AIMessage = {
-        role: 'assistant',
-        content: data.data?.response || 'No response received.',
-        actions: data.data?.actions || [],
-      };
-
-      setMessages(prev => [...prev.slice(0, -1), assistantMsg]);
-    } catch (err: any) {
-      const errMsg: AIMessage = {
-        role: 'assistant',
-        content: `⚠️ Error: ${err.response?.data?.error || err.message || 'Request failed'}`,
-      };
-      setMessages(prev => [...prev.slice(0, -1), errMsg]);
+      setMessages(m => [...m, {
+        role: 'bot',
+        text: data.data.response,
+        actions: data.data.actions || [],
+      }]);
+    } catch {
+      setMessages(m => [...m, {
+        role: 'bot',
+        text: 'Could not connect to AI service. Check server and Jira credentials in `.env`.',
+      }]);
     } finally {
       setLoading(false);
-      inputRef.current?.focus();
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendQuery(input);
+  const handleAction = (action: { label: string; type: string; url?: string; payload?: any }) => {
+    if (action.type === 'url' && action.url) {
+      window.open(action.url, '_blank');
+    } else if (action.type === 'chip' && action.payload) {
+      sendQuestion(action.payload);
+    } else if (action.type === 'log_to_pci') {
+      // TODO: open log modal
     }
   };
 
-  const handleClear = () => {
-    setMessages([{
-      role: 'assistant',
-      content: 'Conversation cleared. How can I help you?',
-    }]);
+  const renderText = (text: string) => {
+    // Simple markdown — bold
+    return text.split('\n').map((line, i) => (
+      <div key={i} style={{ marginBottom: 2 }}>
+        {line.split(/\*\*(.+?)\*\*/).map((part, j) =>
+          j % 2 === 1
+            ? <strong key={j}>{part}</strong>
+            : <span key={j}>{part}</span>
+        )}
+      </div>
+    ));
   };
 
   return (
     <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      height: '100%',
-      fontFamily: 'Segoe UI, Arial, sans-serif',
+      width: 260, borderLeft: '1px solid #dde1e7',
+      display: 'flex', flexDirection: 'column', background: '#fff', flexShrink: 0,
     }}>
       {/* Header */}
       <div style={{
-        background: BLUE_DARK,
-        color: '#fff',
-        padding: '7px 11px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexShrink: 0,
+        background: `linear-gradient(135deg, ${BLUE}, ${PURPLE})`,
+        color: '#fff', padding: '7px 12px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0,
       }}>
-        <span style={{ fontWeight: 700, fontSize: 12, display: 'flex', alignItems: 'center', gap: 5 }}>
-          🤖 AI Assistant
-        </span>
-        <button
-          onClick={handleClear}
-          title="Clear conversation"
-          style={{
-            background: 'transparent', border: 'none', color: 'rgba(255,255,255,.7)',
-            cursor: 'pointer', fontSize: 11, padding: '1px 5px', borderRadius: 4,
-          }}
-          onMouseEnter={e => { e.currentTarget.style.color = '#fff'; }}
-          onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,.7)'; }}
-        >
-          ✕ Clear
-        </button>
+        <span style={{ fontSize: 12, fontWeight: 700 }}>🤖 IAS Hub AI</span>
+        <span
+          style={{ cursor: 'pointer', fontSize: 14, opacity: .8 }}
+          onClick={toggleAIPanel}
+        >✕</span>
       </div>
 
-      {/* Messages area */}
-      <div style={{
-        flex: 1,
-        overflowY: 'auto',
-        padding: '10px 10px 4px',
-        background: '#f7f9fc',
-      }}>
+      {/* Messages */}
+      <div style={{ flex: 1, overflowY: 'auto', padding: 8 }}>
         {messages.map((msg, i) => (
-          <MessageBubble key={i} msg={msg} />
+          <div key={i} style={{ marginBottom: 8 }}>
+            {msg.role === 'sys' && (
+              <div style={{
+                background: '#fafafa', color: '#888', fontSize: 10,
+                textAlign: 'center', padding: '3px 6px', borderRadius: 4,
+              }}>
+                {msg.text}
+              </div>
+            )}
+            {msg.role === 'user' && (
+              <div style={{
+                background: '#e3f2fd', color: '#1565c0',
+                padding: '6px 9px', borderRadius: 8,
+                fontSize: 12, lineHeight: 1.5, textAlign: 'right',
+              }}>
+                {msg.text}
+              </div>
+            )}
+            {msg.role === 'bot' && (
+              <div style={{
+                background: '#f3e5f5', color: PURPLE,
+                border: '1px solid #e1bee7', padding: '6px 9px',
+                borderRadius: 8, fontSize: 12, lineHeight: 1.6,
+              }}>
+                {renderText(msg.text)}
+                {msg.actions && msg.actions.length > 0 && (
+                  <div style={{ marginTop: 6, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                    {msg.actions.map((action, j) => (
+                      <button
+                        key={j}
+                        onClick={() => handleAction(action)}
+                        style={{
+                          display: 'inline-flex', alignItems: 'center', gap: 4,
+                          background: '#fff', border: '1px solid #dde1e7',
+                          borderRadius: 5, padding: '2px 8px', fontSize: 10,
+                          cursor: 'pointer', color: BLUE, fontFamily: 'inherit',
+                        }}
+                      >
+                        {action.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         ))}
+        {loading && (
+          <div style={{ color: '#888', fontSize: 11, fontStyle: 'italic', padding: '4px 8px' }}>
+            Thinking...
+          </div>
+        )}
         <div ref={bottomRef} />
       </div>
 
       {/* Quick chips */}
       <div style={{
-        padding: '6px 8px 4px',
-        background: '#fff',
-        borderTop: '1px solid #eee',
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: 4,
-        flexShrink: 0,
+        display: 'flex', flexWrap: 'wrap', gap: 4, padding: '6px 8px',
+        borderTop: '1px solid #dde1e7', flexShrink: 0,
       }}>
         {CHIPS.map(chip => (
-          <button
+          <div
             key={chip.label}
-            onClick={() => sendQuery(chip.query)}
-            disabled={loading}
+            onClick={() => sendQuestion(chip.question)}
             style={{
-              padding: '3px 8px',
-              border: `1px solid ${BLUE}`,
-              borderRadius: 12,
-              background: BLUE_LIGHT,
-              color: BLUE,
-              fontSize: 10,
-              cursor: loading ? 'not-allowed' : 'pointer',
-              opacity: loading ? 0.5 : 1,
-              fontFamily: 'inherit',
-              transition: 'all .15s',
+              background: chip.label.includes('log') || chip.label.includes('Summarize') ? '#f3e5f5' : '#e3f2fd',
+              color: chip.label.includes('log') || chip.label.includes('Summarize') ? PURPLE : '#1565c0',
+              border: `1px solid ${chip.label.includes('log') || chip.label.includes('Summarize') ? '#ce93d8' : '#bbdefb'}`,
+              borderRadius: 12, padding: '3px 9px', fontSize: 11,
+              cursor: 'pointer', transition: 'background .15s',
             }}
-            onMouseEnter={e => { if (!loading) { e.currentTarget.style.background = BLUE; e.currentTarget.style.color = '#fff'; } }}
-            onMouseLeave={e => { e.currentTarget.style.background = BLUE_LIGHT; e.currentTarget.style.color = BLUE; }}
+            onMouseEnter={e => (e.currentTarget.style.filter = 'brightness(.95)')}
+            onMouseLeave={e => (e.currentTarget.style.filter = 'none')}
           >
             {chip.label}
-          </button>
+          </div>
         ))}
       </div>
 
-      {/* Input area */}
+      {/* Input */}
       <div style={{
-        padding: '6px 8px 8px',
-        background: '#fff',
-        borderTop: '1px solid #eee',
-        flexShrink: 0,
+        padding: '6px 8px', borderTop: '1px solid #dde1e7',
+        display: 'flex', gap: 5, alignItems: 'center', flexShrink: 0,
       }}>
-        <div style={{
-          display: 'flex',
-          gap: 6,
-          alignItems: 'flex-end',
-          border: `1px solid ${loading ? '#90caf9' : '#dde1e7'}`,
-          borderRadius: 8,
-          padding: '4px 6px 4px 10px',
-          background: '#fafafa',
-          transition: 'border-color .15s',
-        }}>
-          <textarea
-            ref={inputRef}
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Ask me anything… (Enter to send)"
-            disabled={loading}
-            rows={1}
-            style={{
-              flex: 1,
-              border: 'none',
-              outline: 'none',
-              background: 'transparent',
-              fontFamily: 'inherit',
-              fontSize: 12,
-              resize: 'none',
-              lineHeight: 1.4,
-              maxHeight: 72,
-              overflowY: 'auto',
-              color: '#1a1a2e',
-            }}
-          />
-          <button
-            onClick={() => sendQuery(input)}
-            disabled={loading || !input.trim()}
-            style={{
-              padding: '4px 10px',
-              background: loading || !input.trim() ? '#ccc' : BLUE,
-              color: '#fff',
-              border: 'none',
-              borderRadius: 6,
-              cursor: loading || !input.trim() ? 'not-allowed' : 'pointer',
-              fontSize: 12,
-              fontFamily: 'inherit',
-              flexShrink: 0,
-              transition: 'background .15s',
-            }}
-          >
-            {loading ? '…' : '↑'}
-          </button>
-        </div>
-        <div style={{ fontSize: 9, color: '#aaa', marginTop: 3, textAlign: 'right' }}>
-          Shift+Enter for new line
-        </div>
+        <input
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && sendQuestion(input)}
+          placeholder="Ask about Jira, PCI..."
+          style={{
+            flex: 1, border: '1px solid #dde1e7', borderRadius: 6,
+            padding: '4px 8px', fontSize: 12, fontFamily: 'inherit', outline: 'none',
+          }}
+          onFocus={e => (e.target.style.borderColor = BLUE)}
+          onBlur={e => (e.target.style.borderColor = '#dde1e7')}
+        />
+        <button
+          onClick={() => sendQuestion(input)}
+          disabled={!input.trim() || loading}
+          style={{
+            padding: '4px 10px', background: input.trim() ? BLUE : '#90caf9',
+            color: '#fff', border: 'none', borderRadius: 6,
+            cursor: input.trim() ? 'pointer' : 'default',
+            fontSize: 11, fontFamily: 'inherit',
+          }}
+        >▶</button>
       </div>
     </div>
   );
