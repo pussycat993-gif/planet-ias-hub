@@ -2,8 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
-const BLUE = '#1976d2';
-const GRAY = '#607d8b';
+const BLUE = 'var(--blue-primary)';
+const GRAY = 'var(--grey-dark)';
 
 interface AutoSettings {
   smart_logger: boolean;
@@ -41,10 +41,10 @@ function Toggle({ label, description, value, onChange }: {
   label: string; description?: string; value: boolean; onChange: (v: boolean) => void;
 }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #f0f0f0', gap: 8 }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid var(--neutral-light-active)', gap: 8 }}>
       <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 12, fontWeight: 600, color: '#1a1a2e' }}>{label}</div>
-        {description && <div style={{ fontSize: 10, color: '#888', marginTop: 1, lineHeight: 1.4 }}>{description}</div>}
+        <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>{label}</div>
+        {description && <div style={{ fontSize: 10, color: 'var(--text3)', marginTop: 1, lineHeight: 1.4 }}>{description}</div>}
       </div>
       <div onClick={() => onChange(!value)} style={{ width: 36, height: 20, borderRadius: 10, flexShrink: 0, background: value ? BLUE : '#ccc', cursor: 'pointer', position: 'relative', transition: 'background .2s' }}>
         <div style={{ position: 'absolute', top: 3, left: value ? 18 : 3, width: 14, height: 14, borderRadius: '50%', background: '#fff', transition: 'left .2s', boxShadow: '0 1px 3px rgba(0,0,0,.25)' }} />
@@ -55,7 +55,7 @@ function Toggle({ label, description, value, onChange }: {
 
 function SectionLabel({ label }: { label: string }) {
   return (
-    <div style={{ background: '#f0f2f5', color: '#546e7a', fontSize: 10, fontWeight: 700, padding: '4px 0 3px', marginTop: 12, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.05em' }}>
+    <div style={{ background: 'var(--grey-light)', color: 'var(--text2)', fontSize: 10, fontWeight: 700, padding: '4px 0 3px', marginTop: 12, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.05em' }}>
       {label}
     </div>
   );
@@ -66,13 +66,13 @@ function EventRow({ event }: { event: AutoEvent }) {
   const label = EVENT_LABELS[event.event_type] || event.event_type;
   const time = new Date(event.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '6px 11px', borderBottom: '1px solid #f5f5f5', fontSize: 11 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '6px 11px', borderBottom: '1px solid var(--neutral-light-active)', fontSize: 11 }}>
       <span style={{ fontSize: 14, flexShrink: 0 }}>{icon}</span>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontWeight: 600, color: '#1a1a2e', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</div>
-        <div style={{ fontSize: 10, color: '#888' }}>by {event.triggered_by} · {time}</div>
+        <div style={{ fontWeight: 600, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</div>
+        <div style={{ fontSize: 10, color: 'var(--text3)' }}>by {event.triggered_by} · {time}</div>
       </div>
-      <span style={{ padding: '1px 6px', borderRadius: 8, fontSize: 9, fontWeight: 700, background: event.status === 'success' ? '#e8f5e9' : '#ffebee', color: event.status === 'success' ? '#2e7d32' : '#c62828' }}>
+      <span style={{ padding: '1px 6px', borderRadius: 8, fontSize: 9, fontWeight: 700, background: event.status === 'success' ? 'rgba(76,175,80,.15)' : 'rgba(198,40,40,.15)', color: event.status === 'success' ? 'var(--green)' : 'var(--red)' }}>
         {event.status}
       </span>
     </div>
@@ -127,7 +127,7 @@ export default function AutoPanel() {
   const activeCount = MODULE_LIST.filter(m => (settings as any)[m.key]).length;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', fontFamily: 'Segoe UI, Arial, sans-serif' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', fontFamily: 'var(--font-sans)' }}>
 
       <div style={{ background: GRAY, color: '#fff', padding: '7px 11px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
@@ -137,9 +137,9 @@ export default function AutoPanel() {
         <button onClick={fetchData} title="Refresh" style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,.7)', cursor: 'pointer', fontSize: 14 }}>↻</button>
       </div>
 
-      <div style={{ display: 'flex', borderBottom: `2px solid ${GRAY}`, background: '#f8f9fa', flexShrink: 0 }}>
+      <div style={{ display: 'flex', borderBottom: `2px solid ${GRAY}`, background: 'var(--grey-light)', flexShrink: 0 }}>
         {(['settings', 'events'] as const).map(tab => (
-          <div key={tab} onClick={() => setActiveTab(tab)} style={{ flex: 1, textAlign: 'center', padding: '6px 2px', fontSize: 11, cursor: 'pointer', fontWeight: 500, background: activeTab === tab ? GRAY : 'transparent', color: activeTab === tab ? '#fff' : '#555' }}>
+          <div key={tab} onClick={() => setActiveTab(tab)} style={{ flex: 1, textAlign: 'center', padding: '6px 2px', fontSize: 11, cursor: 'pointer', fontWeight: 500, background: activeTab === tab ? GRAY : 'transparent', color: activeTab === tab ? '#fff' : 'var(--text2)' }}>
             {tab === 'settings' ? '⚙️ Settings' : '📋 Events'}
           </div>
         ))}
@@ -175,8 +175,8 @@ export default function AutoPanel() {
               <>
                 <SectionLabel label="Briefing Timing" />
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, padding: '6px 0' }}>
-                  <span style={{ color: '#555' }}>Send briefing</span>
-                  <select value={settings.briefing_minutes_before} onChange={e => updateSetting('briefing_minutes_before', parseInt(e.target.value))} style={{ border: '1px solid #dde1e7', borderRadius: 5, padding: '3px 6px', fontSize: 11, fontFamily: 'inherit', cursor: 'pointer' }}>
+                  <span style={{ color: 'var(--text2)' }}>Send briefing</span>
+                  <select value={settings.briefing_minutes_before} onChange={e => updateSetting('briefing_minutes_before', parseInt(e.target.value))} style={{ border: '1px solid var(--border)', borderRadius: 5, padding: '3px 6px', fontSize: 11, fontFamily: 'inherit', cursor: 'pointer', background: 'var(--surface)', color: 'var(--text)' }}>
                     {[5, 10, 15, 20, 30].map(m => <option key={m} value={m}>{m} minutes before</option>)}
                   </select>
                 </div>
@@ -187,8 +187,8 @@ export default function AutoPanel() {
               <>
                 <SectionLabel label="Task Reminder Timing" />
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, padding: '6px 0' }}>
-                  <span style={{ color: '#555' }}>Remind</span>
-                  <select value={settings.task_due_hours_before} onChange={e => updateSetting('task_due_hours_before', parseInt(e.target.value))} style={{ border: '1px solid #dde1e7', borderRadius: 5, padding: '3px 6px', fontSize: 11, fontFamily: 'inherit', cursor: 'pointer' }}>
+                  <span style={{ color: 'var(--text2)' }}>Remind</span>
+                  <select value={settings.task_due_hours_before} onChange={e => updateSetting('task_due_hours_before', parseInt(e.target.value))} style={{ border: '1px solid var(--border)', borderRadius: 5, padding: '3px 6px', fontSize: 11, fontFamily: 'inherit', cursor: 'pointer', background: 'var(--surface)', color: 'var(--text)' }}>
                     <option value={2}>2 hours before</option>
                     <option value={4}>4 hours before</option>
                     <option value={24}>1 day before</option>
@@ -199,12 +199,12 @@ export default function AutoPanel() {
             )}
 
             {/* Status summary */}
-            <div style={{ marginTop: 14, padding: '8px 10px', background: '#f0f2f5', borderRadius: 8, fontSize: 11, border: '1px solid #dde1e7' }}>
-              <div style={{ fontWeight: 700, color: GRAY, marginBottom: 6 }}>Active modules</div>
+            <div style={{ marginTop: 14, padding: '8px 10px', background: 'var(--grey-light)', borderRadius: 8, fontSize: 11, border: '1px solid var(--border)' }}>
+              <div style={{ fontWeight: 700, color: 'var(--text2)', marginBottom: 6 }}>Active modules</div>
               {MODULE_LIST.map(({ key, label }) => (
-                <div key={key} style={{ display: 'flex', justifyContent: 'space-between', padding: '2px 0', color: '#555' }}>
+                <div key={key} style={{ display: 'flex', justifyContent: 'space-between', padding: '2px 0', color: 'var(--text2)' }}>
                   <span>{label}</span>
-                  <span style={{ fontWeight: 700, color: (settings as any)[key] ? '#2e7d32' : '#bbb' }}>
+                  <span style={{ fontWeight: 700, color: (settings as any)[key] ? 'var(--green)' : 'var(--text3)' }}>
                     {(settings as any)[key] ? '● ON' : '○ OFF'}
                   </span>
                 </div>
@@ -215,7 +215,7 @@ export default function AutoPanel() {
 
         {activeTab === 'events' && (
           events.length === 0 ? (
-            <div style={{ padding: '2rem', textAlign: 'center', color: '#aaa', fontSize: 12 }}>
+            <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text3)', fontSize: 12 }}>
               <div style={{ fontSize: 28, marginBottom: 8 }}>⚡</div>
               No automation events yet
             </div>

@@ -32,6 +32,7 @@ interface AuthState {
   setStatusEmoji: (emoji: string | null) => Promise<void>;
   setAutoStatus: (auto: 'in_call' | 'in_meeting' | 'focus' | 'away_auto' | null, until?: string | null) => Promise<void>;
   setTimezone: (tz: string | null) => Promise<void>;
+  setAvatar: (avatarUrl: string | null) => Promise<void>;
 }
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
@@ -124,6 +125,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       await axios.patch(`${API}/users/${user.id}/timezone`, { timezone: tz });
       set({ user: { ...user, timezone: tz } });
+    } catch { /* ignore */ }
+  },
+
+  setAvatar: async (avatarUrl: string | null) => {
+    const { user, token } = get();
+    if (!user || !token) return;
+    try {
+      await axios.patch(`${API}/users/${user.id}/avatar`, { avatar_url: avatarUrl });
+      set({ user: { ...user, avatar_url: avatarUrl || undefined } });
     } catch { /* ignore */ }
   },
 }));

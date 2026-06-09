@@ -12,8 +12,8 @@ import VoiceNotePlayer from './VoiceNotePlayer';
 import { renderMarkdown } from '../../utils/markdown';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
-const BLUE = '#1976d2';
-const BLUE_DARK = '#1565c0';
+const BLUE = 'var(--blue-primary)';
+const BLUE_DARK = 'var(--blue-dark)';
 
 function stringToColor(str: string): string {
   const colors = ['#1565c0', '#2e7d32', '#6a1b9a', '#c62828', '#e65100', '#00695c', '#283593', '#4a148c'];
@@ -69,7 +69,7 @@ function Avatar({ name, avatarUrl, size = 32, status, showStatus = false, onClic
   const [imgError, setImgError] = useState(false);
   const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
   const bg = stringToColor(name);
-  const dotColor = status === 'online' ? '#4caf50' : status === 'away' ? '#ff9800' : '#bbb';
+  const dotColor = status === 'online' ? 'var(--green)' : status === 'away' ? '#BA7517' : 'var(--text3)';
   const dotSize = Math.max(8, Math.round(size * 0.28));
 
   const inner = avatarUrl && !imgError ? (
@@ -102,7 +102,7 @@ const QUICK_EMOJIS = ['👍', '❤️', '😂', '🙏', '🎉', '🔥'];
 
 function EmojiReactionBar({ onReact }: { onReact: (emoji: string) => void }) {
   return (
-    <div style={{ display: 'flex', gap: 2, background: '#fff', border: '1px solid #eee', borderRadius: 20, padding: '2px 6px', boxShadow: '0 2px 8px rgba(0,0,0,.12)' }}>
+    <div style={{ display: 'flex', gap: 2, background: 'var(--surface)', border: '1px solid var(--neutral-light-active)', borderRadius: 20, padding: '2px 6px', boxShadow: '0 2px 8px rgba(0,0,0,.12)' }}>
       {QUICK_EMOJIS.map(e => (
         <span key={e} onClick={() => onReact(e)} style={{ fontSize: 16, cursor: 'pointer', padding: '2px 3px', borderRadius: 6, transition: 'transform .1s' }}
           onMouseEnter={el => (el.currentTarget.style.transform = 'scale(1.3)')}
@@ -116,7 +116,7 @@ function EmojiReactionBar({ onReact }: { onReact: (emoji: string) => void }) {
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div style={{ display: 'flex', marginBottom: 2 }}>
-      <span style={{ color: '#888', width: 80, flexShrink: 0, fontSize: 11 }}>{label}</span>
+      <span style={{ color: 'var(--text3)', width: 80, flexShrink: 0, fontSize: 11 }}>{label}</span>
       <span style={{ fontSize: 12, fontWeight: 500 }}>{children}</span>
     </div>
   );
@@ -125,14 +125,14 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
 function CardBtn({ children, primary, danger, purple, onClick }: {
   children: React.ReactNode; primary?: boolean; danger?: boolean; purple?: boolean; onClick?: () => void;
 }) {
-  const bg = danger ? '#c62828' : purple ? '#6a1b9a' : primary ? BLUE : '#fff';
-  const color = (danger || primary || purple) ? '#fff' : '#555';
-  return <button onClick={onClick} style={{ padding: '3px 12px', borderRadius: 6, fontSize: 11, cursor: 'pointer', background: bg, color, border: (danger || primary || purple) ? 'none' : '1px solid #dde1e7' }}>{children}</button>;
+  const bg = danger ? '#c62828' : purple ? 'var(--purple)' : primary ? BLUE : '#fff';
+  const color = (danger || primary || purple) ? '#fff' : 'var(--text2)';
+  return <button onClick={onClick} style={{ padding: '3px 12px', borderRadius: 6, fontSize: 11, cursor: 'pointer', background: bg, color, border: (danger || primary || purple) ? 'none' : '1px solid var(--border)' }}>{children}</button>;
 }
 
 function MeetingCard({ p }: { p: any }) {
   return (
-    <div style={{ border: '1px solid #90caf9', borderRadius: 8, overflow: 'hidden', maxWidth: 420 }}>
+    <div style={{ border: '1px solid var(--blue-300)', borderRadius: 8, overflow: 'hidden', maxWidth: 420 }}>
       <div style={{ background: BLUE, color: '#fff', padding: '7px 12px', fontSize: 12, fontWeight: 700 }}>📅 Scheduled Meeting</div>
       <div style={{ padding: '8px 12px', fontSize: 12 }}>
         <Row label="Subject">{p.subject}</Row>
@@ -141,7 +141,7 @@ function MeetingCard({ p }: { p: any }) {
         <Row label="Attendees">{(p.participants || []).join(', ')}</Row>
         {p.entities?.length > 0 && <Row label="Entities">{p.entities.join(', ')}</Row>}
       </div>
-      <div style={{ padding: '6px 12px', borderTop: '1px solid #dde1e7', display: 'flex', gap: 8 }}>
+      <div style={{ padding: '6px 12px', borderTop: '1px solid var(--border)', display: 'flex', gap: 8 }}>
         <CardBtn primary>📹 Join Call</CardBtn>
         <CardBtn>↗ Open in PCI</CardBtn>
       </div>
@@ -160,7 +160,7 @@ function DWMCard({ p }: { p: any; messageId: number }) {
   }, [p.pci_workflow_step_id]);
   return (
     <div style={{ border: '1px solid #ce93d8', borderRadius: 8, overflow: 'hidden', background: '#f3e5f5', maxWidth: 420 }}>
-      <div style={{ background: '#6a1b9a', color: '#fff', padding: '7px 12px', fontSize: 12, fontWeight: 700 }}>🔄 DWM Workflow Trigger</div>
+      <div style={{ background: 'var(--purple)', color: '#fff', padding: '7px 12px', fontSize: 12, fontWeight: 700 }}>🔄 DWM Workflow Trigger</div>
       <div style={{ padding: '8px 12px', fontSize: 12 }}>
         <Row label="Workflow">{p.workflow_name}</Row>
         <Row label="Document">{p.document}</Row>
@@ -214,8 +214,8 @@ function FileCard({ file, fileName }: { file?: Message['file']; fileName: string
   // Small action button style for the Transcribe / Log to PCI row
   const actionBtnStyle: React.CSSProperties = {
     padding: '4px 9px', fontSize: 11, fontFamily: 'inherit',
-    border: '1px solid #dde1e7', borderRadius: 6, background: '#fff', cursor: 'pointer',
-    color: '#555', display: 'inline-flex', alignItems: 'center', gap: 4,
+    border: '1px solid var(--border)', borderRadius: 6, background: 'var(--surface)', cursor: 'pointer',
+    color: 'var(--text2)', display: 'inline-flex', alignItems: 'center', gap: 4,
   };
 
   const renderModals = () => (
@@ -283,13 +283,13 @@ function FileCard({ file, fileName }: { file?: Message['file']; fileName: string
           {/* Action row: Transcribe + Log to PCI */}
           <div style={{ display: 'flex', gap: 6 }}>
             <button onClick={() => setShowTranscription(true)} style={actionBtnStyle}
-              onMouseEnter={e => { e.currentTarget.style.background = '#e3f2fd'; e.currentTarget.style.borderColor = '#90caf9'; e.currentTarget.style.color = BLUE; }}
-              onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#dde1e7'; e.currentTarget.style.color = '#555'; }}>
+              onMouseEnter={e => { e.currentTarget.style.background = 'var(--blue-xlight)'; e.currentTarget.style.borderColor = 'var(--blue-300)'; e.currentTarget.style.color = BLUE; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text2)'; }}>
               <span>📝</span> Transcribe
             </button>
             <button onClick={() => setShowLogToPCI(true)} style={actionBtnStyle}
-              onMouseEnter={e => { e.currentTarget.style.background = '#e3f2fd'; e.currentTarget.style.borderColor = '#90caf9'; e.currentTarget.style.color = BLUE; }}
-              onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#dde1e7'; e.currentTarget.style.color = '#555'; }}>
+              onMouseEnter={e => { e.currentTarget.style.background = 'var(--blue-xlight)'; e.currentTarget.style.borderColor = 'var(--blue-300)'; e.currentTarget.style.color = BLUE; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text2)'; }}>
               <span>🔗</span> Log to PCI
             </button>
           </div>
@@ -303,11 +303,11 @@ function FileCard({ file, fileName }: { file?: Message['file']; fileName: string
     return (
       <>
         {renderModals()}
-        <div style={{ display: 'inline-block', borderRadius: 10, overflow: 'hidden', border: '1px solid #dde1e7', maxWidth: 320 }}>
+        <div style={{ display: 'inline-block', borderRadius: 10, overflow: 'hidden', border: '1px solid var(--border)', maxWidth: 320 }}>
           <a href={streamUrl} target="_blank" rel="noreferrer">
             <img src={streamUrl} alt={file.name} style={{ maxWidth: '100%', maxHeight: 240, display: 'block' }} />
           </a>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 10px', background: '#fff' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 10px', background: 'var(--surface)' }}>
             <span style={{ fontSize: 11, fontWeight: 600, color: BLUE_DARK, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.name}</span>
             <span style={{ fontSize: 10, color: '#888' }}>{fmtBytes(file.size)}</span>
             {downloadUrl && (
@@ -317,10 +317,10 @@ function FileCard({ file, fileName }: { file?: Message['file']; fileName: string
                 onMouseLeave={e => (e.currentTarget.style.color = '#888')}>⬇</a>
             )}
           </div>
-          <div style={{ display: 'flex', gap: 6, padding: '4px 10px 8px', background: '#fff', borderTop: '1px solid rgba(0,0,0,.04)' }}>
+          <div style={{ display: 'flex', gap: 6, padding: '4px 10px 8px', background: 'var(--surface)', borderTop: '1px solid rgba(0,0,0,.04)' }}>
             <button onClick={() => setShowLogToPCI(true)} style={actionBtnStyle}
-              onMouseEnter={e => { e.currentTarget.style.background = '#e3f2fd'; e.currentTarget.style.borderColor = '#90caf9'; e.currentTarget.style.color = BLUE; }}
-              onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#dde1e7'; e.currentTarget.style.color = '#555'; }}>
+              onMouseEnter={e => { e.currentTarget.style.background = 'var(--blue-xlight)'; e.currentTarget.style.borderColor = 'var(--blue-300)'; e.currentTarget.style.color = BLUE; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text2)'; }}>
               <span>🔗</span> Log to PCI
             </button>
           </div>
@@ -334,9 +334,9 @@ function FileCard({ file, fileName }: { file?: Message['file']; fileName: string
     return (
       <>
         {renderModals()}
-        <div style={{ display: 'inline-block', borderRadius: 10, overflow: 'hidden', border: '1px solid #dde1e7', maxWidth: 380, background: '#000' }}>
+        <div style={{ display: 'inline-block', borderRadius: 10, overflow: 'hidden', border: '1px solid var(--border)', maxWidth: 380, background: '#000' }}>
           <video controls src={streamUrl} preload="metadata" style={{ width: '100%', maxHeight: 240, display: 'block' }} />
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 10px', background: '#fff' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 10px', background: 'var(--surface)' }}>
             <span style={{ fontSize: 11, fontWeight: 600, color: BLUE_DARK, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.name}</span>
             <span style={{ fontSize: 10, color: '#888' }}>{fmtBytes(file.size)}</span>
             {downloadUrl && (
@@ -346,15 +346,15 @@ function FileCard({ file, fileName }: { file?: Message['file']; fileName: string
                 onMouseLeave={e => (e.currentTarget.style.color = '#888')}>⬇</a>
             )}
           </div>
-          <div style={{ display: 'flex', gap: 6, padding: '4px 10px 8px', background: '#fff', borderTop: '1px solid rgba(0,0,0,.04)' }}>
+          <div style={{ display: 'flex', gap: 6, padding: '4px 10px 8px', background: 'var(--surface)', borderTop: '1px solid rgba(0,0,0,.04)' }}>
             <button onClick={() => setShowTranscription(true)} style={actionBtnStyle}
-              onMouseEnter={e => { e.currentTarget.style.background = '#e3f2fd'; e.currentTarget.style.borderColor = '#90caf9'; e.currentTarget.style.color = BLUE; }}
-              onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#dde1e7'; e.currentTarget.style.color = '#555'; }}>
+              onMouseEnter={e => { e.currentTarget.style.background = 'var(--blue-xlight)'; e.currentTarget.style.borderColor = 'var(--blue-300)'; e.currentTarget.style.color = BLUE; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text2)'; }}>
               <span>📝</span> Transcribe
             </button>
             <button onClick={() => setShowLogToPCI(true)} style={actionBtnStyle}
-              onMouseEnter={e => { e.currentTarget.style.background = '#e3f2fd'; e.currentTarget.style.borderColor = '#90caf9'; e.currentTarget.style.color = BLUE; }}
-              onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#dde1e7'; e.currentTarget.style.color = '#555'; }}>
+              onMouseEnter={e => { e.currentTarget.style.background = 'var(--blue-xlight)'; e.currentTarget.style.borderColor = 'var(--blue-300)'; e.currentTarget.style.color = BLUE; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text2)'; }}>
               <span>🔗</span> Log to PCI
             </button>
           </div>
@@ -370,9 +370,9 @@ function FileCard({ file, fileName }: { file?: Message['file']; fileName: string
       {renderModals()}
       <div style={{ display: 'inline-flex', flexDirection: 'column', gap: 4, maxWidth: 340 }}>
         <a href={downloadUrl || '#'} download={displayName} target="_blank" rel="noreferrer"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 12px', border: '1px solid #dde1e7', borderRadius: 8, background: '#f8f9fa', cursor: 'pointer', textDecoration: 'none', color: 'inherit' }}
-          onMouseEnter={e => (e.currentTarget.style.background = '#e3f2fd')}
-          onMouseLeave={e => (e.currentTarget.style.background = '#f8f9fa')}>
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 12px', border: '1px solid var(--border)', borderRadius: 8, background: 'var(--grey-light)', cursor: 'pointer', textDecoration: 'none', color: 'inherit' }}
+          onMouseEnter={e => (e.currentTarget.style.background = 'var(--blue-xlight)')}
+          onMouseLeave={e => (e.currentTarget.style.background = 'var(--grey-light)')}>
           <span style={{ fontSize: 22 }}>{icons[ext] || '📎'}</span>
           <div style={{ minWidth: 0, flex: 1 }}>
             <div style={{ fontSize: 12, fontWeight: 600, color: BLUE_DARK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{displayName}</div>
@@ -383,8 +383,8 @@ function FileCard({ file, fileName }: { file?: Message['file']; fileName: string
         </a>
         {file && (
           <button onClick={() => setShowLogToPCI(true)} style={{ ...actionBtnStyle, alignSelf: 'flex-start' }}
-            onMouseEnter={e => { e.currentTarget.style.background = '#e3f2fd'; e.currentTarget.style.borderColor = '#90caf9'; e.currentTarget.style.color = BLUE; }}
-            onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#dde1e7'; e.currentTarget.style.color = '#555'; }}>
+            onMouseEnter={e => { e.currentTarget.style.background = 'var(--blue-xlight)'; e.currentTarget.style.borderColor = 'var(--blue-300)'; e.currentTarget.style.color = BLUE; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text2)'; }}>
             <span>🔗</span> Log to PCI
           </button>
         )}
@@ -402,7 +402,7 @@ function highlightText(text: string, query: string): React.ReactNode {
   const parts = text.split(regex);
   return parts.map((part, i) =>
     i % 2 === 1
-      ? <mark key={i} style={{ background: '#fff59d', padding: '0 1px', borderRadius: 2, color: '#1a1a2e' }}>{part}</mark>
+      ? <mark key={i} style={{ background: '#fff59d', padding: '0 1px', borderRadius: 2, color: 'var(--text)' }}>{part}</mark>
       : <React.Fragment key={i}>{part}</React.Fragment>
   );
 }
@@ -485,7 +485,7 @@ function MessageRow({ msg, prevMsg, isGroup, onReply, onPin, onProfileClick, pin
       style={{
         display: 'flex', gap: 10, padding: isContinuation ? '1px 12px' : '6px 12px 2px',
         alignItems: 'flex-start', position: 'relative',
-        background: hovered ? 'rgba(25,118,210,.04)' : isPinned ? 'rgba(249,168,37,.04)' : isMine ? 'rgba(25,118,210,.02)' : 'transparent',
+        background: hovered ? 'rgba(25,100,172,.05)' : isPinned ? 'rgba(249,168,37,.04)' : isMine ? 'rgba(25,100,172,.03)' : 'transparent',
         borderLeft: isPinned ? '3px solid #f9a825' : '3px solid transparent',
         transition: 'background .1s',
       }}
@@ -502,7 +502,7 @@ function MessageRow({ msg, prevMsg, isGroup, onReply, onPin, onProfileClick, pin
         {!isContinuation && (
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 7, marginBottom: 2 }}>
             <span onClick={() => msg.sender && onProfileClick(msg.sender)}
-              style={{ fontSize: 13, fontWeight: 700, color: isMine ? BLUE_DARK : '#1a1a2e', cursor: 'pointer' }}
+              style={{ fontSize: 13, fontWeight: 700, color: isMine ? BLUE_DARK : 'var(--text)', cursor: 'pointer' }}
               onMouseEnter={e => (e.currentTarget.style.textDecoration = 'underline')}
               onMouseLeave={e => (e.currentTarget.style.textDecoration = 'none')}>
               {isMine ? 'You' : senderName}
@@ -527,9 +527,9 @@ function MessageRow({ msg, prevMsg, isGroup, onReply, onPin, onProfileClick, pin
               rows={Math.max(1, Math.min(6, (editText.match(/\n/g) || []).length + 1))}
               style={{
                 width: '100%', maxWidth: 560,
-                border: '1px solid #90caf9', borderRadius: 8,
+                border: '1px solid var(--blue-300)', borderRadius: 8,
                 padding: '7px 10px', fontSize: 13, fontFamily: 'inherit', outline: 'none',
-                background: '#fff', resize: 'vertical', boxSizing: 'border-box',
+                background: 'var(--surface)', resize: 'vertical', boxSizing: 'border-box',
                 lineHeight: 1.5,
               }}
             />
@@ -539,7 +539,7 @@ function MessageRow({ msg, prevMsg, isGroup, onReply, onPin, onProfileClick, pin
                 Save
               </button>
               <button onClick={cancelEdit}
-                style={{ background: '#fff', color: '#555', border: '1px solid #dde1e7', borderRadius: 5, padding: '4px 12px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>
+                style={{ background: 'var(--surface)', color: 'var(--text2)', border: '1px solid var(--border)', borderRadius: 5, padding: '4px 12px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>
                 Cancel
               </button>
               <span style={{ fontSize: 10, color: '#aaa', marginLeft: 4 }}>
@@ -548,7 +548,7 @@ function MessageRow({ msg, prevMsg, isGroup, onReply, onPin, onProfileClick, pin
             </div>
           </div>
         ) : (
-          <div style={{ fontSize: 13, color: '#1a1a2e', lineHeight: 1.5, wordBreak: 'break-word' }}>
+          <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.5, wordBreak: 'break-word' }}>
             {searchQuery
               ? highlightText(msg.body || '', searchQuery)
               : renderMarkdown(msg.body || '')}
@@ -560,7 +560,7 @@ function MessageRow({ msg, prevMsg, isGroup, onReply, onPin, onProfileClick, pin
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 4 }}>
             {reactions.map((emoji, i) => (
               <span key={i} onClick={() => onReact(msg.id, emoji)}
-                style={{ background: '#f0f7ff', border: '1px solid #90caf9', borderRadius: 12, padding: '2px 7px', fontSize: 13, cursor: 'pointer' }}>
+                style={{ background: 'var(--blue-xlight)', border: '1px solid var(--blue-300)', borderRadius: 12, padding: '2px 7px', fontSize: 13, cursor: 'pointer' }}>
                 {emoji}
               </span>
             ))}
@@ -576,13 +576,13 @@ function MessageRow({ msg, prevMsg, isGroup, onReply, onPin, onProfileClick, pin
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 7, marginTop: 4,
                 padding: '3px 10px 3px 4px', borderRadius: 14, cursor: 'pointer',
-                background: unread ? '#e3f2fd' : '#f0f7ff',
-                border: `1px solid ${unread ? BLUE : '#c5def9'}`,
+                background: unread ? 'var(--blue-100)' : 'var(--blue-xlight)',
+                border: `1px solid ${unread ? BLUE : 'var(--blue-200)'}`,
                 fontSize: 11, color: BLUE_DARK, fontWeight: unread ? 700 : 600,
                 transition: 'all .15s',
               }}
-              onMouseEnter={e => { e.currentTarget.style.background = '#e3f2fd'; e.currentTarget.style.borderColor = BLUE; }}
-              onMouseLeave={e => { e.currentTarget.style.background = unread ? '#e3f2fd' : '#f0f7ff'; e.currentTarget.style.borderColor = unread ? BLUE : '#c5def9'; }}>
+              onMouseEnter={e => { e.currentTarget.style.background = 'var(--blue-100)'; e.currentTarget.style.borderColor = BLUE; }}
+              onMouseLeave={e => { e.currentTarget.style.background = unread ? 'var(--blue-100)' : 'var(--blue-xlight)'; e.currentTarget.style.borderColor = unread ? BLUE : 'var(--blue-200)'; }}>
               {/* Overlapping participant avatars */}
               {participants.length > 0 ? (
                 <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -615,7 +615,7 @@ function MessageRow({ msg, prevMsg, isGroup, onReply, onPin, onProfileClick, pin
       </div>
 
       {hovered && !editing && (
-        <div style={{ position: 'absolute', top: -14, right: 12, display: 'flex', gap: 4, background: '#fff', border: '1px solid #eee', borderRadius: 10, padding: '3px 6px', boxShadow: '0 2px 8px rgba(0,0,0,.1)', zIndex: 10 }}>
+        <div style={{ position: 'absolute', top: -14, right: 12, display: 'flex', gap: 4, background: 'var(--surface)', border: '1px solid var(--neutral-light-active)', borderRadius: 10, padding: '3px 6px', boxShadow: '0 2px 8px rgba(0,0,0,.1)', zIndex: 10 }}>
           <span onClick={() => setShowEmoji(s => !s)} style={{ fontSize: 16, cursor: 'pointer', padding: '1px 3px' }} title="React">😊</span>
           <span onClick={() => useUIStore.getState().openThread(msg.id)} style={{ fontSize: 14, cursor: 'pointer', padding: '1px 3px', color: '#888' }} title="Reply in thread">↩</span>
           <span onClick={() => togglePinMessageAction(msg.id, !isPinned)} style={{ fontSize: 14, cursor: 'pointer', padding: '1px 3px', color: isPinned ? '#f9a825' : '#888' }} title={isPinned ? 'Unpin' : 'Pin'}>📌</span>
@@ -628,7 +628,7 @@ function MessageRow({ msg, prevMsg, isGroup, onReply, onPin, onProfileClick, pin
             {showActions && (
               <div style={{
                 position: 'absolute', top: 'calc(100% + 6px)', right: 0, zIndex: 50,
-                background: '#fff', border: '1px solid #dde1e7', borderRadius: 8,
+                background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8,
                 boxShadow: '0 6px 20px rgba(0,0,0,.16)', minWidth: 170, overflow: 'hidden',
               }}>
                 {/* Copy — available for all non-deleted, non-file text messages */}
@@ -638,8 +638,8 @@ function MessageRow({ msg, prevMsg, isGroup, onReply, onPin, onProfileClick, pin
                       if (msg.body) navigator.clipboard?.writeText(msg.body).catch(() => {});
                       setShowActions(false);
                     }}
-                    style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', cursor: 'pointer', fontSize: 12, color: '#1a1a2e' }}
-                    onMouseEnter={e => (e.currentTarget.style.background = '#f5f5f5')}
+                    style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', cursor: 'pointer', fontSize: 12, color: 'var(--text)' }}
+                    onMouseEnter={e => (e.currentTarget.style.background = 'var(--neutral-light-active)')}
                     onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                   >
                     <span style={{ fontSize: 14, width: 18, textAlign: 'center' }}>📋</span>
@@ -651,8 +651,8 @@ function MessageRow({ msg, prevMsg, isGroup, onReply, onPin, onProfileClick, pin
                 {isMine && !msg.deleted_at && msg.message_type !== 'file' && (
                   <div
                     onClick={startEdit}
-                    style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', cursor: 'pointer', fontSize: 12, color: '#1a1a2e' }}
-                    onMouseEnter={e => (e.currentTarget.style.background = '#f5f5f5')}
+                    style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', cursor: 'pointer', fontSize: 12, color: 'var(--text)' }}
+                    onMouseEnter={e => (e.currentTarget.style.background = 'var(--neutral-light-active)')}
                     onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                   >
                     <span style={{ fontSize: 14, width: 18, textAlign: 'center' }}>✏️</span>
@@ -666,8 +666,8 @@ function MessageRow({ msg, prevMsg, isGroup, onReply, onPin, onProfileClick, pin
                     togglePinMessageAction(msg.id, !isPinned);
                     setShowActions(false);
                   }}
-                  style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', cursor: 'pointer', fontSize: 12, color: '#1a1a2e' }}
-                  onMouseEnter={e => (e.currentTarget.style.background = '#f5f5f5')}
+                  style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', cursor: 'pointer', fontSize: 12, color: 'var(--text)' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'var(--neutral-light-active)')}
                   onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                 >
                   <span style={{ fontSize: 14, width: 18, textAlign: 'center' }}>📌</span>
@@ -680,7 +680,7 @@ function MessageRow({ msg, prevMsg, isGroup, onReply, onPin, onProfileClick, pin
                     {!confirmDelete ? (
                       <div
                         onClick={() => setConfirmDelete(true)}
-                        style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', cursor: 'pointer', fontSize: 12, color: '#c62828', borderTop: '1px solid #f0f0f0' }}
+                        style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', cursor: 'pointer', fontSize: 12, color: '#c62828', borderTop: '1px solid var(--neutral-light-active)' }}
                         onMouseEnter={e => (e.currentTarget.style.background = '#fff5f5')}
                         onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                       >
@@ -688,7 +688,7 @@ function MessageRow({ msg, prevMsg, isGroup, onReply, onPin, onProfileClick, pin
                         <span>Delete</span>
                       </div>
                     ) : (
-                      <div style={{ padding: '8px 10px', borderTop: '1px solid #f0f0f0', background: '#fff5f5' }}>
+                      <div style={{ padding: '8px 10px', borderTop: '1px solid var(--neutral-light-active)', background: '#fff5f5' }}>
                         <div style={{ fontSize: 11, color: '#c62828', fontWeight: 600, marginBottom: 6 }}>Delete this message?</div>
                         <div style={{ display: 'flex', gap: 6 }}>
                           <button
@@ -703,7 +703,7 @@ function MessageRow({ msg, prevMsg, isGroup, onReply, onPin, onProfileClick, pin
                           </button>
                           <button
                             onClick={() => setConfirmDelete(false)}
-                            style={{ padding: '5px 10px', background: '#fff', color: '#555', border: '1px solid #dde1e7', borderRadius: 4, cursor: 'pointer', fontSize: 11, fontFamily: 'inherit' }}
+                            style={{ padding: '5px 10px', background: 'var(--surface)', color: 'var(--text2)', border: '1px solid var(--border)', borderRadius: 4, cursor: 'pointer', fontSize: 11, fontFamily: 'inherit' }}
                           >
                             Cancel
                           </button>
@@ -760,7 +760,7 @@ function UnreadDivider({ count }: { count: number }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px 4px', userSelect: 'none' }}>
       <div style={{ flex: 1, height: 1, background: '#ef5350' }} />
-      <span style={{ fontSize: 10, color: '#ef5350', fontWeight: 700, whiteSpace: 'nowrap', background: '#fff', padding: '2px 8px', border: '1px solid #ef5350', borderRadius: 10, textTransform: 'uppercase', letterSpacing: '.05em' }}>
+      <span style={{ fontSize: 10, color: '#ef5350', fontWeight: 700, whiteSpace: 'nowrap', background: 'var(--surface)', padding: '2px 8px', border: '1px solid #ef5350', borderRadius: 10, textTransform: 'uppercase', letterSpacing: '.05em' }}>
         New {count > 0 ? `(${count})` : ''}
       </span>
       <div style={{ flex: 1, height: 1, background: '#ef5350' }} />
@@ -776,9 +776,9 @@ function JumpToLatestChip({ newCount, onClick }: { newCount: number; onClick: ()
         position: 'absolute', bottom: 12, right: 16, zIndex: 20,
         display: 'flex', alignItems: 'center', gap: 6,
         padding: '6px 12px',
-        background: newCount > 0 ? BLUE : '#fff',
-        color: newCount > 0 ? '#fff' : '#555',
-        border: `1px solid ${newCount > 0 ? BLUE : '#dde1e7'}`,
+        background: newCount > 0 ? BLUE : 'var(--surface)',
+        color: newCount > 0 ? '#fff' : 'var(--text2)',
+        border: `1px solid ${newCount > 0 ? BLUE : 'var(--border)'}`,
         borderRadius: 18,
         boxShadow: '0 3px 12px rgba(0,0,0,.15)',
         cursor: 'pointer',
@@ -974,7 +974,7 @@ export default function MessageList({ onReply, searchQuery = '' }: MessageListPr
       )}
 
       <div ref={scrollContainerRef} onScroll={handleScroll}
-        style={{ flex: 1, overflowY: 'auto', paddingBottom: 4, background: '#fff' }}>
+        style={{ flex: 1, overflowY: 'auto', paddingBottom: 4, background: 'var(--surface)' }}>
         {activeSearch && (
           <div style={{ padding: '8px 14px', background: '#fff3e0', borderBottom: '1px solid #ffe0b2', fontSize: 12, color: '#e65100', display: 'flex', alignItems: 'center', gap: 6 }}>
             <span>🔍</span>
@@ -988,7 +988,7 @@ export default function MessageList({ onReply, searchQuery = '' }: MessageListPr
         {hasMoreMessages && (
           <div style={{ textAlign: 'center', padding: 10 }}>
             <button onClick={() => fetchMessages(activeChannelId, messages[0]?.created_at)} disabled={loadingMessages}
-              style={{ border: '1px solid #dde1e7', background: '#fff', borderRadius: 6, padding: '4px 14px', fontSize: 11, cursor: 'pointer', color: '#555' }}>
+              style={{ border: '1px solid var(--border)', background: 'var(--surface)', borderRadius: 6, padding: '4px 14px', fontSize: 11, cursor: 'pointer', color: 'var(--text2)' }}>
               {loadingMessages ? 'Loading...' : '↑ Load older messages'}
             </button>
           </div>

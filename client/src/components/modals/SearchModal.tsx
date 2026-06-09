@@ -5,8 +5,8 @@ import { useChatStore } from '../../store/chatStore';
 import { useAuthStore } from '../../store/authStore';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
-const BLUE = '#1976d2';
-const BLUE_DARK = '#1565c0';
+const BLUE = 'var(--blue-primary)';
+const BLUE_DARK = 'var(--blue-dark)';
 
 // ── Types ──────────────────────────────────────────────────────
 interface SearchUser {
@@ -119,7 +119,7 @@ function ChannelLogo({ channel, size = 28 }: { channel: { name: string; type: st
   return (
     <div style={{
       width: size, height: size, flexShrink: 0, borderRadius: '50%',
-      background: '#e3f2fd', color: BLUE,
+      background: 'var(--blue-xlight)', color: BLUE,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       fontSize: size * 0.5,
     }}>
@@ -132,12 +132,12 @@ function SectionHeader({ label, count }: { label: string; count: number }) {
   return (
     <div style={{
       padding: '10px 16px 4px',
-      fontSize: 10, fontWeight: 700, color: '#888',
+      fontSize: 10, fontWeight: 700, color: 'var(--text3)',
       textTransform: 'uppercase', letterSpacing: '.06em',
       display: 'flex', alignItems: 'center', gap: 6,
     }}>
       <span>{label}</span>
-      <span style={{ background: '#eef2f6', color: '#555', padding: '1px 7px', borderRadius: 10, fontSize: 10, fontWeight: 600 }}>
+      <span style={{ background: 'var(--grey-light)', color: 'var(--text2)', padding: '1px 7px', borderRadius: 10, fontSize: 10, fontWeight: 600 }}>
         {count}
       </span>
     </div>
@@ -153,16 +153,16 @@ function FilterPill({ active, onClick, onRemove, children }: {
       display: 'inline-flex', alignItems: 'center', gap: 5,
       padding: active ? '4px 6px 4px 10px' : '4px 10px',
       borderRadius: 14,
-      background: active ? '#e3f2fd' : '#f5f6f8',
-      border: `1px solid ${active ? '#90caf9' : '#e0e4e9'}`,
-      color: active ? BLUE_DARK : '#555',
+      background: active ? 'var(--blue-xlight)' : 'var(--grey-light)',
+      border: `1px solid ${active ? 'var(--blue-300)' : 'var(--border)'}`,
+      color: active ? BLUE_DARK : 'var(--text2)',
       fontSize: 11, fontWeight: 600, fontFamily: 'inherit',
       cursor: 'pointer', userSelect: 'none',
       transition: 'all .15s',
     }}>
       <span onClick={onClick}>{children}</span>
       {active && onRemove && (
-        <span onClick={onRemove} style={{ color: '#888', fontSize: 12, marginLeft: 1, lineHeight: 1, padding: '0 2px' }}>✕</span>
+        <span onClick={onRemove} style={{ color: 'var(--text3)', fontSize: 12, marginLeft: 1, lineHeight: 1, padding: '0 2px' }}>✕</span>
       )}
     </div>
   );
@@ -321,15 +321,15 @@ export default function SearchModal() {
       }}
     >
       <div onClick={e => e.stopPropagation()} style={{
-        background: '#fff', borderRadius: 12, width: 680, maxWidth: '92vw', maxHeight: '84vh',
+        background: 'var(--surface)', borderRadius: 12, width: 680, maxWidth: '92vw', maxHeight: '84vh',
         display: 'flex', flexDirection: 'column',
         boxShadow: '0 20px 60px rgba(0,0,0,.3)',
-        fontFamily: 'Segoe UI, Arial, sans-serif', overflow: 'hidden',
+        fontFamily: 'var(--font-sans)', overflow: 'hidden',
       }}>
 
         {/* Search input row */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 16px', borderBottom: '1px solid #eee' }}>
-          <span style={{ fontSize: 18, color: '#888' }}>🔍</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 16px', borderBottom: '1px solid var(--border)' }}>
+          <span style={{ fontSize: 18, color: 'var(--text3)' }}>🔍</span>
           <input
             ref={inputRef}
             type="text"
@@ -338,23 +338,23 @@ export default function SearchModal() {
             placeholder="Search messages, files, people, channels…"
             style={{
               flex: 1, border: 'none', outline: 'none', fontSize: 16,
-              color: '#1a1a2e', fontFamily: 'inherit', background: 'transparent',
+              color: 'var(--text)', fontFamily: 'inherit', background: 'transparent',
             }}
           />
           <span style={{
             display: 'inline-flex', gap: 3, alignItems: 'center', marginRight: 8,
           }}>
             <kbd style={kbdStyle}>Esc</kbd>
-            <span style={{ fontSize: 10, color: '#aaa' }}>to close</span>
+            <span style={{ fontSize: 10, color: 'var(--text3)' }}>to close</span>
           </span>
           <span onClick={closeGlobalSearch} style={{
-            cursor: 'pointer', color: '#888', fontSize: 18, lineHeight: 1, padding: '0 4px',
+            cursor: 'pointer', color: 'var(--text3)', fontSize: 18, lineHeight: 1, padding: '0 4px',
           }}>✕</span>
         </div>
 
         {/* Filter pills row */}
-        <div style={{ padding: '10px 16px 10px', borderBottom: '1px solid #f5f5f5', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
-          <span style={{ fontSize: 11, color: '#888', marginRight: 4 }}>Filters:</span>
+        <div style={{ padding: '10px 16px 10px', borderBottom: '1px solid var(--neutral-light-active)', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
+          <span style={{ fontSize: 11, color: 'var(--text3)', marginRight: 4 }}>Filters:</span>
 
           {/* From filter */}
           <div ref={fromPickerRef} style={{ position: 'relative' }}>
@@ -412,12 +412,12 @@ export default function SearchModal() {
           </FilterPill>
 
           {/* Date range (inline) */}
-          <label style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#555' }}>
+          <label style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'var(--text2)' }}>
             After:
             <input type="date" value={afterDate} onChange={e => setAfterDate(e.target.value)}
               style={dateInputStyle} />
           </label>
-          <label style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#555' }}>
+          <label style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'var(--text2)' }}>
             Before:
             <input type="date" value={beforeDate} onChange={e => setBeforeDate(e.target.value)}
               style={dateInputStyle} />
@@ -433,27 +433,27 @@ export default function SearchModal() {
         {/* Results area */}
         <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
           {loading && (
-            <div style={{ padding: '30px', textAlign: 'center', color: '#888', fontSize: 13 }}>
+            <div style={{ padding: '30px', textAlign: 'center', color: 'var(--text3)', fontSize: 13 }}>
               Searching…
             </div>
           )}
 
           {!loading && totalResults === 0 && (query.trim() || hasAnyFilter) && (
-            <div style={{ padding: '40px 20px', textAlign: 'center', color: '#aaa' }}>
+            <div style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--text3)' }}>
               <div style={{ fontSize: 32, marginBottom: 8 }}>🔍</div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: '#888' }}>No results</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text3)' }}>No results</div>
               <div style={{ fontSize: 12, marginTop: 4 }}>Try different keywords or remove some filters.</div>
             </div>
           )}
 
           {!loading && totalResults === 0 && !query.trim() && !hasAnyFilter && (
-            <div style={{ padding: '40px 20px', textAlign: 'center', color: '#aaa' }}>
+            <div style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--text3)' }}>
               <div style={{ fontSize: 32, marginBottom: 8 }}>💬</div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: '#888' }}>Search your workspace</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text3)' }}>Search your workspace</div>
               <div style={{ fontSize: 12, marginTop: 4 }}>
                 Messages, files, channels, and people — filter by who sent it, where, and when.
               </div>
-              <div style={{ fontSize: 11, color: '#bbb', marginTop: 12 }}>
+              <div style={{ fontSize: 11, color: 'var(--text3)', marginTop: 12 }}>
                 Tip: press <kbd style={kbdStyle}>Cmd</kbd>+<kbd style={kbdStyle}>Shift</kbd>+<kbd style={kbdStyle}>F</kbd> to open this from anywhere.
               </div>
             </div>
@@ -464,22 +464,22 @@ export default function SearchModal() {
               <SectionHeader label="Messages" count={results.messages.length} />
               {results.messages.map(m => (
                 <div key={m.id} onClick={() => jumpToMessage(m.channel.id, m.id)}
-                  style={{ display: 'flex', gap: 10, padding: '10px 16px', cursor: 'pointer', borderBottom: '1px solid #f5f5f5' }}
-                  onMouseEnter={e => (e.currentTarget.style.background = '#f0f7ff')}
-                  onMouseLeave={e => (e.currentTarget.style.background = '#fff')}>
-                  {m.sender ? <Avatar name={m.sender.name} avatarUrl={m.sender.avatar_url} /> : <div style={{ width: 28, height: 28, background: '#eee', borderRadius: '50%' }} />}
+                  style={{ display: 'flex', gap: 10, padding: '10px 16px', cursor: 'pointer', borderBottom: '1px solid var(--neutral-light-active)' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'var(--blue-xlight)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'var(--surface)')}>
+                  {m.sender ? <Avatar name={m.sender.name} avatarUrl={m.sender.avatar_url} /> : <div style={{ width: 28, height: 28, background: 'var(--neutral-light-active)', borderRadius: '50%' }} />}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, fontSize: 12 }}>
-                      <span style={{ fontWeight: 700, color: '#1a1a2e' }}>{m.sender?.name || 'System'}</span>
-                      <span style={{ color: '#888' }}>in</span>
+                      <span style={{ fontWeight: 700, color: 'var(--text)' }}>{m.sender?.name || 'System'}</span>
+                      <span style={{ color: 'var(--text3)' }}>in</span>
                       <span style={{ color: BLUE, fontWeight: 500 }}>
                         {m.channel.type === 'dm' ? '💬 DM'
                           : m.channel.type === 'group' ? m.channel.name
                           : '#' + m.channel.name}
                       </span>
-                      <span style={{ color: '#bbb', marginLeft: 'auto', fontSize: 10 }}>{formatRelative(m.created_at)}</span>
+                      <span style={{ color: 'var(--text3)', marginLeft: 'auto', fontSize: 10 }}>{formatRelative(m.created_at)}</span>
                     </div>
-                    <div style={{ fontSize: 13, color: '#444', marginTop: 2, lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                    <div style={{ fontSize: 13, color: 'var(--text2)', marginTop: 2, lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
                       {m.message_type === 'file' && m.file
                         ? <span><span style={{ marginRight: 4 }}>📎</span>{m.file.name}</span>
                         : highlight(snippet(m.body || '', query), query)}
@@ -495,21 +495,21 @@ export default function SearchModal() {
               <SectionHeader label="Channels & Groups" count={results.channels.length} />
               {results.channels.map(c => (
                 <div key={c.id} onClick={() => jumpToChannel(c.id)}
-                  style={{ display: 'flex', gap: 10, padding: '8px 16px', cursor: 'pointer', borderBottom: '1px solid #f5f5f5', alignItems: 'center' }}
-                  onMouseEnter={e => (e.currentTarget.style.background = '#f0f7ff')}
-                  onMouseLeave={e => (e.currentTarget.style.background = '#fff')}>
+                  style={{ display: 'flex', gap: 10, padding: '8px 16px', cursor: 'pointer', borderBottom: '1px solid var(--neutral-light-active)', alignItems: 'center' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'var(--blue-xlight)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'var(--surface)')}>
                   <ChannelLogo channel={c} />
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e' }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
                       {c.type === 'group' ? c.name : '#' + c.name}
                     </div>
                     {c.description && (
-                      <div style={{ fontSize: 11, color: '#888', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <div style={{ fontSize: 11, color: 'var(--text3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {c.description}
                       </div>
                     )}
                   </div>
-                  <span style={{ fontSize: 10, color: '#bbb' }}>
+                  <span style={{ fontSize: 10, color: 'var(--text3)' }}>
                     {c.type === 'group' ? 'Group' : c.type === 'private' ? 'Private' : 'Channel'}
                   </span>
                 </div>
@@ -522,17 +522,17 @@ export default function SearchModal() {
               <SectionHeader label="People" count={results.users.length} />
               {results.users.map(u => (
                 <div key={u.id}
-                  style={{ display: 'flex', gap: 10, padding: '8px 16px', cursor: 'default', borderBottom: '1px solid #f5f5f5', alignItems: 'center' }}>
+                  style={{ display: 'flex', gap: 10, padding: '8px 16px', cursor: 'default', borderBottom: '1px solid var(--neutral-light-active)', alignItems: 'center' }}>
                   <Avatar name={u.name} avatarUrl={u.avatar_url} size={32} />
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 13, fontWeight: 600, color: '#1a1a2e' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
                       {u.status_emoji && <span>{u.status_emoji}</span>}
                       <span>{u.name}</span>
-                      {u.role && <span style={{ fontSize: 10, color: '#888', fontWeight: 400 }}>· {u.role}</span>}
+                      {u.role && <span style={{ fontSize: 10, color: 'var(--text3)', fontWeight: 400 }}>· {u.role}</span>}
                     </div>
-                    <div style={{ fontSize: 11, color: '#888' }}>{u.email}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text3)' }}>{u.email}</div>
                   </div>
-                  <span style={{ fontSize: 10, color: u.status === 'online' ? '#4caf50' : '#bbb' }}>
+                  <span style={{ fontSize: 10, color: u.status === 'online' ? '#4caf50' : 'var(--text3)' }}>
                     ● {u.status || 'offline'}
                   </span>
                 </div>
@@ -550,7 +550,7 @@ function PickerDropdown({ children }: { children: React.ReactNode }) {
   return (
     <div style={{
       position: 'absolute', top: 'calc(100% + 4px)', left: 0, zIndex: 10,
-      background: '#fff', border: '1px solid #dde1e7', borderRadius: 10,
+      background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10,
       boxShadow: '0 8px 24px rgba(0,0,0,.15)', width: 260, maxHeight: 280, overflowY: 'auto',
     }}>
       {children}
@@ -572,22 +572,22 @@ function UserPickerList({ users, currentUserId, onSelect }: {
   );
   return (
     <>
-      <div style={{ padding: '8px 10px', borderBottom: '1px solid #f0f0f0' }}>
+      <div style={{ padding: '8px 10px', borderBottom: '1px solid var(--neutral-light-active)' }}>
         <input autoFocus value={q} onChange={e => setQ(e.target.value)} placeholder="Filter people…"
-          style={{ width: '100%', padding: '6px 9px', border: '1px solid #dde1e7', borderRadius: 6, outline: 'none', fontSize: 12, fontFamily: 'inherit', boxSizing: 'border-box' }} />
+          style={{ width: '100%', padding: '6px 9px', border: '1px solid var(--border)', borderRadius: 6, outline: 'none', fontSize: 12, fontFamily: 'inherit', boxSizing: 'border-box', background: 'var(--surface)', color: 'var(--text)' }} />
       </div>
       <div>
         {filtered.length === 0 ? (
-          <div style={{ padding: 12, color: '#aaa', fontSize: 12, textAlign: 'center' }}>No matches</div>
+          <div style={{ padding: 12, color: 'var(--text3)', fontSize: 12, textAlign: 'center' }}>No matches</div>
         ) : filtered.map(u => (
           <div key={u.id} onClick={() => onSelect(u)}
             style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px', cursor: 'pointer' }}
-            onMouseEnter={e => (e.currentTarget.style.background = '#f0f7ff')}
-            onMouseLeave={e => (e.currentTarget.style.background = '#fff')}>
+            onMouseEnter={e => (e.currentTarget.style.background = 'var(--blue-xlight)')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'var(--surface)')}>
             <Avatar name={u.name} avatarUrl={u.avatar_url} size={24} />
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: '#1a1a2e' }}>{u.name}</div>
-              <div style={{ fontSize: 10, color: '#888', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.email}</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>{u.name}</div>
+              <div style={{ fontSize: 10, color: 'var(--text3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.email}</div>
             </div>
           </div>
         ))}
@@ -607,23 +607,23 @@ function ChannelPickerList({ channels, onSelect }: {
   );
   return (
     <>
-      <div style={{ padding: '8px 10px', borderBottom: '1px solid #f0f0f0' }}>
+      <div style={{ padding: '8px 10px', borderBottom: '1px solid var(--neutral-light-active)' }}>
         <input autoFocus value={q} onChange={e => setQ(e.target.value)} placeholder="Filter channels…"
-          style={{ width: '100%', padding: '6px 9px', border: '1px solid #dde1e7', borderRadius: 6, outline: 'none', fontSize: 12, fontFamily: 'inherit', boxSizing: 'border-box' }} />
+          style={{ width: '100%', padding: '6px 9px', border: '1px solid var(--border)', borderRadius: 6, outline: 'none', fontSize: 12, fontFamily: 'inherit', boxSizing: 'border-box', background: 'var(--surface)', color: 'var(--text)' }} />
       </div>
       <div>
         {filtered.length === 0 ? (
-          <div style={{ padding: 12, color: '#aaa', fontSize: 12, textAlign: 'center' }}>No matches</div>
+          <div style={{ padding: 12, color: 'var(--text3)', fontSize: 12, textAlign: 'center' }}>No matches</div>
         ) : filtered.map(c => (
           <div key={c.id} onClick={() => onSelect(c)}
             style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px', cursor: 'pointer' }}
-            onMouseEnter={e => (e.currentTarget.style.background = '#f0f7ff')}
-            onMouseLeave={e => (e.currentTarget.style.background = '#fff')}>
+            onMouseEnter={e => (e.currentTarget.style.background = 'var(--blue-xlight)')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'var(--surface)')}>
             <ChannelLogo channel={c} size={22} />
-            <span style={{ fontSize: 12, fontWeight: 600, color: '#1a1a2e', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {c.type === 'group' ? c.name : c.type === 'dm' ? '@' + c.name : '#' + c.name}
             </span>
-            <span style={{ fontSize: 9, color: '#aaa' }}>{c.type}</span>
+            <span style={{ fontSize: 9, color: 'var(--text3)' }}>{c.type}</span>
           </div>
         ))}
       </div>
@@ -635,12 +635,12 @@ function ChannelPickerList({ channels, onSelect }: {
 const kbdStyle: React.CSSProperties = {
   display: 'inline-block', padding: '1px 5px',
   fontSize: 9, fontFamily: 'inherit', fontWeight: 600,
-  background: '#f3f4f6', border: '1px solid #dde1e7', borderRadius: 3,
-  color: '#666', lineHeight: 1.4,
+  background: 'var(--grey-light)', border: '1px solid var(--border)', borderRadius: 3,
+  color: 'var(--text2)', lineHeight: 1.4,
 };
 
 const dateInputStyle: React.CSSProperties = {
-  border: '1px solid #dde1e7', borderRadius: 6, padding: '3px 7px',
-  fontSize: 11, fontFamily: 'inherit', outline: 'none', background: '#fff',
-  color: '#555',
+  border: '1px solid var(--border)', borderRadius: 6, padding: '3px 7px',
+  fontSize: 11, fontFamily: 'inherit', outline: 'none', background: 'var(--surface)',
+  color: 'var(--text2)',
 };

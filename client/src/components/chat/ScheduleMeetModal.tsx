@@ -6,8 +6,8 @@ import EntityPickerModal, { PickerKind } from '../modals/EntityPickerModal';
 import { MOCK_ENTITIES, MOCK_PEOPLE, MOCK_TAGS } from '../../utils/pickerData';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
-const BLUE = '#1976d2';
-const BLUE_DARK = '#1565c0';
+const BLUE = 'var(--blue-primary)';
+const BLUE_DARK = 'var(--blue-dark)';
 
 interface Member { id: number; name: string; email: string; role?: string; avatar_url?: string; }
 
@@ -153,7 +153,7 @@ export default function ScheduleMeetModal({ channelId, channelName, onClose, ini
           onClose={() => setPickerOpen(null)}
         />
       )}
-      <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 12, width: 500, maxWidth: '95vw', maxHeight: '90vh', boxShadow: '0 8px 40px rgba(0,0,0,.2)', fontFamily: 'Segoe UI, Arial, sans-serif', display: 'flex', flexDirection: 'column' }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 12, width: 500, maxWidth: '95vw', maxHeight: '90vh', boxShadow: '0 8px 40px rgba(6,25,43,.2)', fontFamily: 'var(--font-sans)', display: 'flex', flexDirection: 'column' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #eee' }}>
           <div>
             <div style={{ fontWeight: 700, fontSize: 15, color: BLUE_DARK }}>📅 Schedule Meeting</div>
@@ -224,7 +224,7 @@ export default function ScheduleMeetModal({ channelId, channelName, onClose, ini
                     const sel = !!selectedEntities.find(x => x.name === e.name);
                     return (
                       <div key={e.name} onClick={() => toggleEntity(e)}
-                        style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 20, cursor: 'pointer', fontSize: 12, border: `1px solid ${sel ? BLUE : '#dde1e7'}`, background: sel ? '#e3f2fd' : '#fff', color: sel ? BLUE_DARK : '#555' }}>
+                        style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 20, cursor: 'pointer', fontSize: 12, border: `1px solid ${sel ? BLUE : 'var(--border)'}`, background: sel ? 'var(--blue-xlight)' : 'var(--surface)', color: sel ? BLUE_DARK : 'var(--text2)' }}>
                         <span>{e.type === 'Company' ? '🏢' : e.type === 'Event' ? '🎫' : e.type === 'Organization' ? '🏛️' : e.type === 'Software' ? '💻' : e.type === 'Award & Grant Program' ? '🏆' : '📁'}</span>
                         <span style={{ fontWeight: sel ? 700 : 400 }}>{e.name}</span>
                         {sel && (
@@ -252,7 +252,7 @@ export default function ScheduleMeetModal({ channelId, channelName, onClose, ini
                 {members.map(m => {
                   const sel = selectedMembers.includes(m.id);
                   return (
-                    <div key={m.id} onClick={() => toggleMember(m.id)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '4px 10px 4px 6px', borderRadius: 20, cursor: 'pointer', border: `1px solid ${sel ? BLUE : '#dde1e7'}`, background: sel ? '#e3f2fd' : '#fff' }}>
+                    <div key={m.id} onClick={() => toggleMember(m.id)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '4px 10px 4px 6px', borderRadius: 20, cursor: 'pointer', border: `1px solid ${sel ? BLUE : 'var(--border)'}`, background: sel ? 'var(--blue-xlight)' : 'var(--surface)' }}>
                       <MemberAvatar member={m} size={22} />
                       <span style={{ fontSize: 12, color: sel ? BLUE_DARK : '#555', fontWeight: sel ? 700 : 400 }}>{m.name}</span>
                       {sel && <span style={{ fontSize: 10, color: BLUE }}>✓</span>}
@@ -279,7 +279,7 @@ export default function ScheduleMeetModal({ channelId, channelName, onClose, ini
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                 {selectedPeople.map(p => (
                   <div key={p}
-                    style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 20, fontSize: 12, border: `1px solid ${BLUE}`, background: '#e3f2fd', color: BLUE_DARK }}>
+                    style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 20, fontSize: 12, border: `1px solid ${BLUE}`, background: 'var(--blue-xlight)', color: BLUE_DARK }}>
                     <span>👤</span>
                     <span style={{ fontWeight: 700 }}>{p}</span>
                     <span
@@ -309,7 +309,7 @@ export default function ScheduleMeetModal({ channelId, channelName, onClose, ini
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                 {selectedTags.map(t => (
                   <div key={t}
-                    style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 20, fontSize: 12, border: `1px solid ${BLUE}`, background: '#e3f2fd', color: BLUE_DARK }}>
+                    style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 20, fontSize: 12, border: `1px solid ${BLUE}`, background: 'var(--blue-xlight)', color: BLUE_DARK }}>
                     <span>🏷️</span>
                     <span style={{ fontWeight: 700 }}>{t}</span>
                     <span
@@ -324,7 +324,7 @@ export default function ScheduleMeetModal({ channelId, channelName, onClose, ini
           </div>
 
           {title && selectedMembers.length > 0 && (
-            <div style={{ background: '#f0f7ff', border: '1px solid #90caf9', borderRadius: 8, padding: '10px 12px', fontSize: 12 }}>
+            <div style={{ background: 'var(--blue-xlight)', border: '1px solid var(--blue-200)', borderRadius: 8, padding: '10px 12px', fontSize: 12 }}>
               <div style={{ fontWeight: 700, color: BLUE_DARK, marginBottom: 4 }}>📋 Meeting Summary</div>
               <div style={{ color: '#555' }}>
                 <b>{title}</b><br />
@@ -343,7 +343,7 @@ export default function ScheduleMeetModal({ channelId, channelName, onClose, ini
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={onClose} style={{ padding: '8px 16px', border: '1px solid #dde1e7', borderRadius: 7, background: '#fff', cursor: 'pointer', fontSize: 13, fontFamily: 'inherit' }}>Cancel</button>
             <button onClick={handleSchedule} disabled={saving || !title.trim() || selectedMembers.length === 0}
-              style={{ padding: '8px 20px', background: saving || !title.trim() ? '#90caf9' : BLUE, color: '#fff', border: 'none', borderRadius: 7, cursor: saving ? 'not-allowed' : 'pointer', fontSize: 13, fontFamily: 'inherit', fontWeight: 600 }}>
+              style={{ padding: '8px 20px', background: saving || !title.trim() ? 'var(--blue-300)' : BLUE, color: '#fff', border: 'none', borderRadius: 7, cursor: saving ? 'not-allowed' : 'pointer', fontSize: 13, fontFamily: 'inherit', fontWeight: 600 }}>
               {saving ? 'Scheduling...' : '📅 Schedule Meeting'}
             </button>
           </div>

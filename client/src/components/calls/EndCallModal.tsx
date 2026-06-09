@@ -4,8 +4,8 @@ import { useUIStore } from '../../store/uiStore';
 import axios from 'axios';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
-const BLUE = '#1976d2';
-const PURPLE = '#6a1b9a';
+const BLUE = 'var(--blue-primary)';
+const PURPLE = 'var(--purple)';
 
 interface SummaryData {
   topic: string;
@@ -112,7 +112,7 @@ export default function EndCallModal() {
       display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 400,
     }}>
       <div style={{
-        background: '#fff', borderRadius: 10, width: 500, maxHeight: '90vh',
+        background: 'var(--surface)', borderRadius: 10, width: 500, maxHeight: '90vh',
         overflow: 'hidden', display: 'flex', flexDirection: 'column',
         boxShadow: '0 12px 40px rgba(0,0,0,.2)',
       }}>
@@ -126,45 +126,45 @@ export default function EndCallModal() {
           {/* Activity type + duration */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#555', marginBottom: 3 }}>Activity Type</label>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text2)', marginBottom: 3 }}>Activity Type</label>
               <select value={activityType} onChange={e => setActivityType(e.target.value)}
-                style={{ width: '100%', border: '1px solid #dde1e7', borderRadius: 6, padding: '6px 8px', fontSize: 13, fontFamily: 'inherit', outline: 'none' }}>
+                style={{ width: '100%', border: '1px solid var(--border)', borderRadius: 6, padding: '6px 8px', fontSize: 13, fontFamily: 'inherit', outline: 'none', background: 'var(--surface)', color: 'var(--text)' }}>
                 <option>Video Call</option>
                 <option>Audio Call</option>
                 <option>Meeting</option>
               </select>
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#555', marginBottom: 3 }}>Duration</label>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text2)', marginBottom: 3 }}>Duration</label>
               <input readOnly value={fmt(callData.elapsedSeconds || 0)}
-                style={{ width: '100%', border: '1px solid #dde1e7', borderRadius: 6, padding: '6px 8px', fontSize: 13, fontFamily: 'inherit', background: '#f8f9fa' }} />
+                style={{ width: '100%', border: '1px solid var(--border)', borderRadius: 6, padding: '6px 8px', fontSize: 13, fontFamily: 'inherit', background: 'var(--grey-light)', color: 'var(--text)' }} />
             </div>
           </div>
 
           {/* Subject */}
           <div style={{ marginBottom: 10 }}>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#555', marginBottom: 3 }}>Subject</label>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text2)', marginBottom: 3 }}>Subject</label>
             <input value={subject} onChange={e => setSubject(e.target.value)}
-              style={{ width: '100%', border: '1px solid #dde1e7', borderRadius: 6, padding: '6px 10px', fontSize: 13, fontFamily: 'inherit', outline: 'none' }} />
+              style={{ width: '100%', border: '1px solid var(--border)', borderRadius: 6, padding: '6px 10px', fontSize: 13, fontFamily: 'inherit', outline: 'none', background: 'var(--surface)', color: 'var(--text)' }} />
           </div>
 
           {/* Timestamps */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#555', marginBottom: 3 }}>Start Time</label>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text2)', marginBottom: 3 }}>Start Time</label>
               <input readOnly value={startTime}
-                style={{ width: '100%', border: '1px solid #dde1e7', borderRadius: 6, padding: '6px 8px', fontSize: 12, fontFamily: 'inherit', background: '#f8f9fa' }} />
+                style={{ width: '100%', border: '1px solid var(--border)', borderRadius: 6, padding: '6px 8px', fontSize: 12, fontFamily: 'inherit', background: 'var(--grey-light)', color: 'var(--text)' }} />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#555', marginBottom: 3 }}>End Time</label>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text2)', marginBottom: 3 }}>End Time</label>
               <input readOnly value={endTime}
-                style={{ width: '100%', border: '1px solid #dde1e7', borderRadius: 6, padding: '6px 8px', fontSize: 12, fontFamily: 'inherit', background: '#f8f9fa' }} />
+                style={{ width: '100%', border: '1px solid var(--border)', borderRadius: 6, padding: '6px 8px', fontSize: 12, fontFamily: 'inherit', background: 'var(--grey-light)', color: 'var(--text)' }} />
             </div>
           </div>
 
           {/* Transcription section */}
-          <div style={{ border: '1px solid #dde1e7', borderRadius: 8, overflow: 'hidden' }}>
-            <div style={{ background: '#f3e5f5', padding: '7px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden' }}>
+            <div style={{ background: 'rgba(176,124,214,.14)', padding: '7px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <span style={{ fontSize: 12, fontWeight: 700, color: PURPLE }}>🎙 Transcription — Whisper AI</span>
               <button
                 onClick={handleTranscribe}
@@ -181,14 +181,14 @@ export default function EndCallModal() {
             </div>
 
             {/* Transcript lines */}
-            <div style={{ padding: '10px 12px', minHeight: 60, fontSize: 12, color: transcriptLines.length === 0 ? '#888' : '#1a1a2e', fontStyle: transcriptLines.length === 0 ? 'italic' : 'normal' }}>
+            <div style={{ padding: '10px 12px', minHeight: 60, fontSize: 12, color: transcriptLines.length === 0 ? 'var(--text3)' : 'var(--text)', fontStyle: transcriptLines.length === 0 ? 'italic' : 'normal' }}>
               {transcriptLines.length === 0
                 ? 'Click "Transcribe" to generate transcript using Whisper AI.'
                 : transcriptLines.map((line, i) => (
                   <div key={i} style={{ marginBottom: 8, lineHeight: 1.5 }}>
                     <span style={{ fontWeight: 700, color: BLUE }}>{line.speaker}</span>
                     {' '}
-                    <span style={{ color: '#888', fontSize: 10 }}>[{line.timestamp}]</span>
+                    <span style={{ color: 'var(--text3)', fontSize: 10 }}>[{line.timestamp}]</span>
                     <br />
                     <span>{line.text}</span>
                   </div>
@@ -198,11 +198,11 @@ export default function EndCallModal() {
 
             {/* AI Summary */}
             {summary && (
-              <div style={{ borderTop: '1px solid #dde1e7', padding: '10px 12px', background: '#fafafa' }}>
+              <div style={{ borderTop: '1px solid var(--border)', padding: '10px 12px', background: 'var(--grey-light)' }}>
                 <div style={{ fontSize: 10, fontWeight: 700, color: PURPLE, marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.04em' }}>
                   ✨ AI Summary
                 </div>
-                <div style={{ fontSize: 12, color: '#1a1a2e', lineHeight: 1.6 }}>
+                <div style={{ fontSize: 12, color: 'var(--text)', lineHeight: 1.6 }}>
                   <div><strong>Topic:</strong> {summary.topic}</div>
                   {summary.key_points.length > 0 && (
                     <div><strong>Key points:</strong> {summary.key_points.join('; ')}</div>
@@ -213,11 +213,11 @@ export default function EndCallModal() {
                 </div>
                 <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
                   <button onClick={copyToClipboard}
-                    style={{ padding: '3px 10px', border: '1px solid #dde1e7', borderRadius: 5, fontSize: 11, cursor: 'pointer', background: '#fff', fontFamily: 'inherit' }}>
+                    style={{ padding: '3px 10px', border: '1px solid var(--border)', borderRadius: 5, fontSize: 11, cursor: 'pointer', background: 'var(--surface)', fontFamily: 'inherit' }}>
                     📋 Copy
                   </button>
                   <button onClick={() => {/* adds to note field */}}
-                    style={{ padding: '3px 10px', border: `1px solid ${BLUE}`, color: BLUE, borderRadius: 5, fontSize: 11, cursor: 'pointer', background: '#fff', fontFamily: 'inherit' }}>
+                    style={{ padding: '3px 10px', border: `1px solid ${BLUE}`, color: BLUE, borderRadius: 5, fontSize: 11, cursor: 'pointer', background: 'var(--surface)', fontFamily: 'inherit' }}>
                     + Add to PCI Note
                   </button>
                 </div>
@@ -227,9 +227,9 @@ export default function EndCallModal() {
         </div>
 
         {/* Footer */}
-        <div style={{ padding: '10px 16px', borderTop: '1px solid #dde1e7', display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+        <div style={{ padding: '10px 16px', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
           <button onClick={() => closeModal()}
-            style={{ padding: '5px 16px', borderRadius: 6, cursor: 'pointer', fontSize: 12, fontFamily: 'inherit', border: '1px solid #dde1e7', background: '#fff' }}>
+            style={{ padding: '5px 16px', borderRadius: 6, cursor: 'pointer', fontSize: 12, fontFamily: 'inherit', border: '1px solid var(--border)', background: 'var(--surface)' }}>
             Skip
           </button>
           <button

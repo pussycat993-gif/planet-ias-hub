@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 
-const BLUE = '#1976d2';
-const BLUE_DARK = '#1565c0';
+const BLUE = '#1964AC';
+const BLUE_DARK = '#155592';
 const WAVE_BAR_COUNT = 42;      // static waveform bar count
 const WAVE_BAR_GAP = 2;          // px between bars
 const WAVE_MIN_BAR_HEIGHT = 3;   // px, so silent samples still render
@@ -136,7 +136,7 @@ export default function VoiceNotePlayer({ src, variant = 'voice' }: Props) {
       const y = mid - barH / 2;
 
       // Played portion: solid blue. Unplayed: light blue.
-      ctx.fillStyle = i <= playedBars ? BLUE : '#bbdefb';
+      ctx.fillStyle = i <= playedBars ? BLUE : '#B8CFE5';
       ctx.fillRect(x, y, barWidth, barH);
     }
   }, [waveform, duration, currentTime]);
@@ -183,7 +183,7 @@ export default function VoiceNotePlayer({ src, variant = 'voice' }: Props) {
     return `${m}:${String(s).padStart(2, '0')}`;
   };
 
-  const accent = variant === 'voice' ? '#f0f7ff' : '#f8f9fa';
+  const accent = variant === 'voice' ? '#E9F0F7' : '#f8f9fa';
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', background: accent, borderRadius: 10, border: '1px solid #dde1e7', minWidth: 0 }}>
@@ -208,7 +208,7 @@ export default function VoiceNotePlayer({ src, variant = 'voice' }: Props) {
           borderRadius: '50%', border: 'none',
           background: BLUE, color: '#fff',
           cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 14, boxShadow: '0 2px 6px rgba(25,118,210,.3)',
+          fontSize: 14, boxShadow: '0 2px 6px rgba(25,100,172,.3)',
         }}
         onMouseEnter={e => (e.currentTarget.style.background = BLUE_DARK)}
         onMouseLeave={e => (e.currentTarget.style.background = BLUE)}

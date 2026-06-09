@@ -6,14 +6,14 @@ import { useUIStore } from '../../store/uiStore';
 import { useFavorites } from '../../hooks/useFavorites';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
-const BLUE = '#1976d2';
-const BLUE_DARK = '#1565c0';
+const BLUE = 'var(--blue-primary)';
+const BLUE_DARK = 'var(--blue-dark)';
 
 // ── Channel avatar ────────────────────────────────────────
 function ChannelAvatar({ ch }: { ch: Channel }) {
   if (ch.type === 'dm' && ch.other_user) {
     const u = ch.other_user;
-    const dotColor = u.status === 'online' ? '#4caf50' : u.status === 'away' ? '#ff9800' : '#bbb';
+    const dotColor = u.status === 'online' ? 'var(--green)' : u.status === 'away' ? '#BA7517' : 'var(--text3)';
     return (
       <div style={{ position: 'relative', flexShrink: 0 }}>
         {u.avatar_url ? (
@@ -37,7 +37,7 @@ function ChannelAvatar({ ch }: { ch: Channel }) {
     const abbr = ch.logo_abbr || ch.name.slice(0, 2).toUpperCase();
     return <div style={{ width: 24, height: 24, borderRadius: 6, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 800, color: '#fff', flexShrink: 0 }}>{abbr}</div>;
   }
-  return <span style={{ color: '#aaa', fontSize: 14, width: 24, textAlign: 'center', flexShrink: 0 }}>#</span>;
+  return <span style={{ color: 'var(--text3)', fontSize: 14, width: 24, textAlign: 'center', flexShrink: 0 }}>#</span>;
 }
 
 // ── Channel row ───────────────────────────────────────────
@@ -50,18 +50,18 @@ function ChannelRow({ ch, isSelected, isFav, onClick, onToggleFav }: {
 
   return (
     <div onClick={onClick} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
-      style={{ display: 'flex', alignItems: 'center', padding: '5px 8px 5px 10px', cursor: 'pointer', gap: 7, borderRadius: 6, margin: '1px 5px', background: isSelected ? '#e3f2fd' : hovered ? '#f0f7ff' : 'transparent', borderLeft: isSelected ? `3px solid ${BLUE}` : '3px solid transparent', paddingLeft: isSelected ? 7 : 10, transition: 'all .12s' }}>
+      style={{ display: 'flex', alignItems: 'center', padding: '5px 8px 5px 10px', cursor: 'pointer', gap: 7, borderRadius: 6, margin: '1px 5px', background: isSelected ? 'var(--blue-xlight)' : hovered ? 'var(--grey-light-hover)' : 'transparent', borderLeft: isSelected ? `3px solid ${BLUE}` : '3px solid transparent', paddingLeft: isSelected ? 7 : 10, transition: 'all .12s' }}>
       <ChannelAvatar ch={ch} />
-      <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 12, color: isSelected ? BLUE : '#1a1a2e', fontWeight: isSelected || (ch.unread_count || 0) > 0 ? 700 : 400 }}>
+      <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 12, color: isSelected ? BLUE : 'var(--text)', fontWeight: isSelected || (ch.unread_count || 0) > 0 ? 700 : 400 }}>
         {displayName}
       </span>
       {(ch.unread_count || 0) > 0 && (
-        <span style={{ background: '#e53935', color: '#fff', fontSize: 9, padding: '1px 5px', borderRadius: 8, fontWeight: 700, flexShrink: 0 }}>{ch.unread_count}</span>
+        <span style={{ background: 'var(--red)', color: '#fff', fontSize: 9, padding: '1px 5px', borderRadius: 8, fontWeight: 700, flexShrink: 0 }}>{ch.unread_count}</span>
       )}
       {(hovered || isFav) && (
-        <span onClick={onToggleFav} style={{ fontSize: 13, cursor: 'pointer', color: isFav ? '#f9a825' : '#ccc', flexShrink: 0, lineHeight: 1 }}
+        <span onClick={onToggleFav} style={{ fontSize: 13, cursor: 'pointer', color: isFav ? '#f9a825' : 'var(--text3)', flexShrink: 0, lineHeight: 1 }}
           onMouseEnter={e => (e.currentTarget.style.color = '#f9a825')}
-          onMouseLeave={e => (e.currentTarget.style.color = isFav ? '#f9a825' : '#ccc')}>★</span>
+          onMouseLeave={e => (e.currentTarget.style.color = isFav ? '#f9a825' : 'var(--text3)')}>★</span>
       )}
     </div>
   );
@@ -69,9 +69,9 @@ function ChannelRow({ ch, isSelected, isFav, onClick, onToggleFav }: {
 
 function SectionHeader({ label, onAdd }: { label: string; onAdd?: () => void }) {
   return (
-    <div style={{ padding: '8px 10px 3px', fontSize: 10, fontWeight: 700, color: '#888', textTransform: 'uppercase', letterSpacing: '.06em', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+    <div style={{ padding: '8px 10px 3px', fontSize: 10, fontWeight: 700, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '.06em', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
       <span>{label}</span>
-      {onAdd && <span onClick={onAdd} style={{ cursor: 'pointer', fontSize: 16, color: '#bbb' }} onMouseEnter={e => (e.currentTarget.style.color = BLUE)} onMouseLeave={e => (e.currentTarget.style.color = '#bbb')}>+</span>}
+      {onAdd && <span onClick={onAdd} style={{ cursor: 'pointer', fontSize: 16, color: 'var(--text3)' }} onMouseEnter={e => (e.currentTarget.style.color = BLUE)} onMouseLeave={e => (e.currentTarget.style.color = 'var(--text3)')}>+</span>}
     </div>
   );
 }
@@ -114,22 +114,22 @@ function CallHistoryList() {
       <SectionHeader label="Recent Calls" />
       {DUMMY_CALLS.map(call => (
         <div key={call.id} style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '7px 10px', borderRadius: 6, margin: '1px 5px', cursor: 'pointer' }}
-          onMouseEnter={e => (e.currentTarget.style.background = '#f0f7ff')}
+          onMouseEnter={e => (e.currentTarget.style.background = 'var(--grey-light-hover)')}
           onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
           <div style={{ width: 28, height: 28, borderRadius: '50%', background: stringToColor(call.name), display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#fff', flexShrink: 0 }}>
             {call.name.split(' ').map(w => w[0]).join('').slice(0, 2)}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 12, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: call.missed ? '#c62828' : '#1a1a2e' }}>
+            <div style={{ fontSize: 12, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: call.missed ? 'var(--red)' : 'var(--text)' }}>
               {call.missed && '↗ '}{call.name}
             </div>
-            <div style={{ fontSize: 10, color: '#888' }}>
+            <div style={{ fontSize: 10, color: 'var(--text3)' }}>
               {call.type === 'video' ? '📹' : '📞'} {call.missed ? 'Missed' : fmtDuration(call.duration)} · {fmtAgo(call.minsAgo)}
             </div>
           </div>
-          <span style={{ fontSize: 14, cursor: 'pointer', color: '#bbb' }} title="Call back"
-            onMouseEnter={e => (e.currentTarget.style.color = '#2e7d32')}
-            onMouseLeave={e => (e.currentTarget.style.color = '#bbb')}>
+          <span style={{ fontSize: 14, cursor: 'pointer', color: 'var(--text3)' }} title="Call back"
+            onMouseEnter={e => (e.currentTarget.style.color = 'var(--green)')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'var(--text3)')}>
             {call.type === 'video' ? '📹' : '📞'}
           </span>
         </div>
@@ -226,29 +226,29 @@ function GlobalFilesList() {
   return (
     <div>
       {/* Search */}
-      <div style={{ padding: '6px 8px', borderBottom: '1px solid #f0f0f0' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 5, background: '#f5f6f8', borderRadius: 8, padding: '4px 9px', border: '1px solid #eee' }}>
-          <span style={{ color: '#bbb', fontSize: 12 }}>🔍</span>
+      <div style={{ padding: '6px 8px', borderBottom: '1px solid var(--neutral-light-active)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'var(--grey-light)', borderRadius: 8, padding: '4px 9px', border: '1px solid var(--neutral-light-active)' }}>
+          <span style={{ color: 'var(--text3)', fontSize: 12 }}>🔍</span>
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search files..."
-            style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: 12, flex: 1, color: '#1a1a2e', fontFamily: 'inherit' }}
+            style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: 12, flex: 1, color: 'var(--text)', fontFamily: 'inherit' }}
           />
-          {search && <span onClick={() => setSearch('')} style={{ color: '#bbb', cursor: 'pointer', fontSize: 14 }}>✕</span>}
+          {search && <span onClick={() => setSearch('')} style={{ color: 'var(--text3)', cursor: 'pointer', fontSize: 14 }}>✕</span>}
         </div>
       </div>
 
       {/* Type filter chips */}
-      <div style={{ display: 'flex', gap: 4, padding: '6px 8px', borderBottom: '1px solid #f0f0f0', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 4, padding: '6px 8px', borderBottom: '1px solid var(--neutral-light-active)', flexWrap: 'wrap' }}>
         {FILTER_CHIPS.map(c => (
           <span key={c.key} onClick={() => setTypeFilter(c.key)}
             style={{
               fontSize: 10, padding: '3px 8px', borderRadius: 10, cursor: 'pointer',
-              background: typeFilter === c.key ? BLUE : '#f5f6f8',
-              color: typeFilter === c.key ? '#fff' : '#555',
+              background: typeFilter === c.key ? BLUE : 'var(--grey-light)',
+              color: typeFilter === c.key ? '#fff' : 'var(--text2)',
               fontWeight: typeFilter === c.key ? 700 : 500,
-              border: `1px solid ${typeFilter === c.key ? BLUE : '#eee'}`,
+              border: `1px solid ${typeFilter === c.key ? BLUE : 'var(--neutral-light-active)'}`,
               transition: 'all .12s',
             }}>
             {c.label}
@@ -258,15 +258,15 @@ function GlobalFilesList() {
 
       {/* File list */}
       {loading ? (
-        <div style={{ padding: '24px 12px', textAlign: 'center', color: '#bbb', fontSize: 12 }}>Loading files…</div>
+        <div style={{ padding: '24px 12px', textAlign: 'center', color: 'var(--text3)', fontSize: 12 }}>Loading files…</div>
       ) : filtered.length === 0 ? (
-        <div style={{ padding: '20px 12px', textAlign: 'center', color: '#bbb', fontSize: 12 }}>
+        <div style={{ padding: '20px 12px', textAlign: 'center', color: 'var(--text3)', fontSize: 12 }}>
           <div style={{ fontSize: 24, marginBottom: 8 }}>📁</div>
           {search ? 'No files match your search' : 'No files yet'}
         </div>
       ) : (
         <div>
-          <div style={{ padding: '6px 12px 3px', fontSize: 10, fontWeight: 700, color: '#888', textTransform: 'uppercase', letterSpacing: '.05em' }}>
+          <div style={{ padding: '6px 12px 3px', fontSize: 10, fontWeight: 700, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '.05em' }}>
             {filtered.length} {filtered.length === 1 ? 'file' : 'files'}
           </div>
           {filtered.map(f => {
@@ -275,12 +275,12 @@ function GlobalFilesList() {
             const isImage = f.mime_type?.startsWith('image/');
             return (
               <div key={f.id}
-                style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px', borderBottom: '1px solid #f5f5f5', cursor: 'pointer' }}
-                onMouseEnter={e => (e.currentTarget.style.background = '#f0f7ff')}
+                style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px', borderBottom: '1px solid var(--neutral-light-active)', cursor: 'pointer' }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'var(--grey-light-hover)')}
                 onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                 onClick={() => selectChannel(f.channel.id)}>
                 {isImage ? (
-                  <div style={{ width: 32, height: 32, borderRadius: 6, overflow: 'hidden', flexShrink: 0, background: '#f5f5f5' }}>
+                  <div style={{ width: 32, height: 32, borderRadius: 6, overflow: 'hidden', flexShrink: 0, background: 'var(--neutral-light-active)' }}>
                     <img src={streamUrl} alt={f.file_name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </div>
                 ) : (
@@ -292,7 +292,7 @@ function GlobalFilesList() {
                   <div style={{ fontSize: 11, fontWeight: 600, color: BLUE_DARK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {f.file_name}
                   </div>
-                  <div style={{ fontSize: 9, color: '#888', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <div style={{ fontSize: 9, color: 'var(--text3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {fmtBytes(f.file_size)} · {f.uploader?.name || 'Unknown'} · {fmtAgoShort(f.created_at)}
                   </div>
                   <div style={{ fontSize: 9, color: BLUE, marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -302,9 +302,9 @@ function GlobalFilesList() {
                 <a href={downloadUrl} download={f.file_name}
                   onClick={e => e.stopPropagation()}
                   title="Download"
-                  style={{ fontSize: 12, color: '#bbb', textDecoration: 'none', padding: '2px 4px', flexShrink: 0 }}
+                  style={{ fontSize: 12, color: 'var(--text3)', textDecoration: 'none', padding: '2px 4px', flexShrink: 0 }}
                   onMouseEnter={e => (e.currentTarget.style.color = BLUE)}
-                  onMouseLeave={e => (e.currentTarget.style.color = '#bbb')}>⬇</a>
+                  onMouseLeave={e => (e.currentTarget.style.color = 'var(--text3)')}>⬇</a>
               </div>
             );
           })}
@@ -323,7 +323,7 @@ export default function Sidebar() {
 
   const [search, setSearch] = useState('');
 
-  const statusColor = myStatus === 'online' ? '#4caf50' : myStatus === 'away' ? '#ff9800' : '#bbb';
+  const statusColor = myStatus === 'online' ? 'var(--green)' : myStatus === 'away' ? '#BA7517' : 'var(--text3)';
   const statusLabel = myStatus === 'online' ? '● Online' : myStatus === 'away' ? '● Away' : '● Offline';
 
   const allChannels = [...channels.public, ...channels.private, ...channels.groups, ...channels.dms];
@@ -358,7 +358,7 @@ export default function Sidebar() {
   };
 
   return (
-    <div style={{ width: 230, borderRight: '1px solid #dde1e7', display: 'flex', flexDirection: 'column', background: '#fff', flexShrink: 0 }}>
+    <div style={{ width: 230, borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column', background: 'var(--surface)', flexShrink: 0 }}>
       {/* Header */}
       <div style={{ background: BLUE, color: '#fff', padding: '5px 10px', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span>{headerLabels[mainTab] || 'All'}</span>
@@ -371,16 +371,16 @@ export default function Sidebar() {
 
       {/* Search */}
       {mainTab !== 'calls' && mainTab !== 'files' && (
-        <div style={{ padding: '6px 8px', borderBottom: '1px solid #f0f0f0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5, background: '#f5f6f8', borderRadius: 8, padding: '4px 9px', border: '1px solid #eee' }}>
-            <span style={{ color: '#bbb', fontSize: 12 }}>🔍</span>
+        <div style={{ padding: '6px 8px', borderBottom: '1px solid var(--neutral-light-active)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'var(--grey-light)', borderRadius: 8, padding: '4px 9px', border: '1px solid var(--neutral-light-active)' }}>
+            <span style={{ color: 'var(--text3)', fontSize: 12 }}>🔍</span>
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search..."
-              style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: 12, flex: 1, color: '#1a1a2e', fontFamily: 'inherit' }}
+              style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: 12, flex: 1, color: 'var(--text)', fontFamily: 'inherit' }}
             />
-            {search && <span onClick={() => setSearch('')} style={{ color: '#bbb', cursor: 'pointer', fontSize: 14 }}>✕</span>}
+            {search && <span onClick={() => setSearch('')} style={{ color: 'var(--text3)', cursor: 'pointer', fontSize: 14 }}>✕</span>}
           </div>
 
           {/* Unread-only filter toggle */}
@@ -388,19 +388,19 @@ export default function Sidebar() {
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               marginTop: 6, padding: '4px 9px', borderRadius: 7, cursor: 'pointer',
-              background: showUnreadOnly ? '#e3f2fd' : 'transparent',
-              border: `1px solid ${showUnreadOnly ? '#90caf9' : 'transparent'}`,
+              background: showUnreadOnly ? 'var(--blue-xlight)' : 'transparent',
+              border: `1px solid ${showUnreadOnly ? 'var(--blue-300)' : 'transparent'}`,
               transition: 'all .12s',
             }}
-            onMouseEnter={e => { if (!showUnreadOnly) e.currentTarget.style.background = '#f5f6f8'; }}
+            onMouseEnter={e => { if (!showUnreadOnly) e.currentTarget.style.background = 'var(--grey-light)'; }}
             onMouseLeave={e => { if (!showUnreadOnly) e.currentTarget.style.background = 'transparent'; }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: showUnreadOnly ? BLUE_DARK : '#666', fontWeight: showUnreadOnly ? 600 : 400 }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: showUnreadOnly ? BLUE_DARK : 'var(--text2)', fontWeight: showUnreadOnly ? 600 : 400 }}>
               <span style={{ fontSize: 12 }}>{showUnreadOnly ? '●' : '○'}</span>
               Unread only
             </span>
             {totalUnread > 0 && (
               <span style={{
-                fontSize: 9, background: showUnreadOnly ? BLUE : '#e53935', color: '#fff',
+                fontSize: 9, background: showUnreadOnly ? BLUE : 'var(--red)', color: '#fff',
                 padding: '1px 5px', borderRadius: 7, fontWeight: 700,
               }}>
                 {totalUnread}
@@ -441,7 +441,7 @@ export default function Sidebar() {
               </>
             )}
             {allChannels.length === 0 && (
-              <div style={{ padding: '20px 12px', textAlign: 'center', color: '#bbb', fontSize: 12 }}>
+              <div style={{ padding: '20px 12px', textAlign: 'center', color: 'var(--text3)', fontSize: 12 }}>
                 <div style={{ fontSize: 24, marginBottom: 8 }}>💬</div>
                 No channels yet.
                 <div onClick={() => openModal('newChannel')} style={{ color: BLUE, cursor: 'pointer', marginTop: 6 }}>+ Create one</div>
@@ -465,7 +465,7 @@ export default function Sidebar() {
                 {filterCh(channels.dms).map(renderRow)}
               </>
             ) : (
-              <div style={{ padding: '20px 12px', textAlign: 'center', color: '#bbb', fontSize: 12 }}>
+              <div style={{ padding: '20px 12px', textAlign: 'center', color: 'var(--text3)', fontSize: 12 }}>
                 <div style={{ fontSize: 24, marginBottom: 8 }}>💬</div>
                 {search ? 'No results' : 'No direct messages'}
                 {!search && <div onClick={() => openModal('newMessage')} style={{ color: BLUE, cursor: 'pointer', marginTop: 6 }}>+ New Message</div>}
@@ -482,7 +482,7 @@ export default function Sidebar() {
       </div>
 
       {/* Footer */}
-      <div style={{ padding: '7px 10px', borderTop: '1px solid #dde1e7', display: 'flex', alignItems: 'center', gap: 7 }}>
+      <div style={{ padding: '7px 10px', borderTop: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 7 }}>
         {/* User avatar */}
         {user?.avatar_url ? (
           <div style={{ width: 26, height: 26, borderRadius: '50%', overflow: 'hidden', flexShrink: 0 }}>
@@ -499,7 +499,7 @@ export default function Sidebar() {
         </div>
 
         {/* Logout */}
-        <span style={{ cursor: 'pointer', color: '#bbb', fontSize: 14 }} title="Logout" onClick={logout}>⎋</span>
+        <span style={{ cursor: 'pointer', color: 'var(--text3)', fontSize: 14 }} title="Logout" onClick={logout}>⎋</span>
       </div>
     </div>
   );

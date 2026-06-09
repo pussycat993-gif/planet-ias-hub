@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useChatStore } from '../../store/chatStore';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
-const BLUE = '#1976d2';
+const BLUE = 'var(--blue-primary)';
 
 export interface Notif {
   id: number;
@@ -56,8 +56,8 @@ export default function NotifDropdown({ onClose, onUnreadChange }: NotifDropdown
   };
 
   return (
-    <div style={{ width: 320, background: '#fff', borderRadius: 10, boxShadow: '0 6px 30px rgba(0,0,0,.18)', border: '1px solid #eee', fontFamily: 'Segoe UI, Arial, sans-serif', overflow: 'hidden' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', borderBottom: '1px solid #eee' }}>
+    <div style={{ width: 320, background: 'var(--surface)', borderRadius: 10, boxShadow: '0 6px 30px rgba(0,0,0,.18)', border: '1px solid var(--border)', fontFamily: 'var(--font-sans)', overflow: 'hidden' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', borderBottom: '1px solid var(--border)' }}>
         <span style={{ fontWeight: 700, fontSize: 13 }}>
           Notifications {unread > 0 && <span style={{ background: BLUE, color: '#fff', borderRadius: 10, padding: '1px 6px', fontSize: 10, marginLeft: 5 }}>{unread}</span>}
         </span>
@@ -65,22 +65,22 @@ export default function NotifDropdown({ onClose, onUnreadChange }: NotifDropdown
       </div>
       <div style={{ maxHeight: 380, overflowY: 'auto' }}>
         {loading ? (
-          <div style={{ padding: 20, textAlign: 'center', color: '#aaa', fontSize: 13 }}>Loading...</div>
+          <div style={{ padding: 20, textAlign: 'center', color: 'var(--text3)', fontSize: 13 }}>Loading...</div>
         ) : notifs.length === 0 ? (
-          <div style={{ padding: '24px 16px', textAlign: 'center', color: '#aaa' }}>
+          <div style={{ padding: '24px 16px', textAlign: 'center', color: 'var(--text3)' }}>
             <div style={{ fontSize: 26, marginBottom: 6 }}>🔔</div>
             <div style={{ fontSize: 12 }}>No notifications yet</div>
           </div>
         ) : notifs.map(n => (
           <div key={n.id} onClick={() => handleClick(n)}
-            style={{ display: 'flex', gap: 9, padding: '9px 14px', borderBottom: '1px solid #f5f5f5', cursor: 'pointer', background: n.read ? '#fff' : '#f0f7ff' }}
-            onMouseEnter={e => (e.currentTarget.style.background = '#e8f4fd')}
-            onMouseLeave={e => (e.currentTarget.style.background = n.read ? '#fff' : '#f0f7ff')}>
+            style={{ display: 'flex', gap: 9, padding: '9px 14px', borderBottom: '1px solid var(--neutral-light-active)', cursor: 'pointer', background: n.read ? 'var(--surface)' : 'var(--blue-xlight)' }}
+            onMouseEnter={e => (e.currentTarget.style.background = 'var(--blue-xlight)')}
+            onMouseLeave={e => (e.currentTarget.style.background = n.read ? 'var(--surface)' : 'var(--blue-xlight)')}>
             <span style={{ fontSize: 16, flexShrink: 0 }}>{NOTIF_ICONS[n.type] || '🔔'}</span>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontWeight: n.read ? 400 : 700, fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{n.title}</div>
-              <div style={{ fontSize: 11, color: '#888', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{n.body}</div>
-              <div style={{ fontSize: 10, color: '#bbb', marginTop: 2 }}>{new Date(n.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</div>
+              <div style={{ fontSize: 11, color: 'var(--text3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{n.body}</div>
+              <div style={{ fontSize: 10, color: 'var(--text3)', marginTop: 2 }}>{new Date(n.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</div>
             </div>
             {!n.read && <div style={{ width: 7, height: 7, borderRadius: '50%', background: BLUE, flexShrink: 0, marginTop: 4 }} />}
           </div>

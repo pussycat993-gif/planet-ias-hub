@@ -3,27 +3,27 @@ import { useUIStore } from '../../store/uiStore';
 import { useAuthStore } from '../../store/authStore';
 import { useChatStore } from '../../store/chatStore';
 
-const BLUE = '#1976d2';
-const BLUE_DARK = '#1565c0';
+const BLUE = 'var(--blue-primary)';
+const BLUE_DARK = 'var(--blue-dark)';
 
 const btn = (active = false): React.CSSProperties => ({
   display: 'flex', alignItems: 'center', gap: 5,
-  padding: '4px 10px', border: `1px solid ${active ? '#90caf9' : '#dde1e7'}`,
-  background: active ? '#e3f2fd' : '#fff', color: active ? BLUE : '#555',
+  padding: '4px 10px', border: `1px solid ${active ? 'var(--blue-300)' : 'var(--border)'}`,
+  background: active ? 'var(--blue-xlight)' : 'var(--surface)', color: active ? BLUE : 'var(--text2)',
   cursor: 'pointer', fontSize: 11, borderRadius: 6, whiteSpace: 'nowrap',
   fontFamily: 'inherit', transition: 'all .15s', fontWeight: active ? 600 : 400,
 });
 
 const autoBtn = (active = false): React.CSSProperties => ({
-  ...btn(), background: active ? '#e1bee7' : '#f3e5f5',
-  color: '#6a1b9a', border: `1px solid ${active ? '#ab47bc' : '#ce93d8'}`,
+  ...btn(), background: active ? 'rgba(176,124,214,.3)' : 'rgba(176,124,214,.14)',
+  color: 'var(--purple)', border: `1px solid ${active ? 'rgba(176,124,214,.6)' : 'rgba(176,124,214,.4)'}`,
   fontWeight: active ? 700 : 500,
 });
 
 const dndBtn = (active = false): React.CSSProperties => ({
-  ...btn(), background: active ? '#fff3e0' : '#fff',
-  color: active ? '#e65100' : '#555',
-  border: `1px solid ${active ? '#ffb74d' : '#dde1e7'}`,
+  ...btn(), background: active ? 'rgba(230,81,0,.15)' : 'var(--surface)',
+  color: active ? 'var(--orange)' : 'var(--text2)',
+  border: `1px solid ${active ? 'rgba(230,81,0,.5)' : 'var(--border)'}`,
   fontWeight: active ? 700 : 400,
 });
 
@@ -67,7 +67,7 @@ function CreateDropdown() {
       {open && (
         <div style={{
           position: 'absolute', top: 'calc(100% + 4px)', left: 0, zIndex: 2000,
-          background: '#fff', border: '1px solid #dde1e7', borderRadius: 8,
+          background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8,
           boxShadow: '0 6px 20px rgba(0,0,0,.14)', minWidth: 240, overflow: 'hidden',
         }}>
           {items.map((it, i) => (
@@ -79,14 +79,14 @@ function CreateDropdown() {
                 padding: '9px 12px',
                 cursor: it.enabled ? 'pointer' : 'not-allowed',
                 opacity: it.enabled ? 1 : 0.45,
-                borderBottom: i < items.length - 1 ? '1px solid #f5f5f5' : 'none',
+                borderBottom: i < items.length - 1 ? '1px solid var(--neutral-light-active)' : 'none',
               }}
-              onMouseEnter={e => { if (it.enabled) e.currentTarget.style.background = '#f0f7ff'; }}
+              onMouseEnter={e => { if (it.enabled) e.currentTarget.style.background = 'var(--blue-xlight)'; }}
               onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
               <span style={{ fontSize: 16, width: 20, textAlign: 'center', flexShrink: 0 }}>{it.icon}</span>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 12, fontWeight: 600, color: BLUE_DARK }}>{it.label}</div>
-                <div style={{ fontSize: 10, color: '#888', marginTop: 1 }}>{it.sub}</div>
+                <div style={{ fontSize: 10, color: 'var(--text3)', marginTop: 1 }}>{it.sub}</div>
               </div>
             </div>
           ))}
@@ -133,7 +133,7 @@ export default function Toolbar() {
     <div style={{
       display: 'flex', alignItems: 'center',
       padding: '5px 12px',
-      background: '#fff', borderBottom: '1px solid #dde1e7',
+      background: 'var(--surface)', borderBottom: '1px solid var(--border)',
       gap: 5, flexShrink: 0, flexWrap: 'wrap',
     }}>
       {/* Create dropdown */}
@@ -142,7 +142,7 @@ export default function Toolbar() {
       {/* Status */}
       <StatusChip />
 
-      <div style={{ width: 1, height: 20, background: '#dde1e7', margin: '0 3px' }} />
+      <div style={{ width: 1, height: 20, background: 'var(--border)', margin: '0 3px' }} />
 
       {/* DND toggle */}
       <button style={dndBtn(dnd)} onClick={toggleDnd} title={dnd ? 'DND active — notifications muted' : 'Toggle Do Not Disturb'}>
@@ -170,14 +170,14 @@ export default function Toolbar() {
           {showSettings && (
             <div style={{
               position: 'absolute', top: 'calc(100% + 4px)', right: 0, zIndex: 2000,
-              background: '#fff', border: '1px solid #dde1e7', borderRadius: 8,
+              background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8,
               boxShadow: '0 6px 20px rgba(0,0,0,.14)', minWidth: 180, overflow: 'hidden',
             }}>
               <SettingsItem icon="👤"  label="My Profile"         onClick={() => { setShowSettings(false); }} />
               <SettingsItem icon="🔔" label="Notifications"      onClick={() => { setShowSettings(false); }} />
               <SettingsItem icon="🎨" label="Appearance"         onClick={() => { setShowSettings(false); }} />
               <SettingsItem icon="⌨"  label="Keyboard Shortcuts" onClick={() => { setShowSettings(false); }} />
-              <div style={{ height: 1, background: '#f0f0f0' }} />
+              <div style={{ height: 1, background: 'var(--neutral-light-active)' }} />
               <SettingsItem icon="⎋" label="Log out"            onClick={() => { setShowSettings(false); logout(); }} danger />
             </div>
           )}
@@ -190,8 +190,8 @@ export default function Toolbar() {
 function SettingsItem({ icon, label, onClick, danger }: { icon: string; label: string; onClick: () => void; danger?: boolean }) {
   return (
     <div onClick={onClick}
-      style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', cursor: 'pointer', fontSize: 12, color: danger ? '#c62828' : '#1a1a2e' }}
-      onMouseEnter={e => (e.currentTarget.style.background = danger ? '#fff5f5' : '#f5f5f5')}
+      style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', cursor: 'pointer', fontSize: 12, color: danger ? '#c62828' : 'var(--text)' }}
+      onMouseEnter={e => (e.currentTarget.style.background = danger ? 'rgba(198,40,40,.12)' : 'var(--neutral-light-active)')}
       onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
       <span style={{ fontSize: 14, width: 18, textAlign: 'center' }}>{icon}</span>
       <span>{label}</span>

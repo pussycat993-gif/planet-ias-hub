@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 
-const BLUE = '#1976d2';
-const BLUE_DARK = '#1565c0';
+const BLUE = 'var(--blue-primary)';
+const BLUE_DARK = 'var(--blue-dark)';
 
 // ── Help content ──────────────────────────────────────────
 const SECTIONS = [

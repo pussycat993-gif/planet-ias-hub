@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 type MainTab = 'all' | 'dms' | 'calls' | 'files';
 type RightPanelTab = 'pci' | 'info' | 'files' | 'log';
-type Modal = 'newChannel' | 'newGroup' | 'newMessage' | 'scheduleMeeting' | 'logSettings' | 'endCall' | 'setStatus' | 'automations' | null;
+type Modal = 'newChannel' | 'newGroup' | 'newMessage' | 'scheduleMeeting' | 'logSettings' | 'endCall' | 'setStatus' | 'automations' | 'profileAccount' | null;
 export type ConnectionStatus = 'connected' | 'reconnecting' | 'disconnected';
 
 interface UIState {

@@ -3,8 +3,8 @@ import { usePCIStore } from '../../store/pciStore';
 import { useUIStore } from '../../store/uiStore';
 import { useChatStore } from '../../store/chatStore';
 
-const BLUE = '#1976d2';
-const BLUE_DARK = '#1565c0';
+const BLUE = 'var(--blue-primary)';
+const BLUE_DARK = 'var(--blue-dark)';
 
 // ── Mock data — Ivana Vrtunic's own schedule ──────────────
 const MOCK_CONTEXT = {
@@ -43,7 +43,7 @@ function StatusBadge({ status }: { status: string }) {
     Complete: { bg: '#2e7d32' },
     Canceled: { bg: '#c62828' },
   };
-  const c = colors[status] || { bg: '#888' };
+  const c = colors[status] || { bg: 'var(--text3)' };
   return (
     <span style={{ display: 'inline-block', padding: '1px 6px', borderRadius: 8, fontSize: 9, fontWeight: 700, background: c.bg, color: '#fff', whiteSpace: 'nowrap', flexShrink: 0 }}>
       {status}
@@ -54,11 +54,11 @@ function StatusBadge({ status }: { status: string }) {
 function ActivityRow({ act }: { act: typeof MOCK_CONTEXT.recent_activities[0] }) {
   const typeIcon: Record<string, string> = { Meeting: '📅', Call: '📞', Email: '📧', Task: '✅', Note: '📝' };
   return (
-    <div style={{ display: 'flex', padding: '5px 11px', borderBottom: '1px solid #f5f5f5', gap: 6, cursor: 'pointer', alignItems: 'center', background: act.status === 'Active' ? '#f0f6ff' : '#fff' }}
+    <div style={{ display: 'flex', padding: '5px 11px', borderBottom: '1px solid var(--neutral-light-active)', gap: 6, cursor: 'pointer', alignItems: 'center', background: act.status === 'Active' ? 'var(--blue-xlight)' : 'var(--surface)' }}
       onMouseEnter={e => (e.currentTarget.style.filter = 'brightness(.97)')}
       onMouseLeave={e => (e.currentTarget.style.filter = 'none')}>
       <span style={{ fontSize: 11, width: 18, flexShrink: 0 }}>{typeIcon[act.type] || '•'}</span>
-      <span style={{ color: '#888', fontSize: 10, width: 50, flexShrink: 0 }}>{act.date.slice(5).replace('-', '/')}</span>
+      <span style={{ color: 'var(--text3)', fontSize: 10, width: 50, flexShrink: 0 }}>{act.date.slice(5).replace('-', '/')}</span>
       <span style={{ color: BLUE, fontSize: 11, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{act.subject}</span>
       <StatusBadge status={act.status} />
     </div>
@@ -67,9 +67,9 @@ function ActivityRow({ act }: { act: typeof MOCK_CONTEXT.recent_activities[0] })
 
 function SectionLabel({ title, action, onAction }: { title: string; action?: string; onAction?: () => void }) {
   return (
-    <div style={{ background: '#eef2f7', color: BLUE_DARK, fontSize: 10, fontWeight: 700, padding: '4px 11px', borderTop: '1px solid #dde1e7', borderBottom: '1px solid #dde1e7', textTransform: 'uppercase', letterSpacing: '.04em', display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
+    <div style={{ background: 'var(--grey-light)', color: BLUE_DARK, fontSize: 10, fontWeight: 700, padding: '4px 11px', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', textTransform: 'uppercase', letterSpacing: '.04em', display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
       <span>{title}</span>
-      {action && <span style={{ fontWeight: 400, color: '#5c6bc0', cursor: 'pointer' }} onClick={onAction}>{action}</span>}
+      {action && <span style={{ fontWeight: 400, color: 'var(--blue-primary)', cursor: 'pointer' }} onClick={onAction}>{action}</span>}
     </div>
   );
 }
@@ -89,25 +89,25 @@ function LogActivityPanel() {
   return (
     <div style={{ padding: '6px 11px 8px' }}>
       {!open ? (
-        <button onClick={() => setOpen(true)} style={{ width: '100%', padding: '5px', border: `1px solid ${BLUE}`, color: BLUE, background: '#fff', cursor: 'pointer', fontSize: 11, borderRadius: 6, fontFamily: 'inherit' }}
+        <button onClick={() => setOpen(true)} style={{ width: '100%', padding: '5px', border: `1px solid ${BLUE}`, color: BLUE, background: 'var(--surface)', cursor: 'pointer', fontSize: 11, borderRadius: 6, fontFamily: 'inherit' }}
           onMouseEnter={e => { e.currentTarget.style.background = BLUE; e.currentTarget.style.color = '#fff'; }}
-          onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = BLUE; }}>
+          onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.color = BLUE; }}>
           + Log Activity
         </button>
       ) : (
-        <div style={{ border: `1px solid ${BLUE}`, borderRadius: 8, padding: 8, background: '#f8fbff' }}>
+        <div style={{ border: `1px solid ${BLUE}`, borderRadius: 8, padding: 8, background: 'var(--blue-xlight)' }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: BLUE_DARK, marginBottom: 6 }}>Log to PCI</div>
-          <select value={type} onChange={e => setType(e.target.value)} style={{ width: '100%', padding: '4px 6px', border: '1px solid #dde1e7', borderRadius: 5, fontSize: 11, marginBottom: 6, fontFamily: 'inherit' }}>
+          <select value={type} onChange={e => setType(e.target.value)} style={{ width: '100%', padding: '4px 6px', border: '1px solid var(--border)', borderRadius: 5, fontSize: 11, marginBottom: 6, fontFamily: 'inherit', background: 'var(--surface)', color: 'var(--text)' }}>
             {['Meeting', 'Call', 'Email', 'Task', 'Note'].map(t => <option key={t}>{t}</option>)}
           </select>
           <input value={subject} onChange={e => setSubject(e.target.value)} placeholder="Subject..."
-            style={{ width: '100%', padding: '4px 6px', border: '1px solid #dde1e7', borderRadius: 5, fontSize: 11, marginBottom: 6, fontFamily: 'inherit', boxSizing: 'border-box' as const }} />
+            style={{ width: '100%', padding: '4px 6px', border: '1px solid var(--border)', borderRadius: 5, fontSize: 11, marginBottom: 6, fontFamily: 'inherit', boxSizing: 'border-box' as const, background: 'var(--surface)', color: 'var(--text)' }} />
           <div style={{ display: 'flex', gap: 5 }}>
             <button onClick={handleLog} disabled={!subject.trim() || saving}
               style={{ flex: 1, padding: '4px', background: BLUE, color: '#fff', border: 'none', borderRadius: 5, fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>
               {saving ? 'Saving...' : 'Log'}
             </button>
-            <button onClick={() => setOpen(false)} style={{ padding: '4px 8px', background: '#fff', border: '1px solid #dde1e7', borderRadius: 5, fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>Cancel</button>
+            <button onClick={() => setOpen(false)} style={{ padding: '4px 8px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 5, fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>Cancel</button>
           </div>
         </div>
       )}
@@ -163,11 +163,11 @@ export default function PCIContextPanel() {
     }
   }
 
-  if (loading) return <div style={{ padding: '2rem', textAlign: 'center', color: '#888', fontSize: 12 }}>Loading...</div>;
+  if (loading) return <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text3)', fontSize: 12 }}>Loading...</div>;
 
   if (!data) {
     return (
-      <div style={{ padding: '2rem', textAlign: 'center', color: '#aaa', fontSize: 12 }}>
+      <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text3)', fontSize: 12 }}>
         <div style={{ fontSize: 28, marginBottom: 10 }}>👤</div>
         Select a conversation to see PCI context
       </div>
@@ -178,10 +178,10 @@ export default function PCIContextPanel() {
   const pciUrl = import.meta.env.VITE_PCI_URL || 'https://ias-app.planetsg.com';
 
   return (
-    <div style={{ overflowY: 'auto', flex: 1, fontSize: 12, fontFamily: 'Segoe UI, Arial, sans-serif' }}>
+    <div style={{ overflowY: 'auto', flex: 1, fontSize: 12, fontFamily: 'var(--font-sans)' }}>
 
       {/* Person header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '10px 11px', borderBottom: '1px solid #dde1e7' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '10px 11px', borderBottom: '1px solid var(--border)' }}>
         {person.avatar_url ? (
           <div style={{ width: 42, height: 42, borderRadius: '50%', overflow: 'hidden', flexShrink: 0 }}>
             <img src={person.avatar_url} alt={person.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -193,10 +193,10 @@ export default function PCIContextPanel() {
         )}
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontWeight: 700, fontSize: 13, color: BLUE_DARK }}>{person.name}</div>
-          <div style={{ fontSize: 10, color: '#888', marginTop: 1 }}>{person.role}</div>
-          <span style={{ display: 'inline-block', padding: '1px 7px', background: '#e8f5e9', color: '#2e7d32', borderRadius: 10, fontSize: 9, fontWeight: 700, border: '1px solid #a5d6a7', marginTop: 3 }}>● {person.status}</span>
+          <div style={{ fontSize: 10, color: 'var(--text3)', marginTop: 1 }}>{person.role}</div>
+          <span style={{ display: 'inline-block', padding: '1px 7px', background: 'rgba(76,175,80,.15)', color: 'var(--green)', borderRadius: 10, fontSize: 9, fontWeight: 700, border: '1px solid rgba(76,175,80,.4)', marginTop: 3 }}>● {person.status}</span>
         </div>
-        <span title="Demo data — PCI not connected" style={{ fontSize: 10, color: '#bbb' }}>🔌</span>
+        <span title="Demo data — PCI not connected" style={{ fontSize: 10, color: 'var(--text3)' }}>🔌</span>
       </div>
 
       {/* Fields */}
@@ -207,11 +207,11 @@ export default function PCIContextPanel() {
           { label: 'Schedule',   value: `${open_tasks.length} upcoming` },
           { label: 'Activities', value: recent_activities.length.toString() },
         ].filter(Boolean).map((row: any) => (
-          <div key={row.label} style={{ display: 'flex', padding: '3px 0', borderBottom: '1px solid #f5f5f5' }}>
-            <span style={{ color: '#aaa', width: 72, flexShrink: 0, fontSize: 11 }}>{row.label}</span>
+          <div key={row.label} style={{ display: 'flex', padding: '3px 0', borderBottom: '1px solid var(--neutral-light-active)' }}>
+            <span style={{ color: 'var(--text3)', width: 72, flexShrink: 0, fontSize: 11 }}>{row.label}</span>
             {row.href
               ? <a href={row.href} style={{ fontSize: 11, fontWeight: 600, color: BLUE, textDecoration: 'none' }}>{row.value}</a>
-              : <span style={{ fontSize: 11, fontWeight: 600, color: '#1a1a2e' }}>{row.value}</span>}
+              : <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text)' }}>{row.value}</span>}
           </div>
         ))}
       </div>
@@ -219,7 +219,7 @@ export default function PCIContextPanel() {
       {/* Entity tags */}
       <div style={{ padding: '6px 11px', display: 'flex', flexWrap: 'wrap', gap: 4 }}>
         {entities.map(e => (
-          <span key={e.id} style={{ background: '#e3f2fd', color: BLUE_DARK, border: '1px solid #90caf9', borderRadius: 10, padding: '2px 8px', fontSize: 10, fontWeight: 600, cursor: 'pointer' }}>
+          <span key={e.id} style={{ background: 'var(--blue-xlight)', color: BLUE_DARK, border: '1px solid var(--blue-300)', borderRadius: 10, padding: '2px 8px', fontSize: 10, fontWeight: 600, cursor: 'pointer' }}>
             {e.type === 'Project' ? '📁' : '🏢'} {e.name}
           </span>
         ))}
@@ -228,9 +228,9 @@ export default function PCIContextPanel() {
       {/* Open in PCI */}
       <div style={{ padding: '0 11px 4px' }}>
         <button onClick={() => window.open(`${pciUrl}/people/${person.id}`, '_blank')}
-          style={{ width: '100%', padding: '5px', border: `1px solid ${BLUE}`, color: BLUE, background: '#fff', cursor: 'pointer', fontSize: 11, borderRadius: 6, fontFamily: 'inherit' }}
+          style={{ width: '100%', padding: '5px', border: `1px solid ${BLUE}`, color: BLUE, background: 'var(--surface)', cursor: 'pointer', fontSize: 11, borderRadius: 6, fontFamily: 'inherit' }}
           onMouseEnter={e => { e.currentTarget.style.background = BLUE; e.currentTarget.style.color = '#fff'; }}
-          onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = BLUE; }}>
+          onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.color = BLUE; }}>
           ↗ Open in PCI
         </button>
       </div>

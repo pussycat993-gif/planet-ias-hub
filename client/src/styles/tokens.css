@@ -1,30 +1,107 @@
-/* IAS Hub — Design Tokens (matches PLANet Contact IAS) */
+/* IAS Hub — Design Tokens (PLANet Systems Group Brand Guidelines v1.0) */
 :root {
-  --blue-primary: #1976d2;
-  --blue-dark:    #1565c0;
-  --blue-light:   #e3f2fd;
-  --blue-xlight:  #f0f7ff;
+  /* ---- Brand scale: Primary (Blue) ---- */
+  --blue-50:  #E9F0F7;
+  --blue-100: #B8CFE5;
+  --blue-200: #98B9DA;
+  --blue-300: #83ABD2;
+  --blue-400: #6A9AC9;
+  --blue-500: #1964AC; /* actions: buttons, links, primary CTA */
+  --blue-600: #155592; /* button hover */
+  --blue-700: #12497E; /* button active */
+  --blue-800: #09233C;
+  --blue-900: #06192B; /* dark backgrounds */
 
+  /* ---- Brand scale: Grey (blue-tinted) — text & surfaces ---- */
+  --grey-light:         #F3F6F9;
+  --grey-light-hover:   #EDF1F6;
+  --grey-light-active:  #D9E2EC;
+  --grey-normal:        #85A1C1;
+  --grey-normal-hover:  #7891AE;
+  --grey-normal-active: #6A819A;
+  --grey-dark:          #647991;
+  --grey-dark-hover:    #506174;
+  --grey-dark-active:   #3C4857;
+  --grey-darker:        #2F3844;
+
+  /* ---- Brand scale: Neutrals — borders, dividers, secondary ---- */
+  --neutral-light:         #F9FAFB;
+  --neutral-light-hover:   #F6F7F9;
+  --neutral-light-active:  #EDEFF3;
+  --neutral-normal:        #C6CCD8;
+  --neutral-normal-hover:  #B2B8C2;
+  --neutral-normal-active: #9EA3AD;
+  --neutral-dark:          #9599A2;
+  --neutral-dark-hover:    #777A82;
+  --neutral-dark-active:   #595C61;
+  --neutral-darker:        #161618;
+
+  /* ---- Semantic tokens (repointed to brand) ---- */
+  --blue-primary: var(--blue-500);
+  --blue-dark:    var(--blue-600);
+  --blue-light:   var(--blue-100);
+  --blue-xlight:  var(--blue-50);
+
+  /* Functional status colors (kept — carry meaning, not brand accent) */
   --green:        #2e7d32;
   --green-light:  #e8f5e9;
-
   --red:          #c62828;
+
+  /* TODO: usage unknown — kept to avoid breaking existing references */
   --orange:       #e65100;
   --purple:       #6a1b9a;
 
-  --border:       #dde1e7;
-  --bg:           #f0f2f5;
+  --border:       var(--neutral-normal);
+  --bg:           var(--grey-light);
   --surface:      #ffffff;
 
-  --text:         #1a1a2e;
-  --text2:        #555555;
-  --text3:        #888888;
+  --text:         var(--blue-900);  /* headings */
+  --text2:        var(--grey-dark); /* body */
+  --text3:        var(--grey-normal);
 
   /* Activity status (same as PCI Activity List) */
-  --status-active:   #1565c0;
+  --status-active:   var(--blue-500);
   --status-complete: #2e7d32;
   --status-canceled: #c62828;
+
+  /* ---- Typography ---- */
+  --font-display: 'Merriweather', Georgia, 'Times New Roman', serif;
+  --font-sans:    'Merriweather Sans', 'Segoe UI', Arial, sans-serif;
 }
+
+/* ===== Dark theme (PLANet brand — dark) ===== */
+:root[data-theme="dark"] {
+  /* Surfaces / backgrounds */
+  --grey-light:           #0B2236;
+  --grey-light-hover:     #15324E;
+  --neutral-light-active: #15324E;
+  --bg:      #06192B;
+  --surface: #0E2840;
+
+  /* Tints */
+  --blue-xlight: #14304C;
+
+  /* Text */
+  --text:  #E9F0F7;
+  --text2: #A9C2DE;
+  --text3: #7C9CBF;
+
+  /* Borders */
+  --border: #20405E;
+
+  /* Status (lifted for contrast on dark) */
+  --green:  #4caf50;
+  --red:    #ef5350;
+  --orange: #ffa726;
+  --purple: #b07cd6;
+  --status-active:   var(--blue-400);
+  --status-complete: #4caf50;
+  --status-canceled: #ef5350;
+
+  /* Accent (--blue-primary / --blue-dark) intentionally inherit brand blue */
+}
+
+:root[data-theme="dark"] ::-webkit-scrollbar-thumb { background: #2A4A68; }
 
 * {
   box-sizing: border-box;
@@ -35,7 +112,7 @@
 html, body, #root {
   height: 100%;
   overflow: hidden;
-  font-family: 'Segoe UI', Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 13px;
   color: var(--text);
   background: var(--bg);

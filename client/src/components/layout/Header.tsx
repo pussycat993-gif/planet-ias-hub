@@ -9,8 +9,8 @@ import AskIASButton from '../ai/AskIASButton';
 import { retrySocketNow } from '../../hooks/useSocket';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
-const BLUE_DARK = '#1565c0';
-const BLUE = '#1976d2';
+const BLUE_DARK = 'var(--blue-dark)';
+const BLUE = 'var(--blue-primary)';
 
 function stringToColor(str: string): string {
   const colors = ['#1565c0', '#2e7d32', '#6a1b9a', '#c62828', '#e65100', '#00695c'];
@@ -75,21 +75,21 @@ function HelpModal({ onClose }: { onClose: () => void }) {
   ];
   return (
     <div onClick={onClose}
-      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.35)', zIndex: 5000, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Segoe UI, Arial, sans-serif' }}>
+      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.35)', zIndex: 5000, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-sans)' }}>
       <div onClick={e => e.stopPropagation()}
-        style={{ background: '#fff', width: 460, maxWidth: '92vw', borderRadius: 12, boxShadow: '0 16px 60px rgba(0,0,0,.3)', overflow: 'hidden' }}>
+        style={{ background: 'var(--surface)', width: 460, maxWidth: '92vw', borderRadius: 12, boxShadow: '0 16px 60px rgba(0,0,0,.3)', overflow: 'hidden' }}>
         <div style={{ background: BLUE_DARK, color: '#fff', padding: '12px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span style={{ fontWeight: 700, fontSize: 14 }}>Keyboard shortcuts</span>
           <span onClick={onClose} style={{ cursor: 'pointer', fontSize: 18, opacity: .8 }}>✕</span>
         </div>
         <div style={{ padding: '8px 18px 18px' }}>
           {rows.map(([key, desc]) => (
-            <div key={key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 0', borderBottom: '1px solid #f0f0f0', fontSize: 13 }}>
-              <span style={{ color: '#1a1a2e' }}>{desc}</span>
-              <kbd style={{ background: '#f5f6f8', border: '1px solid #dde1e7', borderRadius: 5, padding: '2px 8px', fontSize: 11, fontFamily: 'Segoe UI, Arial, sans-serif', color: '#555' }}>{key}</kbd>
+            <div key={key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 0', borderBottom: '1px solid var(--neutral-light-active)', fontSize: 13 }}>
+              <span style={{ color: 'var(--text)' }}>{desc}</span>
+              <kbd style={{ background: 'var(--grey-light)', border: '1px solid var(--border)', borderRadius: 5, padding: '2px 8px', fontSize: 11, fontFamily: 'var(--font-sans)', color: 'var(--text2)' }}>{key}</kbd>
             </div>
           ))}
-          <div style={{ marginTop: 12, fontSize: 11, color: '#888' }}>
+          <div style={{ marginTop: 12, fontSize: 11, color: 'var(--text3)' }}>
             Need more help? Contact <a href="mailto:support@planetsg.com" style={{ color: BLUE }}>support@planetsg.com</a>
           </div>
         </div>
@@ -99,7 +99,180 @@ function HelpModal({ onClose }: { onClose: () => void }) {
 }
 
 // ── Profile dropdown ──────────────────────────────────────
+function MenuIcon({ name, color }: { name: string; color?: string }) {
+  const c = color || 'var(--text2)';
+  const paths: Record<string, React.ReactNode> = {
+    bell: <><path d="M10 5a2 2 0 1 1 4 0c3 1 4 3 4 6v3l1 2H5l1-2v-3c0-3 1-5 4-6"/><path d="M9 17a3 3 0 0 0 6 0"/></>,
+    bellOff: <><path d="M3 3l18 18"/><path d="M17 17H5l1-2v-3c0-1 .2-2 .5-2.9M9 5c.3-.3.6-.5 1-.7A2 2 0 0 1 14 5c3 1 4 3 4 6v1"/><path d="M9 17a3 3 0 0 0 6 0"/></>,
+    user: <><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.3 3.1-5 7-5s7 1.7 7 5"/></>,
+    settings: <><circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M5 5l1.5 1.5M17.5 17.5L19 19M3 12h2M19 12h2M5 19l1.5-1.5M17.5 6.5L19 5"/></>,
+    help: <><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 4 1.5c0 1.5-2 1.8-2 3.2"/><circle cx="12" cy="17" r=".7" fill={c} stroke="none"/></>,
+    logout: <><path d="M14 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8"/><path d="M16 16l4-4-4-4M20 12H9"/></>,
+    schedule: <><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 9h16M8 3v4M16 3v4"/></>,
+    smile: <><circle cx="12" cy="12" r="9"/><path d="M8.5 14a4 4 0 0 0 7 0"/><circle cx="9" cy="10" r=".7" fill={c} stroke="none"/><circle cx="15" cy="10" r=".7" fill={c} stroke="none"/></>,
+    copy: <><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></>,
+    check: <path d="M5 12l5 5L20 6"/>,
+    chevron: <path d="M9 6l6 6-6 6"/>,
+  };
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {paths[name]}
+    </svg>
+  );
+}
+
 function ProfileDropdown({ onClose, onOpenHelp }: { onClose: () => void; onOpenHelp: () => void }) {
+  const { user, logout, setAutoStatus } = useAuthStore();
+  const { myStatus, myStatusMessage, setMyStatus, setMyStatusMessage, dnd, toggleDnd, openModal } = useUIStore();
+
+  const [statusOpen, setStatusOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [notifPause, setNotifPause] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const autoStatus = user?.auto_status;
+  const autoLabel = autoStatus === 'focus' ? 'Focus mode'
+    : autoStatus === 'in_call' ? 'In a call'
+    : autoStatus === 'in_meeting' ? 'In a meeting' : null;
+
+  const STATUSES = [
+    { key: 'active',    label: 'Active',         dot: 'var(--green)' },
+    { key: 'away',      label: 'Away',           dot: '#BA7517' },
+    { key: 'dnd',       label: 'Do not disturb', dot: 'var(--red)' },
+    { key: 'invisible', label: 'Invisible',      dot: 'transparent' },
+    { key: 'offline',   label: 'Offline',        dot: 'var(--text3)' },
+  ];
+  const currentKey = dnd ? 'dnd' : myStatus === 'online' ? 'active' : myStatus === 'away' ? 'away' : 'offline';
+  const current = STATUSES.find(s => s.key === currentKey) || STATUSES[0];
+
+  const applyStatus = (s: 'online' | 'away' | 'offline') => {
+    setMyStatus(s);
+    if (user) axios.patch(`${API}/users/${user.id}/status`, { status: s }).catch(() => {});
+  };
+
+  const selectStatus = (key: string) => {
+    setStatusOpen(false);
+    if (autoStatus) setAutoStatus(null, null);
+    if (key === 'dnd') { if (!dnd) toggleDnd(); return; }
+    if (dnd) toggleDnd();
+    const map: Record<string, 'online' | 'away' | 'offline'> = { active: 'online', away: 'away', invisible: 'offline', offline: 'offline' };
+    applyStatus(map[key]);
+  };
+
+  // NOTE: timed notification pause is UI-only for now. Real auto-resume after
+  // the chosen duration needs a timer + persisted state in uiStore (separate task).
+  const pauseNotif = (label: string) => { setNotifPause(label); setNotifOpen(false); };
+  const resumeNotif = () => { setNotifPause(null); setNotifOpen(false); };
+
+  const copyEmail = () => {
+    if (!user?.email) return;
+    try { navigator.clipboard?.writeText(user.email); } catch { /* ignore */ }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+
+  const initials = (user?.name || 'U').split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase();
+
+  const ROW: React.CSSProperties = { display: 'flex', alignItems: 'center', gap: 13, width: '100%', padding: '11px 13px', border: '0.5px solid var(--border)', borderRadius: 8, background: 'var(--surface)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 14, color: 'var(--text)', textAlign: 'left', marginBottom: 8 };
+  const SUB: React.CSSProperties = { display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '7px 10px', border: 'none', background: 'transparent', borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, color: 'var(--text)', textAlign: 'left' };
+  const KBD: React.CSSProperties = { marginLeft: 'auto', fontSize: 11, color: 'var(--text3)', border: '0.5px solid var(--border)', borderRadius: 4, padding: '1px 6px' };
+  const hov = (on: boolean) => (e: React.MouseEvent<HTMLElement>) => { e.currentTarget.style.background = on ? 'var(--bg)' : 'var(--surface)'; };
+  const hovT = (on: boolean) => (e: React.MouseEvent<HTMLElement>) => { e.currentTarget.style.background = on ? 'var(--bg)' : 'transparent'; };
+
+  return (
+    <div style={{ width: 320, background: 'var(--surface)', borderRadius: 12, boxShadow: '0 8px 40px rgba(6,25,43,.18)', border: '0.5px solid var(--border)', fontFamily: "'Merriweather Sans', 'Segoe UI', Arial, sans-serif", padding: 14 }}>
+
+      {/* Header: avatar + name + email + copy */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+        <div style={{ width: 48, height: 48, borderRadius: '50%', overflow: 'hidden', flexShrink: 0, background: user?.avatar_url ? 'transparent' : 'var(--blue-primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17, fontWeight: 600 }}>
+          {user?.avatar_url ? <img src={user.avatar_url} alt={user.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : initials}
+        </div>
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)' }}>{user?.name || 'User'}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <span style={{ fontSize: 12, color: 'var(--text2)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email || ''}</span>
+            <button onClick={copyEmail} aria-label="Copy email address" title="Copy email" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 24, height: 24, border: 'none', background: 'transparent', borderRadius: 6, cursor: 'pointer', flexShrink: 0 }}>
+              <MenuIcon name={copied ? 'check' : 'copy'} color={copied ? 'var(--green)' : 'var(--text3)'} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Status: Active dropdown + Set a custom status */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: statusOpen ? 8 : 14 }}>
+        <button onClick={() => setStatusOpen(o => !o)} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontFamily: 'inherit', fontSize: 13, padding: '6px 11px', border: '0.5px solid var(--border)', borderRadius: 999, background: 'transparent', color: 'var(--text)', cursor: 'pointer' }}>
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: current.dot === 'transparent' ? 'transparent' : current.dot, border: current.dot === 'transparent' ? '1.5px solid var(--text3)' : 'none' }} />
+          {autoLabel || current.label}
+          <span style={{ display: 'inline-flex', color: 'var(--text2)', transform: statusOpen ? 'rotate(90deg)' : 'none', transition: 'transform .15s' }}><MenuIcon name="chevron" color="var(--text2)" /></span>
+        </button>
+        <button onClick={() => { openModal('setStatus'); onClose(); }} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontFamily: 'inherit', fontSize: 13, padding: '6px 10px', border: 'none', background: 'transparent', color: 'var(--text2)', cursor: 'pointer', borderRadius: 8 }}>
+          {user?.status_emoji ? <span style={{ fontSize: 16 }}>{user.status_emoji}</span> : <MenuIcon name="smile" color="var(--text2)" />}
+          {user?.status_emoji || myStatusMessage ? 'Update status' : 'Set a custom status'}
+        </button>
+      </div>
+
+      {statusOpen && (
+        <div style={{ border: '0.5px solid var(--border)', borderRadius: 8, padding: 5, marginBottom: 14 }}>
+          {autoLabel && (
+            <button style={SUB} onClick={() => { setAutoStatus(null, null); if (autoStatus === 'focus' && dnd) toggleDnd(); setStatusOpen(false); }} onMouseEnter={hovT(true)} onMouseLeave={hovT(false)}>
+              <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#BA7517' }} />Clear &ldquo;{autoLabel}&rdquo;
+            </button>
+          )}
+          {STATUSES.map(s => (
+            <button key={s.key} style={SUB} onClick={() => selectStatus(s.key)} onMouseEnter={hovT(true)} onMouseLeave={hovT(false)}>
+              <span style={{ width: 9, height: 9, borderRadius: '50%', background: s.dot === 'transparent' ? 'transparent' : s.dot, border: s.dot === 'transparent' ? '1.5px solid var(--text3)' : 'none' }} />
+              {s.label}
+              {s.key === currentKey && <span style={{ marginLeft: 'auto', display: 'inline-flex' }}><MenuIcon name="check" color="var(--blue-primary)" /></span>}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div style={{ height: '0.5px', background: 'var(--border)', margin: '0 0 14px' }} />
+
+      {/* Notifications + pause submenu */}
+      <button style={{ ...ROW, marginBottom: 8 }} onClick={() => setNotifOpen(o => !o)} onMouseEnter={hov(true)} onMouseLeave={hov(false)}>
+        <MenuIcon name={notifPause ? 'bellOff' : 'bell'} />
+        <span style={{ display: 'flex', flexDirection: 'column', gap: 1, flex: 1 }}>
+          <span>Notifications</span>
+          {notifPause && <span style={{ fontSize: 12, color: 'var(--text3)' }}>Paused &middot; {notifPause}</span>}
+        </span>
+        <span style={{ display: 'inline-flex', color: 'var(--text2)', transform: notifOpen ? 'rotate(90deg)' : 'none', transition: 'transform .15s' }}><MenuIcon name="chevron" color="var(--text2)" /></span>
+      </button>
+
+      {notifOpen && (
+        <div style={{ border: '0.5px solid var(--border)', borderRadius: 8, padding: 5, margin: '-2px 0 10px' }}>
+          {notifPause && (
+            <button style={{ ...SUB, color: 'var(--blue-primary)' }} onClick={resumeNotif} onMouseEnter={hovT(true)} onMouseLeave={hovT(false)}>
+              <MenuIcon name="bell" color="var(--blue-primary)" />Resume notifications
+            </button>
+          )}
+          <div style={{ fontSize: 11, color: 'var(--text3)', padding: '6px 10px 4px' }}>Pause notifications:</div>
+          {['For 30 minutes', 'For 1 hour', 'For 2 hours', 'Until tomorrow', 'Until next week', 'Custom'].map(l => (
+            <button key={l} style={SUB} onClick={() => pauseNotif(l)} onMouseEnter={hovT(true)} onMouseLeave={hovT(false)}>
+              {l}{notifPause === l && <span style={{ marginLeft: 'auto', display: 'inline-flex' }}><MenuIcon name="check" color="var(--blue-primary)" /></span>}
+            </button>
+          ))}
+          <div style={{ height: '0.5px', background: 'var(--border)', margin: '5px 6px' }} />
+          <button style={SUB} onClick={() => setNotifOpen(false)} onMouseEnter={hovT(true)} onMouseLeave={hovT(false)}>
+            <MenuIcon name="schedule" />Set notification schedule
+          </button>
+        </div>
+      )}
+
+      <button style={ROW} onClick={() => { openModal('profileAccount'); onClose(); }} onMouseEnter={hov(true)} onMouseLeave={hov(false)}><MenuIcon name="user" />Profile &amp; account</button>
+      <button style={ROW} onMouseEnter={hov(true)} onMouseLeave={hov(false)}><MenuIcon name="settings" />Preferences<span style={KBD}>⌘ ,</span></button>
+      <button style={ROW} onClick={() => { onOpenHelp(); onClose(); }} onMouseEnter={hov(true)} onMouseLeave={hov(false)}><MenuIcon name="help" />Help &amp; shortcuts<span style={KBD}>?</span></button>
+
+      <div style={{ height: 8 }} />
+      <button style={{ ...ROW, marginBottom: 0, color: 'var(--red)' }} onClick={() => { logout(); onClose(); }} onMouseEnter={hov(true)} onMouseLeave={hov(false)}>
+        <MenuIcon name="logout" color="var(--red)" />Log out of PLANet Systems Group
+      </button>
+    </div>
+  );
+}
+
+function ProfileDropdown_OLD_UNUSED({ onClose, onOpenHelp }: { onClose: () => void; onOpenHelp: () => void }) {
   const { user, logout, setAutoStatus } = useAuthStore();
   const { myStatus, myStatusMessage, setMyStatus, setMyStatusMessage, dnd, toggleDnd, openModal } = useUIStore();
 
@@ -322,7 +495,7 @@ function SearchDropdown({ query, onSelect, onClose }: {
 
   if (results.length === 0 && query.length >= 2) {
     return (
-      <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4, background: '#fff', borderRadius: 10, boxShadow: '0 8px 32px rgba(0,0,0,.15)', border: '1px solid #eee', zIndex: 4000, padding: '16px', textAlign: 'center', color: '#aaa', fontSize: 13 }}>
+      <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4, background: 'var(--surface)', borderRadius: 10, boxShadow: '0 8px 32px rgba(0,0,0,.15)', border: '1px solid var(--border)', zIndex: 4000, padding: '16px', textAlign: 'center', color: 'var(--text3)', fontSize: 13 }}>
         No results for "{query}"
       </div>
     );
@@ -349,17 +522,17 @@ function SearchDropdown({ query, onSelect, onClose }: {
   });
 
   return (
-    <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4, background: '#fff', borderRadius: 10, boxShadow: '0 8px 32px rgba(0,0,0,.18)', border: '1px solid #eee', zIndex: 4000, overflow: 'hidden', maxHeight: '70vh', overflowY: 'auto', fontFamily: 'Segoe UI, Arial, sans-serif' }}>
+    <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4, background: 'var(--surface)', borderRadius: 10, boxShadow: '0 8px 32px rgba(0,0,0,.18)', border: '1px solid var(--border)', zIndex: 4000, overflow: 'hidden', maxHeight: '70vh', overflowY: 'auto', fontFamily: 'var(--font-sans)' }}>
       {Object.entries(groups).map(([groupLabel, items]) => (
         <div key={groupLabel}>
-          <div style={{ padding: '6px 12px 3px', fontSize: 10, fontWeight: 700, color: '#aaa', textTransform: 'uppercase', letterSpacing: '.06em', background: '#fafafa', borderBottom: '1px solid #f5f5f5' }}>
+          <div style={{ padding: '6px 12px 3px', fontSize: 10, fontWeight: 700, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '.06em', background: 'var(--grey-light)', borderBottom: '1px solid var(--neutral-light-active)' }}>
             {groupLabel}
           </div>
           {items.map((r, i) => (
             <div key={i} onClick={() => { onSelect(r); onClose(); }}
-              style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 14px', cursor: 'pointer', borderBottom: '1px solid #f8f8f8' }}
-              onMouseEnter={e => (e.currentTarget.style.background = '#f0f7ff')}
-              onMouseLeave={e => (e.currentTarget.style.background = '#fff')}>
+              style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 14px', cursor: 'pointer', borderBottom: '1px solid var(--neutral-light-active)' }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--blue-xlight)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'var(--surface)')}>
               {r.type === 'group' ? (
                 <div style={{ width: 28, height: 28, borderRadius: 7, background: r.logoColor || BLUE, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: '#fff', flexShrink: 0 }}>
                   {r.logoAbbr || r.label.slice(0, 2).toUpperCase()}
@@ -369,19 +542,19 @@ function SearchDropdown({ query, onSelect, onClose }: {
                   {r.label.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
                 </div>
               ) : (
-                <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#e3f2fd', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, color: BLUE, flexShrink: 0 }}>
+                <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--blue-xlight)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, color: BLUE, flexShrink: 0 }}>
                   {r.icon || '#'}
                 </div>
               )}
 
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {r.label}
                 </div>
-                {r.sublabel && <div style={{ fontSize: 11, color: '#888', marginTop: 1 }}>{r.sublabel}</div>}
+                {r.sublabel && <div style={{ fontSize: 11, color: 'var(--text3)', marginTop: 1 }}>{r.sublabel}</div>}
               </div>
 
-              <span style={{ fontSize: 11, color: '#bbb', flexShrink: 0 }}>
+              <span style={{ fontSize: 11, color: 'var(--text3)', flexShrink: 0 }}>
                 {r.type === 'channel' ? 'Channel' : r.type === 'group' ? 'Group' : r.type === 'dm' ? 'DM' : 'Message'}
               </span>
             </div>
@@ -412,7 +585,7 @@ function SearchDropdown({ query, onSelect, onClose }: {
               }}
                 style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '10px 14px', cursor: 'pointer', borderBottom: '1px solid #fff8e1', borderLeft: '3px solid #f9a825' }}
                 onMouseEnter={e => (e.currentTarget.style.background = '#fffde7')}
-                onMouseLeave={e => (e.currentTarget.style.background = '#fff')}>
+                onMouseLeave={e => (e.currentTarget.style.background = 'var(--surface)')}>
                 {p.channel.type === 'group' ? (
                   <div style={{ width: 28, height: 28, borderRadius: 7, background: p.channel.logo_color || BLUE, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: '#fff', flexShrink: 0 }}>
                     {p.channel.logo_abbr || p.channel.name.slice(0, 2).toUpperCase()}
@@ -422,21 +595,21 @@ function SearchDropdown({ query, onSelect, onClose }: {
                     {(p.sender?.name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
                   </div>
                 ) : (
-                  <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#e3f2fd', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, color: BLUE, flexShrink: 0 }}>#</div>
+                  <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--blue-xlight)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, color: BLUE, flexShrink: 0 }}>#</div>
                 )}
 
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: '#1a1a2e' }}>{p.sender?.name || 'Unknown'}</span>
-                    <span style={{ fontSize: 10, color: '#888' }}>in</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text)' }}>{p.sender?.name || 'Unknown'}</span>
+                    <span style={{ fontSize: 10, color: 'var(--text3)' }}>in</span>
                     <span style={{ fontSize: 11, color: BLUE, fontWeight: 500 }}>
                       {p.channel.type === 'dm' ? p.sender?.name : p.channel.type === 'public' ? '#' + p.channel.name : p.channel.name}
                     </span>
                   </div>
-                  <div style={{ fontSize: 12, color: '#555', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: 1.4 }}>
+                  <div style={{ fontSize: 12, color: 'var(--text2)', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: 1.4 }}>
                     {p.message_type === 'file' ? `📎 ${p.body || p.file?.name || 'File'}` : p.body}
                   </div>
-                  <div style={{ fontSize: 10, color: '#bbb', marginTop: 3 }}>{fmtDate(p.created_at)}</div>
+                  <div style={{ fontSize: 10, color: 'var(--text3)', marginTop: 3 }}>{fmtDate(p.created_at)}</div>
                 </div>
 
                 <span style={{ fontSize: 10, color: '#f9a825', flexShrink: 0, marginTop: 2 }}>Jump →</span>

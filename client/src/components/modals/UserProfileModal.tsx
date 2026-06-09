@@ -62,9 +62,9 @@ export default function UserProfileModal({ user, onClose, onMessage }: UserProfi
 
   // Auto_status takes precedence over plain `status` for label + color.
   const autoStatus = user.auto_status;
-  const manualColor = user.status === 'online' ? '#4caf50' : user.status === 'away' ? '#ff9800' : '#bbb';
-  const statusColor = autoStatus === 'focus' ? '#e65100'
-    : autoStatus === 'in_call' ? '#2e7d32'
+  const manualColor = user.status === 'online' ? 'var(--green)' : user.status === 'away' ? '#BA7517' : 'var(--text3)';
+  const statusColor = autoStatus === 'focus' ? 'var(--orange)'
+    : autoStatus === 'in_call' ? 'var(--green)'
     : manualColor;
   const primaryStatusLabel = autoStatus === 'focus' ? '🎯 Focus mode'
     : autoStatus === 'in_call' ? '📞 In a call'
@@ -73,12 +73,12 @@ export default function UserProfileModal({ user, onClose, onMessage }: UserProfi
     : user.status === 'away' ? '● Away'
     : '● Offline';
 
-  const BLUE = '#1976d2';
+  const BLUE = 'var(--blue-primary)';
   const localTime = user.timezone ? localTimeIn(user.timezone) : null;
 
   return (
     <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.3)', zIndex: 4000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 14, width: 320, boxShadow: '0 8px 40px rgba(0,0,0,.2)', fontFamily: 'Segoe UI, Arial, sans-serif', overflow: 'hidden' }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: 'var(--surface)', borderRadius: 14, width: 320, boxShadow: '0 8px 40px rgba(6,25,43,.2)', fontFamily: 'var(--font-sans)', overflow: 'hidden' }}>
 
         {/* Banner */}
         <div style={{ height: 70, background: `linear-gradient(135deg, ${stringToColor(user.name)}, ${BLUE})`, position: 'relative' }}>
@@ -110,8 +110,8 @@ export default function UserProfileModal({ user, onClose, onMessage }: UserProfi
 
         {/* Info */}
         <div style={{ padding: '12px 20px 16px', textAlign: 'center' }}>
-          <div style={{ fontWeight: 700, fontSize: 16, color: '#1a1a2e', marginBottom: 2 }}>{user.name}</div>
-          {user.role && <div style={{ fontSize: 12, color: '#888', marginBottom: 4 }}>{user.role}</div>}
+          <div style={{ fontWeight: 700, fontSize: 16, color: 'var(--text)', marginBottom: 2 }}>{user.name}</div>
+          {user.role && <div style={{ fontSize: 12, color: 'var(--text3)', marginBottom: 4 }}>{user.role}</div>}
 
           {/* Primary status label (auto_status or manual) */}
           <div style={{ fontSize: 11, color: statusColor, marginBottom: 6, fontWeight: autoStatus ? 600 : 400 }}>
@@ -120,29 +120,29 @@ export default function UserProfileModal({ user, onClose, onMessage }: UserProfi
 
           {/* Secondary: status message (if any, and not already covered by auto-label) */}
           {user.status_message && !autoStatus && (
-            <div style={{ fontSize: 11, color: '#555', marginBottom: 6, fontStyle: 'italic' }}>
+            <div style={{ fontSize: 11, color: 'var(--text2)', marginBottom: 6, fontStyle: 'italic' }}>
               "{user.status_message}"
             </div>
           )}
 
           {/* Last seen chip for offline users */}
           {user.status === 'offline' && user.last_seen_at && !autoStatus && (
-            <div style={{ fontSize: 10, color: '#999', marginBottom: 8 }}>
+            <div style={{ fontSize: 10, color: 'var(--text3)', marginBottom: 8 }}>
               {formatLastSeen(user.last_seen_at)}
             </div>
           )}
 
           {/* Timezone + local time chip for distributed teams */}
           {user.timezone && (
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 9px', background: '#f0f7ff', border: '1px solid #c5def9', borderRadius: 12, fontSize: 10, color: BLUE, marginBottom: 8 }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 9px', background: 'var(--blue-xlight)', border: '1px solid var(--blue-200)', borderRadius: 12, fontSize: 10, color: BLUE, marginBottom: 8 }}>
               <span>🌍</span>
               <span>{localTime || user.timezone}</span>
-              {localTime && <span style={{ color: '#888' }}>· {user.timezone}</span>}
+              {localTime && <span style={{ color: 'var(--text3)' }}>· {user.timezone}</span>}
             </div>
           )}
 
           {user.email && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '6px 10px', background: '#f8f9fa', borderRadius: 8, marginBottom: 8, textAlign: 'left' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '6px 10px', background: 'var(--grey-light)', borderRadius: 8, marginBottom: 8, textAlign: 'left' }}>
               <span style={{ fontSize: 14 }}>📧</span>
               <a href={`mailto:${user.email}`} style={{ fontSize: 12, color: BLUE, textDecoration: 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.email}</a>
             </div>
@@ -153,7 +153,7 @@ export default function UserProfileModal({ user, onClose, onMessage }: UserProfi
             <button onClick={onMessage} style={{ flex: 1, padding: '8px', background: BLUE, color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontFamily: 'inherit', fontWeight: 600 }}>
               💬 Message
             </button>
-            <button style={{ flex: 1, padding: '8px', background: '#fff', color: '#2e7d32', border: '1px solid #a5d6a7', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontFamily: 'inherit' }}>
+            <button style={{ flex: 1, padding: '8px', background: 'var(--surface)', color: 'var(--green)', border: '1px solid #a5d6a7', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontFamily: 'inherit' }}>
               📞 Call
             </button>
           </div>

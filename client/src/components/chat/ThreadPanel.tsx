@@ -8,8 +8,8 @@ import { getSocket } from '../../hooks/useSocket';
 import { renderMarkdown } from '../../utils/markdown';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
-const BLUE = '#1976d2';
-const BLUE_DARK = '#1565c0';
+const BLUE = 'var(--blue-primary)';
+const BLUE_DARK = 'var(--blue-dark)';
 
 function stringToColor(str: string): string {
   const colors = ['#1565c0', '#2e7d32', '#6a1b9a', '#c62828', '#e65100', '#00695c', '#283593', '#4a148c'];
@@ -49,19 +49,19 @@ function ThreadMessageRow({ msg, isParent = false }: { msg: Message; isParent?: 
   return (
     <div style={{
       display: 'flex', gap: 10, padding: '8px 14px',
-      background: isParent ? '#fafbfc' : 'transparent',
-      borderBottom: isParent ? '1px solid #eee' : 'none',
+      background: isParent ? 'var(--grey-light)' : 'transparent',
+      borderBottom: isParent ? '1px solid var(--border)' : 'none',
       borderLeft: isMine && !isParent ? `3px solid ${BLUE}` : '3px solid transparent',
     }}>
       <Avatar name={senderName} avatarUrl={msg.sender?.avatar_url} size={isParent ? 32 : 28} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 7, marginBottom: 2 }}>
-          <span style={{ fontSize: 12, fontWeight: 700, color: isMine ? BLUE_DARK : '#1a1a2e' }}>
+          <span style={{ fontSize: 12, fontWeight: 700, color: isMine ? BLUE_DARK : 'var(--text)' }}>
             {isMine ? 'You' : senderName}
           </span>
-          <span style={{ fontSize: 10, color: '#bbb' }}>{formatTime(msg.created_at)}</span>
+          <span style={{ fontSize: 10, color: 'var(--text3)' }}>{formatTime(msg.created_at)}</span>
         </div>
-        <div style={{ fontSize: 13, color: '#1a1a2e', lineHeight: 1.45, wordBreak: 'break-word' }}>
+        <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.45, wordBreak: 'break-word' }}>
           {renderMarkdown(msg.body || '')}
         </div>
       </div>
@@ -175,30 +175,30 @@ export default function ThreadPanel() {
   return (
     <div style={{
       width: 380, flexShrink: 0,
-      borderLeft: '1px solid #e8e8e8',
-      background: '#fff',
+      borderLeft: '1px solid var(--border)',
+      background: 'var(--surface)',
       display: 'flex', flexDirection: 'column',
-      fontFamily: 'Segoe UI, Arial, sans-serif',
+      fontFamily: 'var(--font-sans)',
       height: '100%',
     }}>
       {/* Header */}
-      <div style={{ padding: '12px 16px', borderBottom: '1px solid #eee', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+      <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
         <div>
           <div style={{ fontWeight: 700, fontSize: 14, color: BLUE_DARK, display: 'flex', alignItems: 'center', gap: 6 }}>
             <span>💬</span>
             <span>Thread</span>
           </div>
-          <div style={{ fontSize: 11, color: '#888', marginTop: 1 }}>
+          <div style={{ fontSize: 11, color: 'var(--text3)', marginTop: 1 }}>
             {replies.length} {replies.length === 1 ? 'reply' : 'replies'}
           </div>
         </div>
-        <span onClick={closeThread} style={{ cursor: 'pointer', fontSize: 20, color: '#888' }} title="Close thread">✕</span>
+        <span onClick={closeThread} style={{ cursor: 'pointer', fontSize: 20, color: 'var(--text3)' }} title="Close thread">✕</span>
       </div>
 
       {/* Body */}
       <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
         {loading ? (
-          <div style={{ padding: 32, textAlign: 'center', color: '#bbb', fontSize: 12 }}>Loading thread…</div>
+          <div style={{ padding: 32, textAlign: 'center', color: 'var(--text3)', fontSize: 12 }}>Loading thread…</div>
         ) : !parent ? (
           <div style={{ padding: 32, textAlign: 'center', color: '#c62828', fontSize: 12 }}>
             Thread not found
@@ -208,7 +208,7 @@ export default function ThreadPanel() {
             <ThreadMessageRow msg={parent} isParent />
 
             {replies.length === 0 ? (
-              <div style={{ padding: '24px 16px', textAlign: 'center', color: '#aaa', fontSize: 12 }}>
+              <div style={{ padding: '24px 16px', textAlign: 'center', color: 'var(--text3)', fontSize: 12 }}>
                 No replies yet. Start the thread below.
               </div>
             ) : (
@@ -222,7 +222,7 @@ export default function ThreadPanel() {
       </div>
 
       {/* Composer */}
-      <div style={{ borderTop: '1px solid #eee', padding: '10px 12px', flexShrink: 0, background: '#fff' }}>
+      <div style={{ borderTop: '1px solid var(--border)', padding: '10px 12px', flexShrink: 0, background: 'var(--surface)' }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
           {user && <div style={{ paddingTop: 4 }}><Avatar name={user.name} avatarUrl={user.avatar_url} size={28} /></div>}
           <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -238,19 +238,19 @@ export default function ThreadPanel() {
               rows={Math.max(1, Math.min(6, (text.match(/\n/g) || []).length + 1))}
               style={{
                 width: '100%', boxSizing: 'border-box',
-                border: '1px solid #dde1e7', borderRadius: 10,
+                border: '1px solid var(--border)', borderRadius: 10,
                 padding: '8px 12px',
                 fontSize: 13, fontFamily: 'inherit', outline: 'none',
-                background: '#f8f9fa', color: '#1a1a2e',
+                background: 'var(--grey-light)', color: 'var(--text)',
                 resize: 'vertical', minHeight: 36,
                 lineHeight: 1.5,
               }}
-              onFocus={e => (e.currentTarget.style.background = '#fff')}
-              onBlur={e => (e.currentTarget.style.background = '#f8f9fa')}
+              onFocus={e => (e.currentTarget.style.background = 'var(--surface)')}
+              onBlur={e => (e.currentTarget.style.background = 'var(--grey-light)')}
             />
 
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: '#666', cursor: 'pointer', userSelect: 'none' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--text2)', cursor: 'pointer', userSelect: 'none' }}>
                 <input
                   type="checkbox"
                   checked={alsoSendToChannel}
@@ -265,8 +265,8 @@ export default function ThreadPanel() {
                 disabled={!text.trim() || sending || loading}
                 style={{
                   padding: '6px 16px',
-                  background: text.trim() && !sending ? BLUE : '#e0e0e0',
-                  color: text.trim() && !sending ? '#fff' : '#aaa',
+                  background: text.trim() && !sending ? BLUE : 'var(--neutral-light-active)',
+                  color: text.trim() && !sending ? '#fff' : 'var(--text3)',
                   border: 'none', borderRadius: 8,
                   cursor: text.trim() && !sending ? 'pointer' : 'not-allowed',
                   fontSize: 12, fontWeight: 700, fontFamily: 'inherit',

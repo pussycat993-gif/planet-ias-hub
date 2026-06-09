@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useUIStore } from '../../store/uiStore';
 import { useChatStore } from '../../store/chatStore';
 
-const BLUE = '#1976d2';
-const BLUE_DARK = '#1565c0';
+const BLUE = 'var(--blue-primary)';
+const BLUE_DARK = 'var(--blue-dark)';
 
 interface QuickComposeProps {
   onScheduleMeeting: () => void;  // parent owns the modal
@@ -77,8 +77,8 @@ export default function QuickCompose({ onScheduleMeeting }: QuickComposeProps) {
           position: 'absolute',
           bottom: 60,
           right: 0,
-          background: '#fff',
-          border: '1px solid #dde1e7',
+          background: 'var(--surface)',
+          border: '1px solid var(--border)',
           borderRadius: 12,
           boxShadow: '0 10px 32px rgba(0,0,0,.16)',
           width: 240,
@@ -86,7 +86,7 @@ export default function QuickCompose({ onScheduleMeeting }: QuickComposeProps) {
           animation: 'ias-qc-enter .18s ease-out',
         }}>
           <style>{`@keyframes ias-qc-enter { from { opacity: 0; transform: translateY(8px) scale(.96); } to { opacity: 1; transform: none; } }`}</style>
-          <div style={{ padding: '9px 13px', borderBottom: '1px solid #f0f0f0', fontSize: 10, fontWeight: 700, color: '#888', textTransform: 'uppercase', letterSpacing: '.05em' }}>
+          <div style={{ padding: '9px 13px', borderBottom: '1px solid var(--neutral-light-active)', fontSize: 10, fontWeight: 700, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '.05em' }}>
             Quick Create
           </div>
           {actions.map((a, i) => (
@@ -100,16 +100,16 @@ export default function QuickCompose({ onScheduleMeeting }: QuickComposeProps) {
                 padding: '9px 13px',
                 cursor: a.enabled ? 'pointer' : 'not-allowed',
                 opacity: a.enabled ? 1 : 0.45,
-                borderBottom: i < actions.length - 1 ? '1px solid #f5f5f5' : 'none',
+                borderBottom: i < actions.length - 1 ? '1px solid var(--neutral-light-active)' : 'none',
                 transition: 'background .12s',
               }}
-              onMouseEnter={e => { if (a.enabled) e.currentTarget.style.background = '#f0f7ff'; }}
+              onMouseEnter={e => { if (a.enabled) e.currentTarget.style.background = 'var(--blue-xlight)'; }}
               onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
             >
               <span style={{ fontSize: 18, width: 22, textAlign: 'center', flexShrink: 0 }}>{a.icon}</span>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 12, fontWeight: 600, color: BLUE_DARK }}>{a.label}</div>
-                <div style={{ fontSize: 10, color: '#888', marginTop: 1 }}>{a.sublabel}</div>
+                <div style={{ fontSize: 10, color: 'var(--text3)', marginTop: 1 }}>{a.sublabel}</div>
               </div>
             </div>
           ))}

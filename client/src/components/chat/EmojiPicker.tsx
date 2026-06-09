@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 
-const BLUE = '#1976d2';
+const BLUE = 'var(--blue-primary)';
 
 // ── Curated emoji set, grouped by category ─────────────────────
 interface EmojiGroup {
@@ -129,19 +129,19 @@ export default function EmojiPicker({ onSelect, onClose, anchorPosition = 'above
         marginTop: anchorPosition === 'below' ? 8 : 0,
         width: 340,
         maxHeight: 380,
-        background: '#fff',
-        border: '1px solid #e0e0e0',
+        background: 'var(--surface)',
+        border: '1px solid var(--border)',
         borderRadius: 10,
         boxShadow: '0 8px 32px rgba(0,0,0,.15)',
         display: 'flex',
         flexDirection: 'column',
-        fontFamily: 'Segoe UI, Arial, sans-serif',
+        fontFamily: 'var(--font-sans)',
         zIndex: 3000,
         overflow: 'hidden',
       }}
     >
       {/* Category tabs */}
-      <div style={{ display: 'flex', borderBottom: '1px solid #f0f0f0', padding: '4px 6px', gap: 2, flexShrink: 0 }}>
+      <div style={{ display: 'flex', borderBottom: '1px solid var(--neutral-light-active)', padding: '4px 6px', gap: 2, flexShrink: 0 }}>
         {GROUPS.map(g => {
           const isActive = activeGroup === g.key && !search;
           const disabled = g.key === 'recent' && recent.length === 0;
@@ -153,13 +153,13 @@ export default function EmojiPicker({ onSelect, onClose, anchorPosition = 'above
                 flex: 1, textAlign: 'center', padding: '6px 0',
                 cursor: disabled ? 'not-allowed' : 'pointer',
                 borderRadius: 6,
-                background: isActive ? '#e3f2fd' : 'transparent',
+                background: isActive ? 'var(--blue-xlight)' : 'transparent',
                 opacity: disabled ? 0.3 : 1,
                 fontSize: 16,
                 borderBottom: isActive ? `2px solid ${BLUE}` : '2px solid transparent',
                 transition: 'all .12s',
               }}
-              onMouseEnter={e => { if (!disabled && !isActive) e.currentTarget.style.background = '#f5f5f5'; }}
+              onMouseEnter={e => { if (!disabled && !isActive) e.currentTarget.style.background = 'var(--neutral-light-active)'; }}
               onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent'; }}
             >
               {g.icon}
@@ -169,19 +169,19 @@ export default function EmojiPicker({ onSelect, onClose, anchorPosition = 'above
       </div>
 
       {/* Search */}
-      <div style={{ padding: '6px 8px', borderBottom: '1px solid #f0f0f0', flexShrink: 0 }}>
+      <div style={{ padding: '6px 8px', borderBottom: '1px solid var(--neutral-light-active)', flexShrink: 0 }}>
         <input
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Search…"
-          style={{ width: '100%', padding: '5px 10px', border: '1px solid #dde1e7', borderRadius: 6, fontSize: 12, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }}
+          style={{ width: '100%', padding: '5px 10px', border: '1px solid var(--border)', borderRadius: 6, fontSize: 12, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', background: 'var(--surface)', color: 'var(--text)' }}
         />
       </div>
 
       {/* Emoji grid */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '8px 6px' }}>
         {visible.length === 0 ? (
-          <div style={{ padding: 20, textAlign: 'center', color: '#aaa', fontSize: 12 }}>
+          <div style={{ padding: 20, textAlign: 'center', color: 'var(--text3)', fontSize: 12 }}>
             {search ? 'No emojis match' : activeGroup === 'recent' ? 'No recent emojis yet' : 'Empty'}
           </div>
         ) : (
@@ -190,7 +190,7 @@ export default function EmojiPicker({ onSelect, onClose, anchorPosition = 'above
               <div key={`${e}-${i}`}
                 onClick={() => handlePick(e)}
                 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', aspectRatio: '1/1', fontSize: 20, cursor: 'pointer', borderRadius: 6, transition: 'background .08s' }}
-                onMouseEnter={el => (el.currentTarget.style.background = '#f0f7ff')}
+                onMouseEnter={el => (el.currentTarget.style.background = 'var(--blue-xlight)')}
                 onMouseLeave={el => (el.currentTarget.style.background = 'transparent')}
               >
                 {e}

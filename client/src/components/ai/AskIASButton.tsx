@@ -30,8 +30,8 @@ export default function AskIASButton() {
         height: 30,
         background: isOpen
           ? 'linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)'
-          : 'linear-gradient(135deg, #fff 0%, #f0f7ff 100%)',
-        color: '#1565c0',
+          : 'linear-gradient(135deg, var(--surface) 0%, var(--blue-xlight) 100%)',
+        color: 'var(--blue-dark)',
         border: '1px solid rgba(255,255,255,.5)',
         borderRadius: 18,
         cursor: 'pointer',

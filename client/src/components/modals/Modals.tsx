@@ -3,10 +3,11 @@ import axios from 'axios';
 import { useUIStore } from '../../store/uiStore';
 import { useChatStore } from '../../store/chatStore';
 import SetStatusModal from './SetStatusModal';
+import ProfileAccountModal from './ProfileAccountModal';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
-const BLUE = '#1976d2';
-const BLUE_DARK = '#1565c0';
+const BLUE = 'var(--blue-primary)';
+const BLUE_DARK = 'var(--blue-dark)';
 
 // ── Shared Modal Shell ────────────────────────────────────
 function Modal({ title, onClose, children, width = 480 }: {
@@ -19,11 +20,11 @@ function Modal({ title, onClose, children, width = 480 }: {
   }, [onClose]);
 
   return (
-    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.45)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 12, width, maxWidth: '95vw', boxShadow: '0 8px 40px rgba(0,0,0,.2)', fontFamily: 'Segoe UI, Arial, sans-serif', display: 'flex', flexDirection: 'column', maxHeight: '90vh' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #eee' }}>
-          <span style={{ fontWeight: 700, fontSize: 15, color: BLUE_DARK }}>{title}</span>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#888', lineHeight: 1, padding: '0 4px' }}>✕</button>
+    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(6,25,43,.45)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: 'var(--surface)', borderRadius: 12, width, maxWidth: '95vw', boxShadow: '0 8px 40px rgba(6,25,43,.2)', fontFamily: 'var(--font-sans)', display: 'flex', flexDirection: 'column', maxHeight: '90vh' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', background: BLUE }}>
+          <span style={{ fontWeight: 600, fontSize: 15, color: '#fff' }}>{title}</span>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: 'rgba(255,255,255,.85)', lineHeight: 1, padding: '0 4px' }}>✕</button>
         </div>
         <div style={{ padding: '18px', overflowY: 'auto', flex: 1 }}>{children}</div>
       </div>
@@ -34,8 +35,8 @@ function Modal({ title, onClose, children, width = 480 }: {
 function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
   return (
     <div style={{ marginBottom: 14 }}>
-      <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#555', marginBottom: 5 }}>
-        {label} {required && <span style={{ color: '#c62828' }}>*</span>}
+      <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text2)', marginBottom: 5 }}>
+        {label} {required && <span style={{ color: 'var(--red)' }}>*</span>}
       </label>
       {children}
     </div>
@@ -43,7 +44,7 @@ function Field({ label, required, children }: { label: string; required?: boolea
 }
 
 const inputStyle: React.CSSProperties = {
-  width: '100%', padding: '8px 10px', border: '1px solid #dde1e7',
+  width: '100%', padding: '8px 10px', border: '1px solid var(--border)',
   borderRadius: 7, fontSize: 13, fontFamily: 'inherit', outline: 'none',
   boxSizing: 'border-box',
 };
@@ -60,15 +61,15 @@ function LogoUpload({ value, onChange }: { value: string | null; onChange: (url:
   };
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-      <div onClick={() => ref.current?.click()} style={{ width: 56, height: 56, borderRadius: 10, border: '2px dashed #90caf9', background: value ? 'transparent' : '#f0f7ff', backgroundImage: value ? `url(${value})` : 'none', backgroundSize: 'cover', backgroundPosition: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 22, color: BLUE, flexShrink: 0 }}>
+      <div onClick={() => ref.current?.click()} style={{ width: 56, height: 56, borderRadius: 10, border: '2px dashed var(--blue-300)', background: value ? 'transparent' : 'var(--blue-xlight)', backgroundImage: value ? `url(${value})` : 'none', backgroundSize: 'cover', backgroundPosition: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 22, color: BLUE, flexShrink: 0 }}>
         {!value && '📷'}
       </div>
       <div>
-        <button onClick={() => ref.current?.click()} style={{ fontSize: 12, color: BLUE, border: `1px solid ${BLUE}`, background: '#fff', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontFamily: 'inherit' }}>
+        <button onClick={() => ref.current?.click()} style={{ fontSize: 12, color: BLUE, border: `1px solid ${BLUE}`, background: 'var(--surface)', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontFamily: 'inherit' }}>
           {value ? 'Change logo' : 'Upload logo'}
         </button>
-        {value && <button onClick={() => onChange(null)} style={{ fontSize: 12, color: '#888', border: '1px solid #dde1e7', background: '#fff', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontFamily: 'inherit', marginLeft: 6 }}>Remove</button>}
-        <div style={{ fontSize: 10, color: '#aaa', marginTop: 4 }}>PNG, JPG up to 2MB</div>
+        {value && <button onClick={() => onChange(null)} style={{ fontSize: 12, color: 'var(--text3)', border: '1px solid var(--border)', background: 'var(--surface)', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontFamily: 'inherit', marginLeft: 6 }}>Remove</button>}
+        <div style={{ fontSize: 10, color: 'var(--text3)', marginTop: 4 }}>PNG, JPG up to 2MB</div>
       </div>
       <input ref={ref} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFile} />
     </div>
@@ -93,24 +94,24 @@ function MemberPicker({ selected, onChange }: { selected: HubUser[]; onChange: (
       {selected.length > 0 && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 8 }}>
           {selected.map(u => (
-            <div key={u.id} style={{ display: 'flex', alignItems: 'center', gap: 5, background: '#e3f2fd', border: '1px solid #90caf9', borderRadius: 20, padding: '3px 8px 3px 6px', fontSize: 12 }}>
+            <div key={u.id} style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'var(--blue-xlight)', border: '1px solid var(--blue-300)', borderRadius: 20, padding: '3px 8px 3px 6px', fontSize: 12 }}>
               <div style={{ width: 18, height: 18, borderRadius: '50%', background: BLUE, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 700 }}>{u.name.charAt(0)}</div>
               <span style={{ color: BLUE_DARK }}>{u.name}</span>
-              <span onClick={() => remove(u.id)} style={{ cursor: 'pointer', color: '#888', fontSize: 14, lineHeight: 1 }}>×</span>
+              <span onClick={() => remove(u.id)} style={{ cursor: 'pointer', color: 'var(--text3)', fontSize: 14, lineHeight: 1 }}>×</span>
             </div>
           ))}
         </div>
       )}
       <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search members..." style={{ ...inputStyle, marginBottom: 6 }} />
-      <div style={{ maxHeight: 150, overflowY: 'auto', border: '1px solid #eee', borderRadius: 7 }}>
+      <div style={{ maxHeight: 150, overflowY: 'auto', border: '1px solid var(--neutral-light-active)', borderRadius: 7 }}>
         {filtered.length === 0 ? (
-          <div style={{ padding: '10px 12px', color: '#aaa', fontSize: 12 }}>{users.length === 0 ? 'Loading...' : 'No users found'}</div>
+          <div style={{ padding: '10px 12px', color: 'var(--text3)', fontSize: 12 }}>{users.length === 0 ? 'Loading...' : 'No users found'}</div>
         ) : filtered.map(u => (
-          <div key={u.id} onClick={() => add(u)} style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '7px 12px', cursor: 'pointer', borderBottom: '1px solid #f5f5f5', fontSize: 13 }} onMouseEnter={e => (e.currentTarget.style.background = '#f0f7ff')} onMouseLeave={e => (e.currentTarget.style.background = '#fff')}>
-            <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#e3f2fd', color: BLUE, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{u.name.charAt(0)}</div>
+          <div key={u.id} onClick={() => add(u)} style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '7px 12px', cursor: 'pointer', borderBottom: '1px solid var(--neutral-light-active)', fontSize: 13 }} onMouseEnter={e => (e.currentTarget.style.background = 'var(--blue-xlight)')} onMouseLeave={e => (e.currentTarget.style.background = 'var(--surface)')}>
+            <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--blue-xlight)', color: BLUE, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{u.name.charAt(0)}</div>
             <div>
-              <div style={{ fontWeight: 600, color: '#1a1a2e' }}>{u.name}</div>
-              <div style={{ fontSize: 11, color: '#888' }}>{u.email}</div>
+              <div style={{ fontWeight: 600, color: 'var(--text)' }}>{u.name}</div>
+              <div style={{ fontSize: 11, color: 'var(--text3)' }}>{u.email}</div>
             </div>
             <div style={{ marginLeft: 'auto', fontSize: 12, color: BLUE }}>+ Add</div>
           </div>
@@ -122,14 +123,14 @@ function MemberPicker({ selected, onChange }: { selected: HubUser[]; onChange: (
 
 function PrimaryBtn({ children, onClick, disabled, loading }: { children: React.ReactNode; onClick: () => void; disabled?: boolean; loading?: boolean; }) {
   return (
-    <button onClick={onClick} disabled={disabled || loading} style={{ background: disabled || loading ? '#90caf9' : BLUE, color: '#fff', border: 'none', borderRadius: 7, padding: '9px 20px', fontSize: 13, fontFamily: 'inherit', cursor: disabled || loading ? 'not-allowed' : 'pointer', fontWeight: 600 }}>
+    <button onClick={onClick} disabled={disabled || loading} style={{ background: disabled || loading ? 'var(--blue-300)' : BLUE, color: '#fff', border: 'none', borderRadius: 7, padding: '9px 20px', fontSize: 13, fontFamily: 'inherit', cursor: disabled || loading ? 'not-allowed' : 'pointer', fontWeight: 600 }}>
       {loading ? 'Saving...' : children}
     </button>
   );
 }
 
 function ErrorBox({ msg }: { msg: string }) {
-  return <div style={{ background: '#ffebee', color: '#c62828', padding: '8px 12px', borderRadius: 7, fontSize: 12, marginBottom: 14 }}>{msg}</div>;
+  return <div style={{ background: '#fdecea', color: 'var(--red)', padding: '8px 12px', borderRadius: 7, fontSize: 12, marginBottom: 14 }}>{msg}</div>;
 }
 
 // ── New Channel ───────────────────────────────────────────
@@ -160,12 +161,12 @@ function NewChannelModal({ onClose }: { onClose: () => void }) {
       {error && <ErrorBox msg={error} />}
       <Field label="Channel name" required>
         <input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. project-alpha" style={inputStyle} autoFocus />
-        {name && <div style={{ fontSize: 11, color: '#888', marginTop: 4 }}>#{name.toLowerCase().replace(/\s+/g, '-')}</div>}
+        {name && <div style={{ fontSize: 11, color: 'var(--text3)', marginTop: 4 }}>#{name.toLowerCase().replace(/\s+/g, '-')}</div>}
       </Field>
       <Field label="Type">
         <div style={{ display: 'flex', gap: 8 }}>
           {(['public', 'private'] as const).map(t => (
-            <div key={t} onClick={() => setType(t)} style={{ flex: 1, padding: '8px 12px', border: `2px solid ${type === t ? BLUE : '#dde1e7'}`, borderRadius: 7, cursor: 'pointer', fontSize: 12, textAlign: 'center', background: type === t ? '#e3f2fd' : '#fff', color: type === t ? BLUE_DARK : '#555', fontWeight: type === t ? 700 : 400 }}>
+            <div key={t} onClick={() => setType(t)} style={{ flex: 1, padding: '8px 12px', border: `2px solid ${type === t ? BLUE : 'var(--border)'}`, borderRadius: 7, cursor: 'pointer', fontSize: 12, textAlign: 'center', background: type === t ? 'var(--blue-xlight)' : 'var(--surface)', color: type === t ? BLUE_DARK : 'var(--text2)', fontWeight: type === t ? 700 : 400 }}>
               {t === 'public' ? '🌐 Public' : '🔒 Private'}
             </div>
           ))}
@@ -181,7 +182,7 @@ function NewChannelModal({ onClose }: { onClose: () => void }) {
         <MemberPicker selected={members} onChange={setMembers} />
       </Field>
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 4 }}>
-        <button onClick={onClose} style={{ padding: '9px 18px', border: '1px solid #dde1e7', borderRadius: 7, background: '#fff', cursor: 'pointer', fontSize: 13, fontFamily: 'inherit' }}>Cancel</button>
+        <button onClick={onClose} style={{ padding: '9px 18px', border: '1px solid var(--border)', borderRadius: 7, background: 'var(--surface)', cursor: 'pointer', fontSize: 13, fontFamily: 'inherit' }}>Cancel</button>
         <PrimaryBtn onClick={handleCreate} disabled={!name.trim()} loading={loading}>Create Channel</PrimaryBtn>
       </div>
     </Modal>
@@ -226,7 +227,7 @@ function NewGroupModal({ onClose }: { onClose: () => void }) {
         <MemberPicker selected={members} onChange={setMembers} />
       </Field>
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 4 }}>
-        <button onClick={onClose} style={{ padding: '9px 18px', border: '1px solid #dde1e7', borderRadius: 7, background: '#fff', cursor: 'pointer', fontSize: 13, fontFamily: 'inherit' }}>Cancel</button>
+        <button onClick={onClose} style={{ padding: '9px 18px', border: '1px solid var(--border)', borderRadius: 7, background: 'var(--surface)', cursor: 'pointer', fontSize: 13, fontFamily: 'inherit' }}>Cancel</button>
         <PrimaryBtn onClick={handleCreate} disabled={!name.trim()} loading={loading}>Create Group</PrimaryBtn>
       </div>
     </Modal>
@@ -260,15 +261,15 @@ function NewMessageModal({ onClose }: { onClose: () => void }) {
       <Field label="Search people">
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Name or email..." autoFocus style={inputStyle} />
       </Field>
-      <div style={{ border: '1px solid #eee', borderRadius: 8, overflow: 'hidden' }}>
+      <div style={{ border: '1px solid var(--neutral-light-active)', borderRadius: 8, overflow: 'hidden' }}>
         {filtered.length === 0 ? (
-          <div style={{ padding: '16px', textAlign: 'center', color: '#aaa', fontSize: 13 }}>{users.length === 0 ? 'Loading...' : 'No users found'}</div>
+          <div style={{ padding: '16px', textAlign: 'center', color: 'var(--text3)', fontSize: 13 }}>{users.length === 0 ? 'Loading...' : 'No users found'}</div>
         ) : filtered.map(u => (
-          <div key={u.id} onClick={() => !loading && openDM(u)} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', cursor: loading ? 'wait' : 'pointer', borderBottom: '1px solid #f5f5f5' }} onMouseEnter={e => (e.currentTarget.style.background = '#f0f7ff')} onMouseLeave={e => (e.currentTarget.style.background = '#fff')}>
+          <div key={u.id} onClick={() => !loading && openDM(u)} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', cursor: loading ? 'wait' : 'pointer', borderBottom: '1px solid var(--neutral-light-active)' }} onMouseEnter={e => (e.currentTarget.style.background = 'var(--blue-xlight)')} onMouseLeave={e => (e.currentTarget.style.background = 'var(--surface)')}>
             <div style={{ width: 36, height: 36, borderRadius: '50%', background: BLUE, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, flexShrink: 0 }}>{u.name.charAt(0)}</div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: 600, fontSize: 13, color: '#1a1a2e' }}>{u.name}</div>
-              <div style={{ fontSize: 11, color: '#888' }}>{u.email}</div>
+              <div style={{ fontWeight: 600, fontSize: 13, color: 'var(--text)' }}>{u.name}</div>
+              <div style={{ fontSize: 11, color: 'var(--text3)' }}>{u.email}</div>
             </div>
             <span style={{ fontSize: 12, color: BLUE }}>💬 Message</span>
           </div>
@@ -286,5 +287,6 @@ export default function Modals() {
   if (activeModal === 'newGroup') return <NewGroupModal onClose={closeModal} />;
   if (activeModal === 'newMessage') return <NewMessageModal onClose={closeModal} />;
   if (activeModal === 'setStatus') return <SetStatusModal onClose={closeModal} />;
+  if (activeModal === 'profileAccount') return <ProfileAccountModal onClose={closeModal} />;
   return null;
 }

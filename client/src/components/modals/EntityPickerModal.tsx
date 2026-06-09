@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 
-const BLUE = '#1976d2';
-const BLUE_DARK = '#1565c0';
+const BLUE = 'var(--blue-primary)';
+const BLUE_DARK = 'var(--blue-dark)';
 
 // ── Types ──────────────────────────────────────────────────────
 export interface PickerItem {
@@ -73,7 +73,7 @@ export default function EntityPickerModal({ kind, items, onSelect, onClose, maxV
     const size = 44;
     if (item.iconEmoji) {
       return (
-        <div style={{ width: size, height: size, borderRadius: 6, background: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>
+        <div style={{ width: size, height: size, borderRadius: 6, background: 'var(--grey-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>
           {item.iconEmoji}
         </div>
       );
@@ -90,11 +90,11 @@ export default function EntityPickerModal({ kind, items, onSelect, onClose, maxV
   return (
     <div
       onClick={onClose}
-      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.5)', zIndex: 6000, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Segoe UI, Arial, sans-serif' }}
+      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.5)', zIndex: 6000, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-sans)' }}
     >
       <div
         onClick={e => e.stopPropagation()}
-        style={{ background: '#fff', width: 620, maxWidth: '94vw', height: '78vh', maxHeight: 720, borderRadius: 12, boxShadow: '0 16px 60px rgba(0,0,0,.3)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
+        style={{ background: 'var(--surface)', width: 620, maxWidth: '94vw', height: '78vh', maxHeight: 720, borderRadius: 12, boxShadow: '0 16px 60px rgba(0,0,0,.3)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
       >
         {/* Header */}
         <div style={{ background: BLUE, color: '#fff', padding: '12px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
@@ -110,7 +110,7 @@ export default function EntityPickerModal({ kind, items, onSelect, onClose, maxV
               value={query}
               onChange={e => setQuery(e.target.value)}
               placeholder={kind === 'people' ? 'Search people...' : kind === 'tag' ? 'Search tags...' : 'Search entities...'}
-              style={{ width: '100%', padding: '10px 38px 10px 14px', fontSize: 14, border: '1px solid #dde1e7', borderRadius: 8, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }}
+              style={{ width: '100%', padding: '10px 38px 10px 14px', fontSize: 14, border: '1px solid var(--border)', borderRadius: 8, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box', background: 'var(--surface)', color: 'var(--text)' }}
             />
             {query && (
               <span
@@ -123,7 +123,7 @@ export default function EntityPickerModal({ kind, items, onSelect, onClose, maxV
 
         {/* Count / overflow notice */}
         {filtered.length > 0 && (
-          <div style={{ padding: '0 18px 10px', fontSize: 12, color: '#888', flexShrink: 0 }}>
+          <div style={{ padding: '0 18px 10px', fontSize: 12, color: 'var(--text3)', flexShrink: 0 }}>
             Showing {Math.min(visible.length, filtered.length)} of {filtered.length} results
             {overflow && (
               <span style={{ color: '#e65100', fontStyle: 'italic', marginLeft: 6 }}>
@@ -136,7 +136,7 @@ export default function EntityPickerModal({ kind, items, onSelect, onClose, maxV
         {/* Results list */}
         <div style={{ flex: 1, overflowY: 'auto', padding: '0 12px 12px' }}>
           {visible.length === 0 ? (
-            <div style={{ padding: '40px 20px', textAlign: 'center', color: '#aaa', fontSize: 13 }}>
+            <div style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--text3)', fontSize: 13 }}>
               <div style={{ fontSize: 28, marginBottom: 6 }}>🔍</div>
               {query ? `No results for "${query}"` : 'No items available'}
             </div>
@@ -152,24 +152,24 @@ export default function EntityPickerModal({ kind, items, onSelect, onClose, maxV
                   display: 'flex', alignItems: 'center', gap: 12,
                   padding: '10px 12px', borderRadius: 8, margin: '4px 0',
                   cursor: isSelected ? 'default' : 'pointer',
-                  border: '1px solid #e8e8e8',
-                  background: isSelected ? '#f5f5f5' : '#fff',
+                  border: '1px solid var(--border)',
+                  background: isSelected ? 'var(--grey-light)' : 'var(--surface)',
                   opacity: isSelected ? 0.5 : 1,
                   transition: 'all .12s',
                 }}
-                onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = '#f0f7ff'; }}
-                onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = '#fff'; }}
+                onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = 'var(--blue-xlight)'; }}
+                onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = 'var(--surface)'; }}
               >
                 {renderLogo(resolvedItem)}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 700, fontSize: 14, color: '#1a1a2e', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {item.name}
                   </div>
-                  <div style={{ fontSize: 12, color: '#888', marginTop: 1 }}>
+                  <div style={{ fontSize: 12, color: 'var(--text3)', marginTop: 1 }}>
                     {item.type}
                   </div>
                 </div>
-                {isSelected && <span style={{ fontSize: 11, color: '#888', flexShrink: 0 }}>Added</span>}
+                {isSelected && <span style={{ fontSize: 11, color: 'var(--text3)', flexShrink: 0 }}>Added</span>}
               </div>
             );
           })}

@@ -14,20 +14,20 @@ export default function LoginPage() {
   return (
     <div style={{
       height: '100vh', display: 'flex', alignItems: 'center',
-      justifyContent: 'center', background: '#f0f2f5',
-      fontFamily: 'Segoe UI, Arial, sans-serif',
+      justifyContent: 'center', background: 'var(--grey-light)',
+      fontFamily: 'var(--font-sans)',
     }}>
       <div style={{
-        background: '#fff', borderRadius: 10, padding: '2.5rem',
-        width: 380, boxShadow: '0 4px 24px rgba(0,0,0,0.10)',
-        border: '1px solid #dde1e7',
+        background: 'var(--surface)', borderRadius: 10, padding: '2.5rem',
+        width: 380, boxShadow: '0 4px 24px rgba(6,25,43,0.10)',
+        border: '1px solid var(--border)',
       }}>
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-            <span style={{ fontSize: 24, fontWeight: 800, color: '#1565c0', letterSpacing: -0.5 }}>IAS</span>
+            <span style={{ fontSize: 24, fontWeight: 800, color: 'var(--blue-dark)', letterSpacing: -0.5 }}>IAS</span>
             <span style={{
-              background: '#1976d2', color: '#fff', fontSize: 14,
+              background: 'var(--blue-primary)', color: '#fff', fontSize: 14,
               fontWeight: 700, padding: '2px 10px', borderRadius: 12,
             }}>Hub</span>
           </div>
@@ -41,7 +41,7 @@ export default function LoginPage() {
           onClick={() => window.location.href = `${import.meta.env.VITE_PCI_URL}/ias-connect/login`}
           style={{
             width: '100%', padding: '10px', marginBottom: 16,
-            background: '#1976d2', color: '#fff', border: 'none',
+            background: 'var(--blue-primary)', color: '#fff', border: 'none',
             borderRadius: 8, fontSize: 13, fontWeight: 700,
             cursor: 'pointer', fontFamily: 'inherit',
           }}
@@ -104,7 +104,7 @@ export default function LoginPage() {
             type="submit"
             disabled={loading}
             style={{
-              width: '100%', padding: '10px', background: loading ? '#90caf9' : '#1565c0',
+              width: '100%', padding: '10px', background: loading ? 'var(--blue-300)' : 'var(--blue-dark)',
               color: '#fff', border: 'none', borderRadius: 8,
               fontSize: 13, fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer',
               fontFamily: 'inherit',
@@ -117,7 +117,7 @@ export default function LoginPage() {
         <div style={{ textAlign: 'center', marginTop: 16 }}>
           <a
             href="#"
-            style={{ color: '#1976d2', fontSize: 11, textDecoration: 'none' }}
+            style={{ color: 'var(--blue-primary)', fontSize: 11, textDecoration: 'none' }}
             onClick={() => {/* TODO: password reset */}}
           >
             Forgot password?

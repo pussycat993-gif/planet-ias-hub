@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
-const BLUE = '#1976d2';
-const BLUE_DARK = '#1565c0';
+const BLUE = 'var(--blue-primary)';
+const BLUE_DARK = 'var(--blue-dark)';
 
 interface Member {
   id: number;
@@ -23,7 +23,7 @@ function stringToColor(str: string): string {
 
 function statusDot(status?: string) {
   const color = status === 'online' ? '#4caf50' : status === 'away' ? '#ff9800' : '#bbb';
-  return <div style={{ width: 9, height: 9, borderRadius: '50%', background: color, border: '1.5px solid #fff', flexShrink: 0 }} />;
+  return <div style={{ width: 9, height: 9, borderRadius: '50%', background: color, border: '1.5px solid var(--surface)', flexShrink: 0 }} />;
 }
 
 interface MemberRowProps {
@@ -36,9 +36,9 @@ function MemberRow({ m, onMessageUser }: MemberRowProps) {
 
   return (
     <div
-      style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '7px 12px', cursor: 'pointer', borderBottom: '1px solid #f5f5f5' }}
-      onMouseEnter={e => (e.currentTarget.style.background = '#f0f7ff')}
-      onMouseLeave={e => (e.currentTarget.style.background = '#fff')}
+      style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '7px 12px', cursor: 'pointer', borderBottom: '1px solid var(--neutral-light-active)' }}
+      onMouseEnter={e => (e.currentTarget.style.background = 'var(--blue-xlight)')}
+      onMouseLeave={e => (e.currentTarget.style.background = 'var(--surface)')}
     >
       <div style={{ position: 'relative', flexShrink: 0 }}>
         {m.avatar_url && !imgError ? (
@@ -56,8 +56,8 @@ function MemberRow({ m, onMessageUser }: MemberRowProps) {
       </div>
 
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name}</div>
-        <div style={{ fontSize: 11, color: '#888', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.role || m.email}</div>
+        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name}</div>
+        <div style={{ fontSize: 11, color: 'var(--text3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.role || m.email}</div>
       </div>
 
       <div style={{ fontSize: 10, color: m.status === 'online' ? '#4caf50' : m.status === 'away' ? '#ff9800' : '#bbb', flexShrink: 0, fontWeight: 600 }}>
@@ -66,10 +66,10 @@ function MemberRow({ m, onMessageUser }: MemberRowProps) {
 
       {onMessageUser && (
         <div onClick={e => { e.stopPropagation(); onMessageUser(m.id); }}
-          style={{ width: 26, height: 26, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#bbb', fontSize: 14, flexShrink: 0 }}
+          style={{ width: 26, height: 26, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text3)', fontSize: 14, flexShrink: 0 }}
           title="Send message"
-          onMouseEnter={e => { e.currentTarget.style.background = '#e3f2fd'; e.currentTarget.style.color = BLUE; }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#bbb'; }}>
+          onMouseEnter={e => { e.currentTarget.style.background = 'var(--blue-xlight)'; e.currentTarget.style.color = BLUE; }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text3)'; }}>
           💬
         </div>
       )}
@@ -107,7 +107,7 @@ export default function MembersPanel({ channelId, onClose, onMessageUser }: Prop
     if (list.length === 0) return null;
     return (
       <>
-        <div style={{ padding: '6px 12px 3px', fontSize: 10, fontWeight: 700, color: '#888', textTransform: 'uppercase', letterSpacing: '.05em', display: 'flex', alignItems: 'center', gap: 5 }}>
+        <div style={{ padding: '6px 12px 3px', fontSize: 10, fontWeight: 700, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '.05em', display: 'flex', alignItems: 'center', gap: 5 }}>
           <div style={{ width: 6, height: 6, borderRadius: '50%', background: color }} />
           {label} — {list.length}
         </div>
@@ -119,35 +119,35 @@ export default function MembersPanel({ channelId, onClose, onMessageUser }: Prop
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.3)', zIndex: 2500, display: 'flex', alignItems: 'stretch', justifyContent: 'flex-end' }}
       onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{ width: 320, background: '#fff', display: 'flex', flexDirection: 'column', boxShadow: '-4px 0 20px rgba(0,0,0,.15)', fontFamily: 'Segoe UI, Arial, sans-serif', animation: 'slideIn .2s ease' }}>
+      <div onClick={e => e.stopPropagation()} style={{ width: 320, background: 'var(--surface)', display: 'flex', flexDirection: 'column', boxShadow: '-4px 0 20px rgba(0,0,0,.15)', fontFamily: 'var(--font-sans)', animation: 'slideIn .2s ease' }}>
 
         <style>{`@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }`}</style>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderBottom: '1px solid #eee' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderBottom: '1px solid var(--border)' }}>
           <div>
             <div style={{ fontWeight: 700, fontSize: 14, color: BLUE_DARK }}>Members</div>
-            <div style={{ fontSize: 11, color: '#888', marginTop: 1 }}>{members.length} total · {online.length} online</div>
+            <div style={{ fontSize: 11, color: 'var(--text3)', marginTop: 1 }}>{members.length} total · {online.length} online</div>
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#888' }}>✕</button>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: 'var(--text3)' }}>✕</button>
         </div>
 
-        <div style={{ padding: '8px 12px', borderBottom: '1px solid #f0f0f0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#f5f6f8', borderRadius: 8, padding: '5px 10px', border: '1px solid #eee' }}>
-            <span style={{ color: '#bbb', fontSize: 13 }}>🔍</span>
+        <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--neutral-light-active)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'var(--grey-light)', borderRadius: 8, padding: '5px 10px', border: '1px solid var(--border)' }}>
+            <span style={{ color: 'var(--text3)', fontSize: 13 }}>🔍</span>
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search members..."
-              style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: 12, flex: 1, fontFamily: 'inherit' }} />
-            {search && <span onClick={() => setSearch('')} style={{ color: '#bbb', cursor: 'pointer', fontSize: 14 }}>✕</span>}
+              style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: 12, flex: 1, fontFamily: 'inherit', color: 'var(--text)' }} />
+            {search && <span onClick={() => setSearch('')} style={{ color: 'var(--text3)', cursor: 'pointer', fontSize: 14 }}>✕</span>}
           </div>
         </div>
 
         <div style={{ flex: 1, overflowY: 'auto' }}>
           {loading ? (
-            <div style={{ padding: 20, textAlign: 'center', color: '#aaa', fontSize: 13 }}>Loading members...</div>
+            <div style={{ padding: 20, textAlign: 'center', color: 'var(--text3)', fontSize: 13 }}>Loading members...</div>
           ) : members.length === 0 ? (
-            <div style={{ padding: 20, textAlign: 'center', color: '#aaa', fontSize: 13 }}>No members found</div>
+            <div style={{ padding: 20, textAlign: 'center', color: 'var(--text3)', fontSize: 13 }}>No members found</div>
           ) : filtered ? (
             filtered.length === 0
-              ? <div style={{ padding: 20, textAlign: 'center', color: '#aaa', fontSize: 13 }}>No results</div>
+              ? <div style={{ padding: 20, textAlign: 'center', color: 'var(--text3)', fontSize: 13 }}>No results</div>
               : filtered.map(m => <MemberRow key={m.id} m={m} onMessageUser={onMessageUser} />)
           ) : (
             <>

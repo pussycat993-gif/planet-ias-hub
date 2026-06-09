@@ -4,8 +4,8 @@ import { useChatStore } from '../../store/chatStore';
 import axios from 'axios';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
-const PURPLE = '#6a1b9a';
-const BLUE = '#1976d2';
+const PURPLE = 'var(--purple)';
+const BLUE = 'var(--blue-primary)';
 
 interface AIMessage {
   role: 'user' | 'bot' | 'sys';
@@ -96,8 +96,8 @@ export default function AIPanel() {
 
   return (
     <div style={{
-      width: 260, borderLeft: '1px solid #dde1e7',
-      display: 'flex', flexDirection: 'column', background: '#fff', flexShrink: 0,
+      width: 260, borderLeft: '1px solid var(--border)',
+      display: 'flex', flexDirection: 'column', background: 'var(--surface)', flexShrink: 0,
     }}>
       {/* Header */}
       <div style={{
@@ -118,7 +118,7 @@ export default function AIPanel() {
           <div key={i} style={{ marginBottom: 8 }}>
             {msg.role === 'sys' && (
               <div style={{
-                background: '#fafafa', color: '#888', fontSize: 10,
+                background: 'var(--grey-light)', color: 'var(--text3)', fontSize: 10,
                 textAlign: 'center', padding: '3px 6px', borderRadius: 4,
               }}>
                 {msg.text}
@@ -126,7 +126,7 @@ export default function AIPanel() {
             )}
             {msg.role === 'user' && (
               <div style={{
-                background: '#e3f2fd', color: '#1565c0',
+                background: 'var(--blue-xlight)', color: 'var(--blue-dark)',
                 padding: '6px 9px', borderRadius: 8,
                 fontSize: 12, lineHeight: 1.5, textAlign: 'right',
               }}>
@@ -135,8 +135,8 @@ export default function AIPanel() {
             )}
             {msg.role === 'bot' && (
               <div style={{
-                background: '#f3e5f5', color: PURPLE,
-                border: '1px solid #e1bee7', padding: '6px 9px',
+                background: 'rgba(176,124,214,.14)', color: PURPLE,
+                border: '1px solid rgba(176,124,214,.35)', padding: '6px 9px',
                 borderRadius: 8, fontSize: 12, lineHeight: 1.6,
               }}>
                 {renderText(msg.text)}
@@ -148,7 +148,7 @@ export default function AIPanel() {
                         onClick={() => handleAction(action)}
                         style={{
                           display: 'inline-flex', alignItems: 'center', gap: 4,
-                          background: '#fff', border: '1px solid #dde1e7',
+                          background: 'var(--surface)', border: '1px solid var(--border)',
                           borderRadius: 5, padding: '2px 8px', fontSize: 10,
                           cursor: 'pointer', color: BLUE, fontFamily: 'inherit',
                         }}
@@ -163,7 +163,7 @@ export default function AIPanel() {
           </div>
         ))}
         {loading && (
-          <div style={{ color: '#888', fontSize: 11, fontStyle: 'italic', padding: '4px 8px' }}>
+          <div style={{ color: 'var(--text3)', fontSize: 11, fontStyle: 'italic', padding: '4px 8px' }}>
             Thinking...
           </div>
         )}
@@ -173,16 +173,16 @@ export default function AIPanel() {
       {/* Quick chips */}
       <div style={{
         display: 'flex', flexWrap: 'wrap', gap: 4, padding: '6px 8px',
-        borderTop: '1px solid #dde1e7', flexShrink: 0,
+        borderTop: '1px solid var(--border)', flexShrink: 0,
       }}>
         {CHIPS.map(chip => (
           <div
             key={chip.label}
             onClick={() => sendQuestion(chip.question)}
             style={{
-              background: chip.label.includes('log') || chip.label.includes('Summarize') ? '#f3e5f5' : '#e3f2fd',
-              color: chip.label.includes('log') || chip.label.includes('Summarize') ? PURPLE : '#1565c0',
-              border: `1px solid ${chip.label.includes('log') || chip.label.includes('Summarize') ? '#ce93d8' : '#bbdefb'}`,
+              background: chip.label.includes('log') || chip.label.includes('Summarize') ? 'rgba(176,124,214,.14)' : 'var(--blue-xlight)',
+              color: chip.label.includes('log') || chip.label.includes('Summarize') ? PURPLE : 'var(--blue-dark)',
+              border: `1px solid ${chip.label.includes('log') || chip.label.includes('Summarize') ? 'rgba(176,124,214,.4)' : 'var(--blue-200)'}`,
               borderRadius: 12, padding: '3px 9px', fontSize: 11,
               cursor: 'pointer', transition: 'background .15s',
             }}
@@ -196,7 +196,7 @@ export default function AIPanel() {
 
       {/* Input */}
       <div style={{
-        padding: '6px 8px', borderTop: '1px solid #dde1e7',
+        padding: '6px 8px', borderTop: '1px solid var(--border)',
         display: 'flex', gap: 5, alignItems: 'center', flexShrink: 0,
       }}>
         <input
@@ -205,17 +205,18 @@ export default function AIPanel() {
           onKeyDown={e => e.key === 'Enter' && sendQuestion(input)}
           placeholder="Ask about Jira, PCI..."
           style={{
-            flex: 1, border: '1px solid #dde1e7', borderRadius: 6,
+            flex: 1, border: '1px solid var(--border)', borderRadius: 6,
             padding: '4px 8px', fontSize: 12, fontFamily: 'inherit', outline: 'none',
+            background: 'var(--surface)', color: 'var(--text)',
           }}
           onFocus={e => (e.target.style.borderColor = BLUE)}
-          onBlur={e => (e.target.style.borderColor = '#dde1e7')}
+          onBlur={e => (e.target.style.borderColor = 'var(--border)')}
         />
         <button
           onClick={() => sendQuestion(input)}
           disabled={!input.trim() || loading}
           style={{
-            padding: '4px 10px', background: input.trim() ? BLUE : '#90caf9',
+            padding: '4px 10px', background: input.trim() ? BLUE : 'var(--blue-300)',
             color: '#fff', border: 'none', borderRadius: 6,
             cursor: input.trim() ? 'pointer' : 'default',
             fontSize: 11, fontFamily: 'inherit',

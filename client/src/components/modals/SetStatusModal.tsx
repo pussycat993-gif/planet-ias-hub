@@ -2,8 +2,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useAuthStore } from '../../store/authStore';
 import { useUIStore } from '../../store/uiStore';
 
-const BLUE = '#1976d2';
-const BLUE_DARK = '#1565c0';
+const BLUE = 'var(--blue-primary)';
+const BLUE_DARK = 'var(--blue-dark)';
 
 // ── SetStatusModal ─────────────────────────────────────────────
 // Lets the user pick:
@@ -126,14 +126,14 @@ export default function SetStatusModal({ onClose }: { onClose: () => void }) {
   return (
     <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.45)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div onClick={e => e.stopPropagation()} style={{
-        background: '#fff', borderRadius: 12, width: 440, maxWidth: '95vw',
-        boxShadow: '0 8px 40px rgba(0,0,0,.2)', fontFamily: 'Segoe UI, Arial, sans-serif',
+        background: 'var(--surface)', borderRadius: 12, width: 440, maxWidth: '95vw',
+        boxShadow: '0 8px 40px rgba(0,0,0,.2)', fontFamily: 'var(--font-sans)',
         display: 'flex', flexDirection: 'column', maxHeight: '90vh',
       }}>
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #eee' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid var(--border)' }}>
           <span style={{ fontWeight: 700, fontSize: 15, color: BLUE_DARK }}>Set your status</span>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#888', lineHeight: 1, padding: '0 4px' }}>✕</button>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: 'var(--text3)', lineHeight: 1, padding: '0 4px' }}>✕</button>
         </div>
 
         {/* Body */}
@@ -142,7 +142,7 @@ export default function SetStatusModal({ onClose }: { onClose: () => void }) {
           {/* Preview */}
           <div style={{
             display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px',
-            background: '#f0f7ff', border: '1px solid #c5def9', borderRadius: 10,
+            background: 'var(--blue-xlight)', border: '1px solid var(--blue-200)', borderRadius: 10,
           }}>
             <div style={{ fontSize: 22, width: 28, textAlign: 'center' }}>
               {emoji || (focusMode ? '🎯' : '💬')}
@@ -152,7 +152,7 @@ export default function SetStatusModal({ onClose }: { onClose: () => void }) {
                 {user?.name}
                 {focusMode && <span style={{ marginLeft: 7, fontSize: 10, background: '#e65100', color: '#fff', padding: '1px 6px', borderRadius: 10, fontWeight: 700 }}>FOCUS</span>}
               </div>
-              <div style={{ fontSize: 11, color: '#555', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <div style={{ fontSize: 11, color: 'var(--text2)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {message || (focusMode ? 'Heads down, back later' : 'No status set')}
               </div>
             </div>
@@ -160,7 +160,7 @@ export default function SetStatusModal({ onClose }: { onClose: () => void }) {
 
           {/* Emoji picker */}
           <div>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#555', marginBottom: 7 }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text2)', marginBottom: 7 }}>
               Pick an emoji
             </label>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: 4 }}>
@@ -170,14 +170,14 @@ export default function SetStatusModal({ onClose }: { onClose: () => void }) {
                   <button key={label} onClick={() => setEmoji(e)} title={label}
                     style={{
                       height: 38, fontSize: 18,
-                      background: selected ? '#e3f2fd' : '#fff',
-                      border: `1px solid ${selected ? BLUE : '#dde1e7'}`,
+                      background: selected ? 'var(--blue-xlight)' : 'var(--surface)',
+                      border: `1px solid ${selected ? BLUE : 'var(--border)'}`,
                       borderRadius: 8, cursor: 'pointer',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       fontFamily: 'inherit',
                     }}
                   >
-                    {e || <span style={{ fontSize: 10, color: '#888' }}>None</span>}
+                    {e || <span style={{ fontSize: 10, color: 'var(--text3)' }}>None</span>}
                   </button>
                 );
               })}
@@ -186,9 +186,9 @@ export default function SetStatusModal({ onClose }: { onClose: () => void }) {
 
           {/* Message */}
           <div>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#555', marginBottom: 7 }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text2)', marginBottom: 7 }}>
               Status message
-              <span style={{ marginLeft: 8, fontSize: 10, color: '#aaa', fontWeight: 400 }}>
+              <span style={{ marginLeft: 8, fontSize: 10, color: 'var(--text3)', fontWeight: 400 }}>
                 {message.length}/150
               </span>
             </label>
@@ -199,15 +199,16 @@ export default function SetStatusModal({ onClose }: { onClose: () => void }) {
               placeholder={focusMode ? 'Heads down, back later…' : 'What are you up to?'}
               style={{
                 width: '100%', padding: '9px 12px', boxSizing: 'border-box',
-                border: '1px solid #dde1e7', borderRadius: 8,
+                border: '1px solid var(--border)', borderRadius: 8,
                 fontSize: 13, fontFamily: 'inherit', outline: 'none',
+                background: 'var(--surface)', color: 'var(--text)',
               }}
             />
           </div>
 
           {/* Clear-after */}
           <div>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#555', marginBottom: 7 }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text2)', marginBottom: 7 }}>
               Clear after
             </label>
             <select
@@ -215,9 +216,9 @@ export default function SetStatusModal({ onClose }: { onClose: () => void }) {
               onChange={e => setClearAfter(e.target.value as ClearAfter)}
               style={{
                 width: '100%', padding: '9px 12px', boxSizing: 'border-box',
-                border: '1px solid #dde1e7', borderRadius: 8,
+                border: '1px solid var(--border)', borderRadius: 8,
                 fontSize: 13, fontFamily: 'inherit', outline: 'none',
-                background: '#fff', cursor: 'pointer',
+                background: 'var(--surface)', color: 'var(--text)', cursor: 'pointer',
               }}
             >
               {CLEAR_OPTIONS.map(o => (
@@ -225,7 +226,7 @@ export default function SetStatusModal({ onClose }: { onClose: () => void }) {
               ))}
             </select>
             {clearPreview && (
-              <div style={{ fontSize: 10, color: '#888', marginTop: 4 }}>
+              <div style={{ fontSize: 10, color: 'var(--text3)', marginTop: 4 }}>
                 Status will clear at {clearPreview}
               </div>
             )}
@@ -236,17 +237,17 @@ export default function SetStatusModal({ onClose }: { onClose: () => void }) {
             onClick={() => setFocusMode(f => !f)}
             style={{
               display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px',
-              background: focusMode ? '#fff3e0' : '#f8f9fa',
-              border: `1px solid ${focusMode ? '#ffcc80' : '#eee'}`,
+              background: focusMode ? 'rgba(230,81,0,.15)' : 'var(--grey-light)',
+              border: `1px solid ${focusMode ? 'rgba(230,81,0,.5)' : 'var(--border)'}`,
               borderRadius: 10, cursor: 'pointer',
             }}
           >
             <div style={{ fontSize: 22 }}>🎯</div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: focusMode ? '#e65100' : '#1a1a2e' }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: focusMode ? '#e65100' : 'var(--text)' }}>
                 Focus mode
               </div>
-              <div style={{ fontSize: 11, color: '#555', marginTop: 2 }}>
+              <div style={{ fontSize: 11, color: 'var(--text2)', marginTop: 2 }}>
                 Sets your status to 🎯, silences notifications, and shows a FOCUS badge
               </div>
             </div>
@@ -266,20 +267,20 @@ export default function SetStatusModal({ onClose }: { onClose: () => void }) {
         </div>
 
         {/* Footer */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, padding: '12px 18px', borderTop: '1px solid #eee' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, padding: '12px 18px', borderTop: '1px solid var(--border)' }}>
           <button onClick={handleClearAll} disabled={saving}
-            style={{ padding: '8px 14px', border: '1px solid #dde1e7', borderRadius: 7, background: '#fff', cursor: saving ? 'wait' : 'pointer', fontSize: 12, color: '#888', fontFamily: 'inherit' }}>
+            style={{ padding: '8px 14px', border: '1px solid var(--border)', borderRadius: 7, background: 'var(--surface)', cursor: saving ? 'wait' : 'pointer', fontSize: 12, color: 'var(--text3)', fontFamily: 'inherit' }}>
             Clear status
           </button>
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={onClose} disabled={saving}
-              style={{ padding: '8px 14px', border: '1px solid #dde1e7', borderRadius: 7, background: '#fff', cursor: saving ? 'wait' : 'pointer', fontSize: 13, fontFamily: 'inherit' }}>
+              style={{ padding: '8px 14px', border: '1px solid var(--border)', borderRadius: 7, background: 'var(--surface)', cursor: saving ? 'wait' : 'pointer', fontSize: 13, fontFamily: 'inherit' }}>
               Cancel
             </button>
             <button onClick={handleSave} disabled={saving}
               style={{
                 padding: '8px 20px', border: 'none', borderRadius: 7,
-                background: saving ? '#90caf9' : BLUE, color: '#fff',
+                background: saving ? 'var(--blue-300)' : BLUE, color: '#fff',
                 cursor: saving ? 'wait' : 'pointer',
                 fontSize: 13, fontWeight: 600, fontFamily: 'inherit',
               }}>

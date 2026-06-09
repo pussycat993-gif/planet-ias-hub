@@ -167,7 +167,7 @@ export default function VideoCallModal() {
   // ── PRE-CALL DIALOG ───────────────────────────────────
   if (phase === 'pre') {
     return (
-      <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.6)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Segoe UI, Arial, sans-serif' }}>
+      <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.6)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-sans)' }}>
         <div style={{ background: '#0d0d1a', borderRadius: 16, width: 400, boxShadow: '0 16px 60px rgba(0,0,0,.7)', border: '1px solid rgba(255,255,255,.12)', overflow: 'hidden' }}>
 
           <div style={{ background: 'rgba(255,255,255,.05)', padding: '24px 24px 18px', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,.08)' }}>
@@ -190,7 +190,7 @@ export default function VideoCallModal() {
                 </div>
               </div>
               {/* Toggle */}
-              <div style={{ width: 44, height: 24, borderRadius: 12, background: transcriptionEnabled ? '#1976d2' : 'rgba(255,255,255,.2)', position: 'relative', transition: 'background .2s', flexShrink: 0 }}>
+              <div style={{ width: 44, height: 24, borderRadius: 12, background: transcriptionEnabled ? 'var(--blue-primary)' : 'rgba(255,255,255,.2)', position: 'relative', transition: 'background .2s', flexShrink: 0 }}>
                 <div style={{ position: 'absolute', top: 3, left: transcriptionEnabled ? 22 : 2, width: 18, height: 18, borderRadius: '50%', background: '#fff', transition: 'left .2s', boxShadow: '0 1px 4px rgba(0,0,0,.3)' }} />
               </div>
             </div>
@@ -222,7 +222,7 @@ export default function VideoCallModal() {
   // ── FULLSCREEN 3-PANEL (transcription + video) ────────
   if (isTranscriptionLayout) {
     return (
-      <div style={{ position: 'fixed', inset: 0, background: '#0a0a14', zIndex: 1000, display: 'flex', flexDirection: 'column', fontFamily: 'Segoe UI, Arial, sans-serif' }}>
+      <div style={{ position: 'fixed', inset: 0, background: '#0a0a14', zIndex: 1000, display: 'flex', flexDirection: 'column', fontFamily: 'var(--font-sans)' }}>
 
         {/* Top bar */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 20px', background: 'rgba(255,255,255,.04)', borderBottom: '1px solid rgba(255,255,255,.07)', flexShrink: 0 }}>
@@ -334,7 +334,7 @@ export default function VideoCallModal() {
 
   // ── FLOATING WINDOW (no transcription / audio call) ───
   return (
-    <div style={{ position: 'fixed', left: pos.x, top: pos.y, width: 380, zIndex: 1000, background: '#0d0d1a', borderRadius: 12, boxShadow: '0 8px 40px rgba(0,0,0,.6)', border: '1px solid rgba(255,255,255,.12)', fontFamily: 'Segoe UI, Arial, sans-serif', overflow: 'hidden', userSelect: 'none' }}>
+    <div style={{ position: 'fixed', left: pos.x, top: pos.y, width: 380, zIndex: 1000, background: '#0d0d1a', borderRadius: 12, boxShadow: '0 8px 40px rgba(0,0,0,.6)', border: '1px solid rgba(255,255,255,.12)', fontFamily: 'var(--font-sans)', overflow: 'hidden', userSelect: 'none' }}>
 
       <div onMouseDown={onMouseDown} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: 'rgba(255,255,255,.05)', borderBottom: '1px solid rgba(255,255,255,.08)', cursor: 'grab' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>

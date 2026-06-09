@@ -11,7 +11,46 @@ import PCIContextPanel from '../pci/PCIContextPanel';
 import AIPanel from '../ai/AIPanel';
 import { useChatStore } from '../../store/chatStore';
 import { useUIStore } from '../../store/uiStore';
+import { useCallStore } from '../../store/callStore';
 import { useSocket } from '../../hooks/useSocket';
+
+// Shared user avatar. Renders the photo when available and falls back to
+// colored initials if there's no URL or the image fails to load.
+// Defined at top level (not nested) to avoid React remount loops.
+function avatarColor(str: string): string {
+  const colors = ['#1565c0', '#2e7d32', '#6a1b9a', '#c62828', '#e65100', '#00695c', '#283593', '#4a148c'];
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  return colors[Math.abs(hash) % colors.length];
+}
+
+export function Avatar({ name, avatarUrl, size = 32 }: {
+  name: string;
+  avatarUrl?: string | null;
+  size?: number;
+}) {
+  const [imgError, setImgError] = React.useState(false);
+  const safeName = name || '?';
+  const initials = safeName.trim().split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase();
+  const showImg = avatarUrl && !imgError;
+  return (
+    <div style={{
+      width: size, height: size, borderRadius: '50%', flexShrink: 0,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      background: avatarColor(safeName), color: '#fff', overflow: 'hidden',
+      fontSize: Math.round(size * 0.4), fontWeight: 600,
+    }}>
+      {showImg ? (
+        <img
+          src={avatarUrl as string}
+          alt={safeName}
+          onError={() => setImgError(true)}
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+        />
+      ) : initials}
+    </div>
+  );
+}
 
 export default function Layout() {
   const { fetchChannels, receiveMessage, setTyping, activeChannel } = useChatStore();
@@ -31,7 +70,7 @@ export default function Layout() {
   }, [socket]);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', fontFamily: 'Segoe UI, Arial, sans-serif', fontSize: 13, color: '#1a1a2e' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', fontFamily: 'var(--font-sans)', fontSize: 13, color: 'var(--text)' }}>
       <Header />
       <Toolbar />
       <TabBar />
@@ -40,7 +79,7 @@ export default function Layout() {
         <Sidebar />
 
         {/* Center */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, background: '#f0f2f5' }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, background: 'var(--grey-light)' }}>
           <ChatTitleBar />
           <CallBar />
           <MessageList />
@@ -49,15 +88,15 @@ export default function Layout() {
 
         {/* Right panel */}
         {rightPanelOpen && (
-          <div style={{ width: 280, borderLeft: '1px solid #dde1e7', background: '#fff', flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
+          <div style={{ width: 280, borderLeft: '1px solid var(--border)', background: 'var(--surface)', flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
             {/* Tabs */}
-            <div style={{ display: 'flex', borderBottom: '2px solid #1976d2', background: '#f8f9fa', flexShrink: 0 }}>
+            <div style={{ display: 'flex', borderBottom: '2px solid var(--blue-primary)', background: 'var(--grey-light)', flexShrink: 0 }}>
               {(['pci', 'info', 'files', 'log'] as const).map(t => (
                 <div key={t} onClick={() => setRightPanelTab(t)} style={{
                   flex: 1, textAlign: 'center', padding: '6px 2px',
                   fontSize: 11, cursor: 'pointer', fontWeight: 500,
-                  background: rightPanelTab === t ? '#1976d2' : 'transparent',
-                  color: rightPanelTab === t ? '#fff' : '#555',
+                  background: rightPanelTab === t ? 'var(--blue-primary)' : 'transparent',
+                  color: rightPanelTab === t ? '#fff' : 'var(--text2)',
                 }}>
                   {t === 'pci' ? 'PCI' : t.charAt(0).toUpperCase() + t.slice(1)}
                 </div>
@@ -79,7 +118,7 @@ export default function Layout() {
       </div>
 
       {/* Footer */}
-      <div style={{ background: '#1565c0', color: '#fff', padding: '0 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 24, flexShrink: 0 }}>
+      <div style={{ background: 'var(--blue-dark)', color: '#fff', padding: '0 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 24, flexShrink: 0 }}>
         <div style={{ display: 'flex', gap: 14 }}>
           {['Channels', 'Calls', 'Notifications', 'Help'].map(l => (
             <span key={l} style={{ fontSize: 10, color: 'rgba(255,255,255,.8)', cursor: 'pointer', textDecoration: 'underline' }}>{l}</span>
@@ -96,10 +135,10 @@ export default function Layout() {
 
 function ChatTitleBar() {
   const { activeChannel, activeChannelId } = useChatStore();
-  const { startCall } = require('../../store/callStore').useCallStore();
+  const { startCall } = useCallStore();
 
   if (!activeChannel) return (
-    <div style={{ background: '#fff', borderBottom: '1px solid #dde1e7', padding: '10px 12px', color: '#888', fontSize: 12, flexShrink: 0 }}>
+    <div style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)', padding: '10px 12px', color: 'var(--text3)', fontSize: 12, flexShrink: 0 }}>
       Select a channel to start messaging
     </div>
   );
@@ -108,12 +147,12 @@ function ChatTitleBar() {
   const icon = isDM ? '💬' : activeChannel.type === 'group' ? '⬡' : '#';
 
   return (
-    <div style={{ background: '#fff', borderBottom: '1px solid #dde1e7', padding: '5px 12px', display: 'flex', alignItems: 'center', gap: 7, flexShrink: 0 }}>
-      <span style={{ color: '#888', fontSize: 15 }}>{icon}</span>
-      <span style={{ fontWeight: 700, color: '#1565c0', fontSize: 14 }}>
+    <div style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)', padding: '5px 12px', display: 'flex', alignItems: 'center', gap: 7, flexShrink: 0 }}>
+      <span style={{ color: 'var(--text3)', fontSize: 15 }}>{icon}</span>
+      <span style={{ fontWeight: 700, color: 'var(--blue-dark)', fontSize: 14 }}>
         {isDM ? activeChannel.other_user?.name : activeChannel.name}
       </span>
-      <span style={{ color: '#888', fontSize: 11 }}>
+      <span style={{ color: 'var(--text3)', fontSize: 11 }}>
         {isDM ? `● ${activeChannel.other_user?.status || 'offline'}` : `— ${activeChannel.type}`}
       </span>
       <div style={{ marginLeft: 'auto', display: 'flex', gap: 4 }}>
@@ -126,8 +165,8 @@ function ChatTitleBar() {
         ].map(({ label, green, onClick }) => (
           <button key={label} onClick={onClick} style={{
             padding: '4px 10px',
-            border: `1px solid ${green ? '#a5d6a7' : '#dde1e7'}`,
-            background: '#fff', color: green ? '#2e7d32' : '#555',
+            border: `1px solid ${green ? '#a5d6a7' : 'var(--border)'}`,
+            background: 'var(--surface)', color: green ? 'var(--green)' : 'var(--text2)',
             cursor: 'pointer', fontSize: 11, borderRadius: 6, fontFamily: 'inherit',
           }}>
             {label}

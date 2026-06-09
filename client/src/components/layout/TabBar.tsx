@@ -29,7 +29,7 @@ export default function TabBar() {
   return (
     <div style={{
       display: 'flex', alignItems: 'flex-end', padding: '0 12px',
-      background: '#fff', borderBottom: '2px solid #1976d2', flexShrink: 0,
+      background: 'var(--surface)', borderBottom: '2px solid var(--blue-primary)', flexShrink: 0,
     }}>
       <style>{`@keyframes ias-tab-live-pulse { 0%,100%{opacity:1} 50%{opacity:.4} }`}</style>
 
@@ -45,12 +45,12 @@ export default function TabBar() {
             style={{
               padding: '6px 16px', cursor: 'pointer', fontSize: 12, fontWeight: 500,
               borderRadius: '6px 6px 0 0', transition: 'all .15s',
-              background: isActive ? '#1976d2' : 'transparent',
-              color: isActive ? '#fff' : '#555',
+              background: isActive ? 'var(--blue-primary)' : 'transparent',
+              color: isActive ? '#fff' : 'var(--text2)',
               display: 'flex', alignItems: 'center', gap: 6, position: 'relative',
             }}
-            onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = '#f0f7ff'; e.currentTarget.style.color = '#1976d2'; } }}
-            onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#555'; } }}
+            onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = 'var(--blue-xlight)'; e.currentTarget.style.color = 'var(--blue-primary)'; } }}
+            onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text2)'; } }}
           >
             <span style={{ fontSize: 13 }}>{icon}</span>
             <span>{label}</span>
@@ -59,7 +59,7 @@ export default function TabBar() {
             {showLiveOnCalls && (
               <span style={{
                 display: 'inline-flex', alignItems: 'center', gap: 3,
-                background: '#e53935', color: '#fff',
+                background: 'var(--red)', color: '#fff',
                 fontSize: 8, fontWeight: 800, letterSpacing: '.05em',
                 padding: '1px 6px', borderRadius: 8,
                 animation: 'ias-tab-live-pulse 1.4s infinite',
@@ -73,7 +73,7 @@ export default function TabBar() {
             {/* Unread badge */}
             {!showLiveOnCalls && badge > 0 && (
               <span style={{
-                background: isActive ? 'rgba(255,255,255,.3)' : '#e53935',
+                background: isActive ? 'rgba(255,255,255,.3)' : 'var(--red)',
                 color: '#fff', fontSize: 9, fontWeight: 700,
                 padding: '1px 5px', borderRadius: 8, lineHeight: 1.4,
               }}>

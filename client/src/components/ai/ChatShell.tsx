@@ -3,8 +3,8 @@ import { useAskIASStore, type Turn } from '../../store/askIASStore';
 import { useAskIAS } from '../../hooks/useAskIAS';
 import ResponseRenderer from './ResponseRenderer';
 
-const BLUE = '#1976d2';
-const BLUE_DARK = '#1565c0';
+const BLUE = 'var(--blue-primary)';
+const BLUE_DARK = 'var(--blue-dark)';
 
 /**
  * Ask IAS — ChatShell.
@@ -68,14 +68,14 @@ function EmptyState() {
       alignItems: 'center',
       justifyContent: 'center',
       padding: '28px 24px',
-      color: '#888',
+      color: 'var(--text3)',
       textAlign: 'center',
     }}>
       <div style={{ fontSize: 34, marginBottom: 10, opacity: .45 }}>✨</div>
-      <div style={{ fontSize: 13, fontWeight: 600, color: '#555', marginBottom: 4 }}>
+      <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text2)', marginBottom: 4 }}>
         What can I help you with?
       </div>
-      <div style={{ fontSize: 11, color: '#aaa', maxWidth: 380 }}>
+      <div style={{ fontSize: 11, color: 'var(--text3)', maxWidth: 380 }}>
         Pick one of the questions below, or type your own. I can pull from your
         tasks, meetings, unread channels, and pinned messages.
       </div>
@@ -92,8 +92,8 @@ function UserBubble({ turn }: { turn: Turn }) {
       <div style={{
         maxWidth: '78%',
         padding: '9px 13px',
-        background: '#f0f2f5',
-        color: '#1a1a2e',
+        background: 'var(--grey-light)',
+        color: 'var(--text)',
         borderRadius: '14px 14px 4px 14px',
         fontSize: 13,
         lineHeight: 1.45,
@@ -115,16 +115,16 @@ function AssistantBlock({ turn }: { turn: Turn }) {
   return (
     <div style={{
       width: '100%',
-      border: `1px solid ${isFallback ? '#ffcc80' : '#e6eaf0'}`,
+      border: `1px solid ${isFallback ? '#ffcc80' : 'var(--border)'}`,
       borderRadius: 12,
-      background: '#fff',
+      background: 'var(--surface)',
       overflow: 'hidden',
     }}>
       {/* Small header strip */}
       <div style={{
         padding: '6px 12px',
-        background: isFallback ? '#fff8e1' : '#f8fafd',
-        borderBottom: `1px solid ${isFallback ? '#ffe082' : '#eef1f5'}`,
+        background: isFallback ? '#fff8e1' : 'var(--grey-light)',
+        borderBottom: `1px solid ${isFallback ? '#ffe082' : 'var(--border)'}`,
         fontSize: 10,
         fontWeight: 700,
         color: isFallback ? '#8a6d00' : BLUE_DARK,
@@ -137,7 +137,7 @@ function AssistantBlock({ turn }: { turn: Turn }) {
         <span>✨</span>
         <span>Ask IAS</span>
         {turn.parsed?.source === 'cache' && (
-          <span style={{ color: '#aaa', fontWeight: 500, textTransform: 'none', marginLeft: 'auto' }}>cached</span>
+          <span style={{ color: 'var(--text3)', fontWeight: 500, textTransform: 'none', marginLeft: 'auto' }}>cached</span>
         )}
         {isFallback && (
           <span style={{ color: '#8a6d00', fontWeight: 600, textTransform: 'none', marginLeft: 'auto' }}>
@@ -145,7 +145,7 @@ function AssistantBlock({ turn }: { turn: Turn }) {
           </span>
         )}
         {typeof turn.parsed?.generated_in_ms === 'number' && !isFallback && turn.parsed.source !== 'cache' && (
-          <span style={{ color: '#aaa', fontWeight: 500, textTransform: 'none', marginLeft: 'auto' }}>
+          <span style={{ color: 'var(--text3)', fontWeight: 500, textTransform: 'none', marginLeft: 'auto' }}>
             {Math.round(turn.parsed.generated_in_ms / 100) / 10}s
           </span>
         )}
@@ -183,7 +183,7 @@ function LoadingBody() {
       gap: 8,
       padding: '14px 14px',
       fontSize: 12,
-      color: '#888',
+      color: 'var(--text3)',
     }}>
       <span style={{ display: 'inline-flex', gap: 3 }}>
         {[0, 1, 2].map(i => (
@@ -216,8 +216,8 @@ function ErrorBody({ error, turnId }: { error: string; turnId: string }) {
     <div style={{
       padding: '12px 14px',
       fontSize: 12,
-      background: '#ffebee',
-      borderTop: '1px solid #ffcdd2',
+      background: 'rgba(198,40,40,.12)',
+      borderTop: '1px solid rgba(198,40,40,.3)',
     }}>
       <div style={{ fontWeight: 600, marginBottom: 3, color: '#c62828' }}>
         Could not get an answer.
@@ -232,7 +232,7 @@ function ErrorBody({ error, turnId }: { error: string; turnId: string }) {
           fontSize: 11,
           fontWeight: 600,
           border: '1px solid #c62828',
-          background: retrying ? '#ffcdd2' : '#fff',
+          background: retrying ? '#ffcdd2' : 'var(--surface)',
           color: '#c62828',
           borderRadius: 5,
           cursor: retrying ? 'not-allowed' : 'pointer',
@@ -242,7 +242,7 @@ function ErrorBody({ error, turnId }: { error: string; turnId: string }) {
           gap: 4,
         }}
         onMouseEnter={e => { if (!retrying) e.currentTarget.style.background = '#ffebee'; }}
-        onMouseLeave={e => { if (!retrying) e.currentTarget.style.background = '#fff'; }}
+        onMouseLeave={e => { if (!retrying) e.currentTarget.style.background = 'var(--surface)'; }}
       >
         {retrying ? 'Retrying…' : '↻ Retry'}
       </button>

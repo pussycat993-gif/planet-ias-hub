@@ -180,4 +180,19 @@ router.patch('/:id/timezone', async (req: Request, res: Response) => {
   }
 });
 
+// PATCH /users/:id/avatar — store a base64 data URL, or null to remove
+router.patch('/:id/avatar', async (req: Request, res: Response) => {
+  const { avatar_url } = req.body;
+  const clean = typeof avatar_url === 'string' && avatar_url.trim() ? avatar_url.trim() : null;
+  try {
+    await pool.query(
+      'UPDATE users SET avatar_url = $1, updated_at = NOW() WHERE id = $2',
+      [clean, req.params.id]
+    );
+    return res.json({ success: true, data: { avatar_url: clean } });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: 'Failed to update avatar' });
+  }
+});
+
 export default router;

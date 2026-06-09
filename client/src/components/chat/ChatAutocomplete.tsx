@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 
-const BLUE = '#1976d2';
-const BLUE_DARK = '#1565c0';
+const BLUE = 'var(--blue-primary)';
+const BLUE_DARK = 'var(--blue-dark)';
 
 // ── Types ──────────────────────────────────────────────────────
 export interface AutocompleteItem {
@@ -52,13 +52,13 @@ export default function ChatAutocomplete({ kind, items, highlightedIndex, onHigh
       style={{
         position: 'absolute', bottom: '100%', left: 0, marginBottom: 8,
         width: 320, maxHeight: 280,
-        background: '#fff', border: '1px solid #e0e0e0', borderRadius: 10,
+        background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10,
         boxShadow: '0 8px 32px rgba(0,0,0,.15)',
         display: 'flex', flexDirection: 'column', overflow: 'hidden',
-        fontFamily: 'Segoe UI, Arial, sans-serif', zIndex: 2500,
+        fontFamily: 'var(--font-sans)', zIndex: 2500,
       }}
     >
-      <div style={{ padding: '6px 12px', fontSize: 10, fontWeight: 700, color: '#888', textTransform: 'uppercase', letterSpacing: '.05em', background: '#fafafa', borderBottom: '1px solid #f0f0f0', flexShrink: 0 }}>
+      <div style={{ padding: '6px 12px', fontSize: 10, fontWeight: 700, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '.05em', background: 'var(--grey-light)', borderBottom: '1px solid var(--neutral-light-active)', flexShrink: 0 }}>
         {title}
       </div>
 
@@ -73,7 +73,7 @@ export default function ChatAutocomplete({ kind, items, highlightedIndex, onHigh
               style={{
                 display: 'flex', alignItems: 'center', gap: 10,
                 padding: '7px 12px', cursor: 'pointer',
-                background: highlighted ? '#f0f7ff' : '#fff',
+                background: highlighted ? 'var(--blue-xlight)' : 'var(--surface)',
                 borderLeft: highlighted ? `3px solid ${BLUE}` : '3px solid transparent',
                 paddingLeft: highlighted ? 9 : 12,
               }}
@@ -90,24 +90,24 @@ export default function ChatAutocomplete({ kind, items, highlightedIndex, onHigh
                   </div>
                 )
               ) : (
-                <div style={{ width: 28, height: 28, borderRadius: 6, background: '#e3f2fd', color: BLUE, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, flexShrink: 0 }}>
+                <div style={{ width: 28, height: 28, borderRadius: 6, background: 'var(--blue-xlight)', color: BLUE, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, flexShrink: 0 }}>
                   {item.icon || '/'}
                 </div>
               )}
 
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {item.label}
                 </div>
                 {item.sublabel && (
-                  <div style={{ fontSize: 11, color: '#888', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <div style={{ fontSize: 11, color: 'var(--text3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {item.sublabel}
                   </div>
                 )}
               </div>
 
               {item.hotkey && (
-                <span style={{ fontSize: 10, color: '#aaa', background: '#f5f6f8', padding: '2px 6px', borderRadius: 4, flexShrink: 0, fontFamily: 'monospace' }}>
+                <span style={{ fontSize: 10, color: 'var(--text3)', background: 'var(--grey-light)', padding: '2px 6px', borderRadius: 4, flexShrink: 0, fontFamily: 'monospace' }}>
                   {item.hotkey}
                 </span>
               )}
@@ -116,7 +116,7 @@ export default function ChatAutocomplete({ kind, items, highlightedIndex, onHigh
         })}
       </div>
 
-      <div style={{ padding: '5px 12px', fontSize: 10, color: '#aaa', borderTop: '1px solid #f0f0f0', background: '#fafafa', display: 'flex', gap: 12, flexShrink: 0 }}>
+      <div style={{ padding: '5px 12px', fontSize: 10, color: 'var(--text3)', borderTop: '1px solid var(--neutral-light-active)', background: 'var(--grey-light)', display: 'flex', gap: 12, flexShrink: 0 }}>
         <span><kbd style={kbdStyle}>↑↓</kbd> Navigate</span>
         <span><kbd style={kbdStyle}>Enter</kbd> Select</span>
         <span><kbd style={kbdStyle}>Esc</kbd> Close</span>
@@ -126,6 +126,6 @@ export default function ChatAutocomplete({ kind, items, highlightedIndex, onHigh
 }
 
 const kbdStyle: React.CSSProperties = {
-  background: '#e8e8e8', border: '1px solid #ddd', borderRadius: 3,
-  padding: '1px 4px', fontFamily: 'monospace', fontSize: 9, color: '#555',
+  background: 'var(--grey-light)', border: '1px solid var(--border)', borderRadius: 3,
+  padding: '1px 4px', fontFamily: 'monospace', fontSize: 9, color: 'var(--text2)',
 };

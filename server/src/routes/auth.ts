@@ -7,6 +7,7 @@ import {
   findUserByEmail,
   createSession,
   invalidateSession,
+  invalidateOtherSessions,
   findUserById,
 } from '../db/auth';
 
@@ -129,6 +130,19 @@ router.post('/logout', async (req: Request, res: Response) => {
   const token = req.headers.authorization?.split(' ')[1];
   if (token) await invalidateSession(token);
   return res.json({ success: true });
+});
+
+// ── Logout all other sessions ─────────────────────────────
+router.post('/logout-others', async (req: Request, res: Response) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) return res.status(401).json({ success: false, error: 'Unauthorized' });
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET!) as { userId: number };
+    const count = await invalidateOtherSessions(payload.userId, token);
+    return res.json({ success: true, data: { signed_out: count } });
+  } catch {
+    return res.status(401).json({ success: false, error: 'Invalid or expired token' });
+  }
 });
 
 // ── Reset password (external users) ──────────────────────

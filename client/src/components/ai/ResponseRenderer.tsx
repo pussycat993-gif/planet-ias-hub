@@ -40,20 +40,20 @@ export interface AskResponseParsed {
 }
 
 // ── Tokens ───────────────────────────────────────────────────────────
-const BLUE      = '#1976d2';
-const BLUE_DARK = '#1565c0';
-const BLUE_SOFT = '#f0f7ff';
-const RED       = '#c62828';
-const RED_SOFT  = '#ffebee';
-const ORANGE    = '#e65100';
-const ORANGE_SOFT = '#fff3e0';
-const GREEN     = '#2e7d32';
-const GREEN_SOFT = '#e8f5e9';
-const INK       = '#1a1a2e';
-const INK_DIM   = '#555';
-const INK_MUTE  = '#888';
-const BORDER    = '#e6eaf0';
-const BORDER_SOFT = '#f0f2f5';
+const BLUE      = 'var(--blue-primary)';
+const BLUE_DARK = 'var(--blue-dark)';
+const BLUE_SOFT = 'var(--blue-xlight)';
+const RED       = 'var(--red)';
+const RED_SOFT  = 'rgba(198,40,40,.15)';
+const ORANGE    = 'var(--orange)';
+const ORANGE_SOFT = 'rgba(230,81,0,.15)';
+const GREEN     = 'var(--green)';
+const GREEN_SOFT = 'rgba(76,175,80,.15)';
+const INK       = 'var(--text)';
+const INK_DIM   = 'var(--text2)';
+const INK_MUTE  = 'var(--text3)';
+const BORDER    = 'var(--border)';
+const BORDER_SOFT = 'var(--neutral-light-active)';
 
 // ════════════════════════════════════════════════════════════════════
 //  Dispatcher
@@ -284,7 +284,7 @@ function parseInline(text: string): React.ReactNode[] {
     else if (m[3] !== undefined) out.push(<em key={key++}>{m[3]}</em>);
     else if (m[4] !== undefined) out.push(
       <code key={key++} style={{
-        background: '#f5f6f8',
+        background: 'var(--grey-light)',
         padding: '1px 5px',
         borderRadius: 4,
         fontFamily: 'Menlo, Consolas, monospace',
@@ -337,7 +337,7 @@ function TableResponse({ content }: { content: any }) {
                   fontWeight: 700,
                   padding: '9px 12px',
                   textAlign: 'left',
-                  borderBottom: `2px solid #bbdefb`,
+                  borderBottom: `2px solid var(--blue-200)`,
                   whiteSpace: 'nowrap',
                   letterSpacing: '.02em',
                   fontSize: 11.5,
@@ -347,7 +347,7 @@ function TableResponse({ content }: { content: any }) {
           </thead>
           <tbody>
             {rows.map((row, ri) => (
-              <tr key={ri} style={{ background: ri % 2 === 0 ? '#fff' : '#fafbfc' }}>
+              <tr key={ri} style={{ background: ri % 2 === 0 ? 'var(--surface)' : 'var(--grey-light)' }}>
                 {row.map((cell, ci) => (
                   <td key={ci} style={{
                     padding: '8px 12px',
@@ -388,7 +388,7 @@ function UnknownResponse({ response }: { response: AskResponseParsed }) {
         margin: 0,
         padding: 10,
         fontSize: 10.5,
-        background: '#fafbfc',
+        background: 'var(--grey-light)',
         border: `1px solid ${BORDER}`,
         borderRadius: 6,
         color: INK_DIM,
@@ -404,7 +404,7 @@ function UnknownResponse({ response }: { response: AskResponseParsed }) {
 // ════════════════════════════════════════════════════════════════════
 
 function Badge({ kind, value }: { kind: 'urgency' | 'type'; value: string }) {
-  let bg = '#f0f0f0', color = INK_DIM;
+  let bg = 'var(--grey-light)', color = INK_DIM;
   if (kind === 'urgency') {
     const v = value.toLowerCase();
     if (v.includes('overdue')) {
@@ -417,7 +417,7 @@ function Badge({ kind, value }: { kind: 'urgency' | 'type'; value: string }) {
       bg = BLUE_SOFT; color = BLUE_DARK;
     }
   } else {
-    bg = '#f5f6f8'; color = INK_DIM;
+    bg = 'var(--grey-light)'; color = INK_DIM;
   }
   return (
     <span style={{
@@ -457,7 +457,7 @@ function ActionButton({ variant, onClick, children }: {
         padding: '4px 10px',
         fontSize: 11,
         border: `1px solid ${palette.border}`,
-        background: hover ? palette.soft : '#fff',
+        background: hover ? palette.soft : 'var(--surface)',
         color: palette.color,
         borderRadius: 5,
         cursor: 'pointer',

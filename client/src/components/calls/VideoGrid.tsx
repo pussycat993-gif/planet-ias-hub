@@ -31,7 +31,7 @@ function VideoTile({ stream, label, muted = false, isLocal = false, isCameraOff 
       borderRadius: 10,
       overflow: 'hidden',
       background: '#1a1a2e',
-      border: isLocal ? '2px solid #1976d2' : '1px solid #333',
+      border: isLocal ? '2px solid var(--blue-primary)' : '1px solid #333',
       aspectRatio: '16/9',
       display: 'flex',
       alignItems: 'center',
@@ -50,7 +50,7 @@ function VideoTile({ stream, label, muted = false, isLocal = false, isCameraOff 
         /* Avatar fallback when no video */
         <div style={{
           width: 64, height: 64, borderRadius: '50%',
-          background: '#1976d2',
+          background: 'var(--blue-primary)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: 22, fontWeight: 700, color: '#fff',
         }}>
@@ -86,7 +86,7 @@ function VideoTile({ stream, label, muted = false, isLocal = false, isCameraOff 
       {isLocal && (
         <div style={{
           position: 'absolute', top: 8, left: 8,
-          background: 'rgba(25,118,210,.7)', color: '#fff',
+          background: 'rgba(25,100,172,.7)', color: '#fff',
           fontSize: 9, padding: '2px 6px', borderRadius: 8, fontWeight: 700,
         }}>
           YOU

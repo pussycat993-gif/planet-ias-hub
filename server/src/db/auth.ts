@@ -78,6 +78,14 @@ export async function invalidateSession(token: string) {
   await pool.query('DELETE FROM sessions WHERE token = $1', [token]);
 }
 
+export async function invalidateOtherSessions(userId: number, keepToken: string) {
+  const { rowCount } = await pool.query(
+    'DELETE FROM sessions WHERE user_id = $1 AND token <> $2',
+    [userId, keepToken]
+  );
+  return rowCount || 0;
+}
+
 export async function isSessionValid(token: string): Promise<boolean> {
   const { rows } = await pool.query(
     'SELECT id FROM sessions WHERE token = $1 AND expires_at > NOW()',

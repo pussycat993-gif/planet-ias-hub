@@ -6,8 +6,8 @@ import ChipsRow from './ChipsRow';
 import ChipsEditor from './ChipsEditor';
 import ChatShell from './ChatShell';
 
-const BLUE_DARK = '#1565c0';
-const BLUE = '#1976d2';
+const BLUE_DARK = 'var(--blue-dark)';
+const BLUE = 'var(--blue-primary)';
 const MODEL_LABEL = 'claude-sonnet-4';
 
 /**
@@ -105,7 +105,7 @@ export default function AskIASModal() {
         justifyContent: 'center',
         paddingTop: 60,
         animation: 'ias-ask-fade .18s ease-out',
-        fontFamily: 'Segoe UI, Arial, sans-serif',
+        fontFamily: 'var(--font-sans)',
       }}
     >
       <style>{`
@@ -122,7 +122,7 @@ export default function AskIASModal() {
         aria-label="Ask IAS — AI assistant"
         onClick={e => e.stopPropagation()}
         style={{
-          background: '#fff',
+          background: 'var(--surface)',
           borderRadius: 14,
           width: 720,
           maxWidth: '95vw',
@@ -137,7 +137,7 @@ export default function AskIASModal() {
         {/* Header */}
         <div style={{
           padding: '14px 20px 12px',
-          borderBottom: '1px solid #eee',
+          borderBottom: '1px solid var(--border)',
           display: 'flex',
           alignItems: 'center',
           gap: 8,
@@ -153,11 +153,11 @@ export default function AskIASModal() {
             title={editing ? 'Close editor' : 'Edit questions'}
             style={{
               padding: '5px 10px',
-              border: editing ? '1px solid #90caf9' : '1px solid #dde1e7',
-              background: editing ? '#f0f7ff' : '#fff',
+              border: editing ? '1px solid var(--blue-300)' : '1px solid var(--border)',
+              background: editing ? 'var(--blue-xlight)' : 'var(--surface)',
               borderRadius: 6,
               fontSize: 11,
-              color: editing ? BLUE : '#666',
+              color: editing ? BLUE : 'var(--text2)',
               cursor: 'pointer',
               fontFamily: 'inherit',
               whiteSpace: 'nowrap',
@@ -174,7 +174,7 @@ export default function AskIASModal() {
               border: 'none',
               fontSize: 18,
               cursor: 'pointer',
-              color: '#888',
+              color: 'var(--text3)',
               padding: '0 4px',
               lineHeight: 1,
             }}
@@ -185,7 +185,7 @@ export default function AskIASModal() {
         <div style={{
           flex: 1,
           overflowY: 'auto',
-          background: hasHistory ? '#fafbfc' : '#fff',
+          background: hasHistory ? 'var(--grey-light)' : 'var(--surface)',
           transition: 'background .2s',
         }}>
           <ChatShell />
@@ -193,7 +193,7 @@ export default function AskIASModal() {
 
         {/* Chips editor inline (when open) OR chips row above prompt */}
         {editing ? (
-          <div style={{ borderTop: '1px solid #eee', background: '#fff', flexShrink: 0, paddingTop: 12 }}>
+          <div style={{ borderTop: '1px solid var(--border)', background: 'var(--surface)', flexShrink: 0, paddingTop: 12 }}>
             <ChipsEditor
               chips={chips}
               saving={saving}
@@ -203,10 +203,10 @@ export default function AskIASModal() {
             />
           </div>
         ) : (
-          <div style={{ borderTop: '1px solid #eee', background: '#fff', flexShrink: 0, paddingTop: 10 }}>
+          <div style={{ borderTop: '1px solid var(--border)', background: 'var(--surface)', flexShrink: 0, paddingTop: 10 }}>
             <ChipsRow chips={chips} onSelect={handleSelectChip} compact={hasHistory} />
             {chipsLoading && (
-              <div style={{ padding: '0 20px 8px', fontSize: 10, color: '#bbb', fontStyle: 'italic' }}>
+              <div style={{ padding: '0 20px 8px', fontSize: 10, color: 'var(--text3)', fontStyle: 'italic' }}>
                 Loading your question chips…
               </div>
             )}
@@ -214,7 +214,7 @@ export default function AskIASModal() {
         )}
 
         {/* Prompt input (always visible, pinned above footer) */}
-        <div style={{ padding: '4px 20px 12px', background: '#fff', flexShrink: 0 }}>
+        <div style={{ padding: '4px 20px 12px', background: 'var(--surface)', flexShrink: 0 }}>
           <PromptInput
             ref={inputRef}
             value={draftQuestion}
@@ -236,13 +236,13 @@ export default function AskIASModal() {
         {/* Footer */}
         <div style={{
           padding: '8px 20px',
-          borderTop: '1px solid #eee',
+          borderTop: '1px solid var(--border)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           fontSize: 11,
-          color: '#888',
-          background: '#fafbfc',
+          color: 'var(--text3)',
+          background: 'var(--grey-light)',
           flexShrink: 0,
         }}>
           <span>
@@ -290,14 +290,14 @@ const PromptInput = React.forwardRef<HTMLTextAreaElement, PromptInputProps>(
             width: '100%',
             minHeight: 42,
             maxHeight: 120,
-            border: '1px solid #dde1e7',
+            border: '1px solid var(--border)',
             borderRadius: 10,
             padding: '11px 48px 11px 14px',
             fontSize: 13,
             fontFamily: 'inherit',
             outline: 'none',
-            background: disabled ? '#f5f5f5' : '#f8f9fa',
-            color: disabled ? '#aaa' : '#1a1a2e',
+            background: disabled ? 'var(--neutral-light-active)' : 'var(--grey-light)',
+            color: disabled ? 'var(--text3)' : 'var(--text)',
             resize: 'none',
             boxSizing: 'border-box',
             transition: 'border-color .15s, background .15s, box-shadow .15s',
@@ -305,12 +305,12 @@ const PromptInput = React.forwardRef<HTMLTextAreaElement, PromptInputProps>(
           onFocus={e => {
             if (disabled) return;
             e.currentTarget.style.borderColor = BLUE;
-            e.currentTarget.style.background = '#fff';
+            e.currentTarget.style.background = 'var(--surface)';
             e.currentTarget.style.boxShadow = '0 0 0 3px rgba(25,118,210,.1)';
           }}
           onBlur={e => {
-            e.currentTarget.style.borderColor = '#dde1e7';
-            e.currentTarget.style.background = disabled ? '#f5f5f5' : '#f8f9fa';
+            e.currentTarget.style.borderColor = 'var(--border)';
+            e.currentTarget.style.background = disabled ? 'var(--neutral-light-active)' : 'var(--grey-light)';
             e.currentTarget.style.boxShadow = 'none';
           }}
         />
@@ -326,7 +326,7 @@ const PromptInput = React.forwardRef<HTMLTextAreaElement, PromptInputProps>(
             width: 32,
             height: 32,
             borderRadius: 8,
-            background: canSend ? BLUE : '#cfd8dc',
+            background: canSend ? BLUE : 'var(--blue-300)',
             color: '#fff',
             border: 'none',
             cursor: canSend ? 'pointer' : 'not-allowed',
@@ -349,12 +349,12 @@ function Kbd({ children }: { children: React.ReactNode }) {
     <kbd style={{
       display: 'inline-block',
       padding: '1px 6px',
-      border: '1px solid #dde1e7',
+      border: '1px solid var(--border)',
       borderRadius: 4,
-      background: '#fff',
+      background: 'var(--surface)',
       fontFamily: 'Menlo, Consolas, monospace',
       fontSize: 10,
-      color: '#555',
+      color: 'var(--text2)',
     }}>{children}</kbd>
   );
 }

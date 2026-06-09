@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { DEFAULT_CUSTOM_CHIPS, PINNED_CHIP } from '../../hooks/useAskIASPrefs';
 
-const BLUE = '#1976d2';
+const BLUE = 'var(--blue-primary)';
 
 interface Props {
   /** Currently persisted chips (starting state for the form). */
@@ -79,15 +79,15 @@ export default function ChipsEditor({ chips, saving, onSave, onReset, onClose }:
     <div style={{
       margin: '0 20px 14px',
       padding: 14,
-      background: '#fafbfc',
-      border: '1px solid #dde1e7',
+      background: 'var(--grey-light)',
+      border: '1px solid var(--border)',
       borderRadius: 10,
       fontFamily: 'inherit',
     }}>
       <div style={{
         fontSize: 10,
         fontWeight: 700,
-        color: '#888',
+        color: 'var(--text3)',
         textTransform: 'uppercase',
         letterSpacing: '.05em',
         marginBottom: 10,
@@ -121,8 +121,8 @@ export default function ChipsEditor({ chips, saving, onSave, onReset, onClose }:
           marginTop: 8,
           fontSize: 11,
           color: '#c62828',
-          background: '#ffebee',
-          border: '1px solid #ffcdd2',
+          background: 'rgba(198,40,40,.12)',
+          border: '1px solid rgba(198,40,40,.3)',
           padding: '6px 10px',
           borderRadius: 6,
         }}>
@@ -139,9 +139,9 @@ export default function ChipsEditor({ chips, saving, onSave, onReset, onClose }:
           style={{
             marginRight: 'auto',
             padding: '6px 12px',
-            border: '1px solid #dde1e7',
-            background: '#fff',
-            color: '#666',
+            border: '1px solid var(--border)',
+            background: 'var(--surface)',
+            color: 'var(--text2)',
             borderRadius: 6,
             fontSize: 11,
             cursor: saving ? 'not-allowed' : 'pointer',
@@ -158,9 +158,9 @@ export default function ChipsEditor({ chips, saving, onSave, onReset, onClose }:
           disabled={saving}
           style={{
             padding: '6px 12px',
-            border: '1px solid #dde1e7',
-            background: '#fff',
-            color: '#666',
+            border: '1px solid var(--border)',
+            background: 'var(--surface)',
+            color: 'var(--text2)',
             borderRadius: 6,
             fontSize: 11,
             cursor: saving ? 'not-allowed' : 'pointer',
@@ -176,9 +176,9 @@ export default function ChipsEditor({ chips, saving, onSave, onReset, onClose }:
           disabled={saving || !isDirty}
           style={{
             padding: '6px 14px',
-            background: isDirty ? BLUE : '#90caf9',
+            background: isDirty ? BLUE : 'var(--blue-300)',
             color: '#fff',
-            border: `1px solid ${isDirty ? BLUE : '#90caf9'}`,
+            border: `1px solid ${isDirty ? BLUE : 'var(--blue-300)'}`,
             borderRadius: 6,
             fontSize: 11,
             fontWeight: 600,
@@ -209,7 +209,7 @@ interface RowProps {
 function Row({ num, value, readonly, rightLabel, onChange, error, maxLength }: RowProps) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-      <span style={{ fontSize: 11, color: '#888', width: 14, flexShrink: 0 }}>{num}.</span>
+      <span style={{ fontSize: 11, color: 'var(--text3)', width: 14, flexShrink: 0 }}>{num}.</span>
       <input
         type="text"
         value={value}
@@ -222,19 +222,19 @@ function Row({ num, value, readonly, rightLabel, onChange, error, maxLength }: R
             ? '1px solid #c62828'
             : readonly
               ? '1px solid #ffd54f'
-              : '1px solid #dde1e7',
+              : '1px solid var(--border)',
           borderRadius: 6,
           padding: '6px 10px',
           fontSize: 12,
           fontFamily: 'inherit',
           outline: 'none',
-          background: readonly ? '#fffde7' : '#fff',
-          color: readonly ? '#8a6d00' : '#1a1a2e',
+          background: readonly ? '#fffde7' : 'var(--surface)',
+          color: readonly ? '#8a6d00' : 'var(--text)',
           cursor: readonly ? 'not-allowed' : 'text',
           transition: 'border-color .15s',
         }}
         onFocus={e => { if (!readonly && !error) e.currentTarget.style.borderColor = BLUE; }}
-        onBlur={e => { if (!readonly && !error) e.currentTarget.style.borderColor = '#dde1e7'; }}
+        onBlur={e => { if (!readonly && !error) e.currentTarget.style.borderColor = 'var(--border)'; }}
       />
       {rightLabel && (
         <span style={{

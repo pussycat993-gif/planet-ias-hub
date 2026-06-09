@@ -67,9 +67,9 @@ function Chip({ text, pinned = false, compact = false, onClick }: ChipProps) {
         fontWeight: 600,
       }
     : {
-        background: '#fff',
-        border: '1px solid #dde1e7',
-        color: '#555',
+        background: 'var(--surface)',
+        border: '1px solid var(--border)',
+        color: 'var(--text2)',
         fontWeight: 500,
       };
 
@@ -96,9 +96,9 @@ function Chip({ text, pinned = false, compact = false, onClick }: ChipProps) {
           e.currentTarget.style.background = '#fff8e1';
           e.currentTarget.style.borderColor = '#ffb300';
         } else {
-          e.currentTarget.style.background = '#f0f7ff';
-          e.currentTarget.style.borderColor = '#90caf9';
-          e.currentTarget.style.color = '#1565c0';
+          e.currentTarget.style.background = 'var(--blue-xlight)';
+          e.currentTarget.style.borderColor = 'var(--blue-300)';
+          e.currentTarget.style.color = 'var(--blue-dark)';
         }
       }}
       onMouseLeave={e => {
