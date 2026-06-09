@@ -43,6 +43,7 @@ export default function LogActivityModal({
   const [priority, setPriority] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [suggesting, setSuggesting] = useState(false);
   const [pickerOpen, setPickerOpen] = useState<PickerKind | null>(null);
 
   const removePerson = (p: string) => setPeople(prev => prev.filter(x => x !== p));
@@ -64,6 +65,30 @@ export default function LogActivityModal({
                        : pickerOpen === 'people' ? people
                        : pickerOpen === 'tag'    ? tags
                        : [];
+
+  // AI prefill — asks the backend to fill in the activity fields from the
+  // current note (or subject if the note is empty). Prefill only; the user
+  // still reviews and clicks Save.
+  const handleSuggest = async () => {
+    const text = (note.trim() || subject.trim());
+    if (!text || suggesting) return;
+    setSuggesting(true);
+    try {
+      const { data } = await axios.post(`${API}/ai/activity-suggest`, { text });
+      if (data?.success && data.data) {
+        const d = data.data;
+        if (d.subject)        setSubject(d.subject);
+        if (d.activity_type)  setActivityType(d.activity_type);
+        if (d.activity_class) setActivityClass(d.activity_class);
+        if (d.note)           setNote(d.note);
+        if (Array.isArray(d.people))   setPeople(d.people);
+        if (Array.isArray(d.entities)) setEntities(d.entities);
+        if (Array.isArray(d.tags))     setTags(d.tags);
+        if (typeof d.priority === 'boolean') setPriority(d.priority);
+      }
+    } catch { /* suggestion failed, leave fields untouched */ }
+    setSuggesting(false);
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -139,7 +164,8 @@ export default function LogActivityModal({
                   <input value={subject} onChange={e => setSubject(e.target.value)}
                     placeholder="What is this about?"
                     style={{ ...inp }} />
-                  <div style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', width: 22, height: 22, borderRadius: '50%', background: 'var(--blue-xlight)', border: `1px solid ${BLUE}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: BLUE, fontWeight: 700, cursor: 'pointer' }}>AI</div>
+                  <div onClick={handleSuggest} title="Suggest fields with AI"
+                    style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', width: 22, height: 22, borderRadius: '50%', background: 'var(--blue-xlight)', border: `1px solid ${BLUE}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: BLUE, fontWeight: 700, cursor: suggesting ? 'wait' : 'pointer', opacity: suggesting ? 0.6 : 1 }}>{suggesting ? '…' : 'AI'}</div>
                 </div>
               </div>
 

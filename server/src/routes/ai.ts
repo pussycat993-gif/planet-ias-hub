@@ -41,6 +41,100 @@ router.post('/ask', async (req: Request, res: Response) => {
   }
 });
 
+// ── POST /ai/activity-suggest ─────────────────────
+// Phase 1 of the Activity Suggestion feature. Takes a free-text blob (a note
+// or subject) and asks the model to fill out the PCI activity fields. We force
+// JSON-only output and strip any stray markdown fences before parsing.
+// Body: { text: string }
+const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
+const ANTHROPIC_MODEL = 'claude-sonnet-4-20250514';
+
+const ACTIVITY_SUGGEST_SYSTEM = `You extract structured PCI activity fields from free text.
+Return ONLY valid JSON — no prose, no explanation, and no markdown code fences.
+
+The JSON object must have exactly these keys:
+{
+  "subject": string,          // a concise title, under 80 characters
+  "activity_type": string,    // one of: Meeting, Call, Email, Task, Note
+  "activity_class": string,   // one of: Business, Internal, Client, Personal
+  "note": string,             // a 1-3 sentence English summary of the text
+  "priority": boolean,        // true only if the text signals urgency/importance
+  "people": string[],         // names of people; ONLY those mentioned in the input
+  "entities": string[],       // organizations/projects; ONLY those in the input
+  "tags": string[]            // short topic keywords drawn from the input
+}
+
+Rules:
+- subject must be under 80 characters.
+- activity_type must be exactly one of Meeting, Call, Email, Task, Note.
+- activity_class must be exactly one of Business, Internal, Client, Personal.
+- people and entities must come ONLY from the input text. Do not invent names.
+- If a field has no value, use an empty string, empty array, or false.`;
+
+function stripFences(s: string): string {
+  let t = s.trim();
+  if (t.startsWith('```')) {
+    t = t.replace(/^```(?:json)?\s*/, '').replace(/```\s*$/, '').trim();
+  }
+  return t;
+}
+
+router.post('/activity-suggest', async (req: Request, res: Response) => {
+  const { text } = req.body || {};
+
+  if (!text || typeof text !== 'string' || !text.trim()) {
+    return res.status(400).json({ success: false, error: 'text required' });
+  }
+
+  try {
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) throw new Error('ANTHROPIC_API_KEY not set');
+
+    const { data } = await axios.post(
+      ANTHROPIC_URL,
+      {
+        model: ANTHROPIC_MODEL,
+        max_tokens: 1024,
+        temperature: 0.2,
+        system: ACTIVITY_SUGGEST_SYSTEM,
+        messages: [{ role: 'user', content: text.slice(0, 4000) }],
+      },
+      {
+        timeout: 15_000,
+        headers: {
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'content-type': 'application/json',
+        },
+      }
+    );
+
+    const raw = (data?.content || [])
+      .filter((b: any) => b.type === 'text')
+      .map((b: any) => b.text)
+      .join('')
+      .trim();
+
+    const parsed = JSON.parse(stripFences(raw));
+
+    const data_out = {
+      subject: String(parsed.subject || '').slice(0, 80),
+      activity_type: ['Meeting', 'Call', 'Email', 'Task', 'Note'].includes(parsed.activity_type) ? parsed.activity_type : 'Note',
+      activity_class: ['Business', 'Internal', 'Client', 'Personal'].includes(parsed.activity_class) ? parsed.activity_class : 'Business',
+      note: String(parsed.note || ''),
+      priority: Boolean(parsed.priority),
+      people: Array.isArray(parsed.people) ? parsed.people.map(String) : [],
+      entities: Array.isArray(parsed.entities) ? parsed.entities.map(String) : [],
+      tags: Array.isArray(parsed.tags) ? parsed.tags.map(String) : [],
+    };
+
+    return res.json({ success: true, data: data_out });
+  } catch (err: any) {
+    console.error('Activity suggest error:', err);
+    return res.status(500).json({ success: false, error: 'Suggestion failed' });
+  }
+});
+
 // ── POST /ai/mark-done ───────────────────────────
 // Called when the user clicks Done on an Ask IAS list item. We log a
 // Complete activity to PCI referencing the source item in the Note field,
