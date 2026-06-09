@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { Zap, Settings, Clipboard } from '@/components/ui/Icon';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 const BLUE = 'var(--blue-primary)';
@@ -131,7 +132,7 @@ export default function AutoPanel() {
 
       <div style={{ background: GRAY, color: '#fff', padding: '7px 11px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-          <span style={{ fontWeight: 700, fontSize: 12 }}>⚡ Automations</span>
+          <span style={{ fontWeight: 700, fontSize: 12, display: 'inline-flex', alignItems: 'center', gap: 6 }}><Zap size={13} /> Automations</span>
           <span style={{ background: 'rgba(255,255,255,.2)', padding: '1px 6px', borderRadius: 8, fontSize: 10 }}>{activeCount} active</span>
         </div>
         <button onClick={fetchData} title="Refresh" style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,.7)', cursor: 'pointer', fontSize: 14 }}>↻</button>
@@ -140,7 +141,9 @@ export default function AutoPanel() {
       <div style={{ display: 'flex', borderBottom: `2px solid ${GRAY}`, background: 'var(--grey-light)', flexShrink: 0 }}>
         {(['settings', 'events'] as const).map(tab => (
           <div key={tab} onClick={() => setActiveTab(tab)} style={{ flex: 1, textAlign: 'center', padding: '6px 2px', fontSize: 11, cursor: 'pointer', fontWeight: 500, background: activeTab === tab ? GRAY : 'transparent', color: activeTab === tab ? '#fff' : 'var(--text2)' }}>
-            {tab === 'settings' ? '⚙️ Settings' : '📋 Events'}
+            {tab === 'settings'
+              ? <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><Settings size={12} /> Settings</span>
+              : <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><Clipboard size={12} /> Events</span>}
           </div>
         ))}
       </div>
@@ -216,7 +219,7 @@ export default function AutoPanel() {
         {activeTab === 'events' && (
           events.length === 0 ? (
             <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text3)', fontSize: 12 }}>
-              <div style={{ fontSize: 28, marginBottom: 8 }}>⚡</div>
+              <div style={{ marginBottom: 8 }}><Zap size={28} /></div>
               No automation events yet
             </div>
           ) : events.map(e => <EventRow key={e.id} event={e} />)

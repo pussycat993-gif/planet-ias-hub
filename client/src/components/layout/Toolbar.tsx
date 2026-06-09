@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useUIStore } from '../../store/uiStore';
 import { useAuthStore } from '../../store/authStore';
 import { useChatStore } from '../../store/chatStore';
+import { ChevronDown, Zap, Settings } from '@/components/ui/Icon';
 
 const BLUE = 'var(--blue-primary)';
 const BLUE_DARK = 'var(--blue-dark)';
@@ -62,7 +63,7 @@ function CreateDropdown() {
           borderRadius: 6, fontSize: 11, fontWeight: 600,
           cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap',
         }}>
-        + New <span style={{ fontSize: 9, opacity: .8 }}>▾</span>
+        + New <span style={{ opacity: .8, display: 'inline-flex' }}><ChevronDown size={12} /></span>
       </button>
       {open && (
         <div style={{
@@ -105,7 +106,7 @@ function StatusChip() {
     <button onClick={() => openModal('setStatus')} style={{ ...btn(), gap: 5 }} title="Change status">
       <span style={{ width: 8, height: 8, borderRadius: '50%', background: color, display: 'inline-block' }} />
       {label}
-      <span style={{ fontSize: 8, opacity: .6, marginLeft: 2 }}>▾</span>
+      <span style={{ opacity: .6, marginLeft: 2, display: 'inline-flex' }}><ChevronDown size={11} /></span>
     </button>
   );
 }
@@ -152,7 +153,7 @@ export default function Toolbar() {
       {/* Right-side cluster */}
       <div style={{ marginLeft: 'auto', display: 'flex', gap: 5, alignItems: 'center' }}>
         <button style={autoBtn(autoPanelOpen)} onClick={toggleAutoPanel} title="Automations panel (Cmd+/)">
-          ⚡ Automations
+          <Zap size={13} /> Automations
         </button>
 
         <button style={btn(rightPanelOpen)} onClick={toggleRightPanel} title="Toggle context panel">
@@ -166,7 +167,7 @@ export default function Toolbar() {
 
         {/* Settings cog */}
         <div ref={settingsRef} style={{ position: 'relative' }}>
-          <button style={btn(showSettings)} onClick={() => setShowSettings(o => !o)} title="Settings">⚙</button>
+          <button style={btn(showSettings)} onClick={() => setShowSettings(o => !o)} title="Settings"><Settings size={14} /></button>
           {showSettings && (
             <div style={{
               position: 'absolute', top: 'calc(100% + 4px)', right: 0, zIndex: 2000,

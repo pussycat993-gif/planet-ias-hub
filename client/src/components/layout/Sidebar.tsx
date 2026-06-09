@@ -4,6 +4,7 @@ import { useChatStore, Channel } from '../../store/chatStore';
 import { useAuthStore } from '../../store/authStore';
 import { useUIStore } from '../../store/uiStore';
 import { useFavorites } from '../../hooks/useFavorites';
+import { Search, X, Video, Phone } from '@/components/ui/Icon';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 const BLUE = 'var(--blue-primary)';
@@ -124,13 +125,13 @@ function CallHistoryList() {
               {call.missed && '↗ '}{call.name}
             </div>
             <div style={{ fontSize: 10, color: 'var(--text3)' }}>
-              {call.type === 'video' ? '📹' : '📞'} {call.missed ? 'Missed' : fmtDuration(call.duration)} · {fmtAgo(call.minsAgo)}
+              {call.type === 'video' ? <Video size={12} style={{ verticalAlign: '-2px' }} /> : <Phone size={12} style={{ verticalAlign: '-2px' }} />} {call.missed ? 'Missed' : fmtDuration(call.duration)} · {fmtAgo(call.minsAgo)}
             </div>
           </div>
           <span style={{ fontSize: 14, cursor: 'pointer', color: 'var(--text3)' }} title="Call back"
             onMouseEnter={e => (e.currentTarget.style.color = 'var(--green)')}
             onMouseLeave={e => (e.currentTarget.style.color = 'var(--text3)')}>
-            {call.type === 'video' ? '📹' : '📞'}
+            {call.type === 'video' ? <Video size={15} /> : <Phone size={15} />}
           </span>
         </div>
       ))}
@@ -228,14 +229,14 @@ function GlobalFilesList() {
       {/* Search */}
       <div style={{ padding: '6px 8px', borderBottom: '1px solid var(--neutral-light-active)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'var(--grey-light)', borderRadius: 8, padding: '4px 9px', border: '1px solid var(--neutral-light-active)' }}>
-          <span style={{ color: 'var(--text3)', fontSize: 12 }}>🔍</span>
+          <span style={{ color: 'var(--text3)', display: 'inline-flex' }}><Search size={14} /></span>
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search files..."
             style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: 12, flex: 1, color: 'var(--text)', fontFamily: 'inherit' }}
           />
-          {search && <span onClick={() => setSearch('')} style={{ color: 'var(--text3)', cursor: 'pointer', fontSize: 14 }}>✕</span>}
+          {search && <span onClick={() => setSearch('')} style={{ color: 'var(--text3)', cursor: 'pointer', display: 'inline-flex' }}><X size={14} /></span>}
         </div>
       </div>
 
@@ -373,14 +374,14 @@ export default function Sidebar() {
       {mainTab !== 'calls' && mainTab !== 'files' && (
         <div style={{ padding: '6px 8px', borderBottom: '1px solid var(--neutral-light-active)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'var(--grey-light)', borderRadius: 8, padding: '4px 9px', border: '1px solid var(--neutral-light-active)' }}>
-            <span style={{ color: 'var(--text3)', fontSize: 12 }}>🔍</span>
+            <span style={{ color: 'var(--text3)', display: 'inline-flex' }}><Search size={14} /></span>
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search..."
               style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: 12, flex: 1, color: 'var(--text)', fontFamily: 'inherit' }}
             />
-            {search && <span onClick={() => setSearch('')} style={{ color: 'var(--text3)', cursor: 'pointer', fontSize: 14 }}>✕</span>}
+            {search && <span onClick={() => setSearch('')} style={{ color: 'var(--text3)', cursor: 'pointer', display: 'inline-flex' }}><X size={14} /></span>}
           </div>
 
           {/* Unread-only filter toggle */}

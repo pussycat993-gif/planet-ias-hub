@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { Zap, X, Check, Calendar, Building2, User, Tag } from '@/components/ui/Icon';
 import EntityPickerModal, { PickerKind, PickerItem } from './EntityPickerModal';
 import { MOCK_ENTITIES, MOCK_PEOPLE, MOCK_TAGS } from '../../utils/pickerData';
 
@@ -120,7 +121,7 @@ export default function LogActivityModal({
     return (
       <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.55)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-sans)' }}>
         <div style={{ background: 'var(--surface)', borderRadius: 12, width: 400, padding: '40px 30px', boxShadow: '0 12px 50px rgba(0,0,0,.3)', textAlign: 'center' }}>
-          <div style={{ fontSize: 48, marginBottom: 12 }}>✅</div>
+          <div style={{ marginBottom: 12, color: '#2e7d32' }}><Check size={48} /></div>
           <div style={{ fontWeight: 700, fontSize: 16, color: '#2e7d32' }}>Logged to PLANet IAS!</div>
           <div style={{ fontSize: 13, color: 'var(--text3)', marginTop: 4 }}>Activity saved successfully</div>
         </div>
@@ -136,9 +137,9 @@ export default function LogActivityModal({
 
         {/* Header bar */}
         <div style={{ background: BLUE, color: '#fff', padding: '10px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-          <span style={{ fontWeight: 700, fontSize: 14 }}>⚡ New Activity</span>
+          <span style={{ fontWeight: 700, fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 6 }}><Zap size={15} /> New Activity</span>
           <span style={{ fontSize: 12, opacity: .8 }}>AI Functionality In Development</span>
-          <span onClick={onClose} style={{ cursor: 'pointer', fontSize: 18, opacity: .8 }}>✕</span>
+          <span onClick={onClose} style={{ cursor: 'pointer', opacity: .8, display: 'inline-flex' }}><X size={18} /></span>
         </div>
 
         {pickerOpen && (
@@ -174,13 +175,13 @@ export default function LogActivityModal({
                 <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span style={{ fontSize: 12, color: 'var(--text2)', width: 70, flexShrink: 0 }}>Start</span>
                   <div style={{ flex: 1, border: '1px solid var(--border)', borderRadius: 6, padding: '6px 8px', background: 'var(--surface)', fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    {today} <span style={{ fontSize: 14 }}>📅</span>
+                    {today} <Calendar size={14} style={{ flexShrink: 0 }} />
                   </div>
                 </div>
                 <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span style={{ fontSize: 12, color: 'var(--text2)', width: 70, flexShrink: 0 }}>End</span>
                   <div style={{ flex: 1, border: '1px solid var(--border)', borderRadius: 6, padding: '6px 8px', background: 'var(--surface)', fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    {today} <span style={{ fontSize: 14 }}>📅</span>
+                    {today} <Calendar size={14} style={{ flexShrink: 0 }} />
                   </div>
                 </div>
               </div>
@@ -232,7 +233,7 @@ export default function LogActivityModal({
                   ? <div style={{ fontSize: 11, color: 'var(--text3)', fontStyle: 'italic', textAlign: 'center', paddingTop: 8 }}>Click + to add entities</div>
                   : entities.map(e => (
                     <div key={e} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '3px 0', fontSize: 12 }}>
-                      <span style={{ color: BLUE, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>🏢 {e}</span>
+                      <span style={{ color: BLUE, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}><Building2 size={13} style={{ verticalAlign: '-2px', marginRight: 4 }} />{e}</span>
                       <span onClick={() => removeEntity(e)} style={{ cursor: 'pointer', color: 'var(--text3)', fontSize: 14, flexShrink: 0, marginLeft: 6 }}>✕</span>
                     </div>
                   ))
@@ -251,7 +252,7 @@ export default function LogActivityModal({
                   ? <div style={{ fontSize: 11, color: 'var(--text3)', fontStyle: 'italic', textAlign: 'center', paddingTop: 8 }}>Click + to add people</div>
                   : people.map(p => (
                     <div key={p} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '3px 0', fontSize: 12 }}>
-                      <span style={{ color: BLUE, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>👤 {p}</span>
+                      <span style={{ color: BLUE, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}><User size={13} style={{ verticalAlign: '-2px', marginRight: 4 }} />{p}</span>
                       <span onClick={() => removePerson(p)} style={{ cursor: 'pointer', color: 'var(--text3)', fontSize: 14, flexShrink: 0, marginLeft: 6 }}>✕</span>
                     </div>
                   ))
@@ -270,7 +271,7 @@ export default function LogActivityModal({
                   ? <div style={{ fontSize: 11, color: 'var(--text3)', fontStyle: 'italic', textAlign: 'center', paddingTop: 6 }}>Click + to add tags</div>
                   : tags.map(t => (
                     <div key={t} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '3px 0', fontSize: 12 }}>
-                      <span style={{ color: BLUE, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>🏷️ {t}</span>
+                      <span style={{ color: BLUE, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}><Tag size={13} style={{ verticalAlign: '-2px', marginRight: 4 }} />{t}</span>
                       <span onClick={() => removeTag(t)} style={{ cursor: 'pointer', color: 'var(--text3)', fontSize: 14, flexShrink: 0, marginLeft: 6 }}>✕</span>
                     </div>
                   ))
@@ -282,10 +283,10 @@ export default function LogActivityModal({
 
         {/* Footer */}
         <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 16px', borderTop: '1px solid var(--border)', flexShrink: 0 }}>
-          <button onClick={onClose} style={{ padding: '8px 20px', border: '1px solid var(--border)', borderRadius: 6, background: 'var(--surface)', cursor: 'pointer', fontSize: 13, fontFamily: 'inherit' }}>✕ Cancel</button>
+          <button onClick={onClose} style={{ padding: '8px 20px', border: '1px solid var(--border)', borderRadius: 6, background: 'var(--surface)', cursor: 'pointer', fontSize: 13, fontFamily: 'inherit' }}><X size={14} style={{ verticalAlign: '-2px', marginRight: 4 }} />Cancel</button>
           <button onClick={handleSave} disabled={saving}
             style={{ padding: '8px 24px', background: saving ? 'var(--blue-300)' : BLUE, color: '#fff', border: 'none', borderRadius: 6, cursor: saving ? 'not-allowed' : 'pointer', fontSize: 13, fontFamily: 'inherit', fontWeight: 700 }}>
-            {saving ? 'Saving...' : '✓ Save'}
+            {saving ? 'Saving...' : <><Check size={14} style={{ verticalAlign: '-2px', marginRight: 4 }} />Save</>}
           </button>
         </div>
       </div>

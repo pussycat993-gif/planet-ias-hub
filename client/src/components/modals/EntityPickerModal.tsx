@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { Search, X } from '@/components/ui/Icon';
 
 const BLUE = 'var(--blue-primary)';
 const BLUE_DARK = 'var(--blue-dark)';
@@ -99,7 +100,7 @@ export default function EntityPickerModal({ kind, items, onSelect, onClose, maxV
         {/* Header */}
         <div style={{ background: BLUE, color: '#fff', padding: '12px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
           <span style={{ fontWeight: 700, fontSize: 15 }}>{KIND_LABELS[kind]}</span>
-          <span onClick={onClose} style={{ cursor: 'pointer', fontSize: 20, opacity: .9 }}>✕</span>
+          <span onClick={onClose} style={{ cursor: 'pointer', opacity: .9, display: 'inline-flex' }}><X size={20} /></span>
         </div>
 
         {/* Search */}
@@ -116,7 +117,7 @@ export default function EntityPickerModal({ kind, items, onSelect, onClose, maxV
               <span
                 onClick={() => { setQuery(''); inputRef.current?.focus(); }}
                 style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', width: 22, height: 22, borderRadius: '50%', background: '#bbb', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, cursor: 'pointer' }}
-              >✕</span>
+              ><X size={13} /></span>
             )}
           </div>
         </div>
@@ -137,7 +138,7 @@ export default function EntityPickerModal({ kind, items, onSelect, onClose, maxV
         <div style={{ flex: 1, overflowY: 'auto', padding: '0 12px 12px' }}>
           {visible.length === 0 ? (
             <div style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--text3)', fontSize: 13 }}>
-              <div style={{ fontSize: 28, marginBottom: 6 }}>🔍</div>
+              <div style={{ marginBottom: 6 }}><Search size={28} /></div>
               {query ? `No results for "${query}"` : 'No items available'}
             </div>
           ) : visible.map(item => {

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Pin, X } from '@/components/ui/Icon';
 
 const BLUE_DARK = 'var(--blue-dark)';
 
@@ -32,18 +33,18 @@ export default function PinnedPanel({ messages, onClose, onJump }: Props) {
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderBottom: '1px solid var(--border)' }}>
           <div>
-            <div style={{ fontWeight: 700, fontSize: 14, color: BLUE_DARK }}>📌 Pinned Messages</div>
+            <div style={{ fontWeight: 700, fontSize: 14, color: BLUE_DARK, display: 'flex', alignItems: 'center', gap: 6 }}><Pin size={15} /> Pinned Messages</div>
             <div style={{ fontSize: 11, color: 'var(--text3)', marginTop: 1 }}>{messages.length} pinned</div>
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: 'var(--text3)' }}>✕</button>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text3)', display: 'inline-flex' }}><X size={18} /></button>
         </div>
 
         <div style={{ flex: 1, overflowY: 'auto' }}>
           {messages.length === 0 ? (
             <div style={{ padding: '32px 20px', textAlign: 'center', color: 'var(--text3)' }}>
-              <div style={{ fontSize: 32, marginBottom: 10 }}>📌</div>
+              <div style={{ marginBottom: 10 }}><Pin size={32} /></div>
               <div style={{ fontSize: 13 }}>No pinned messages yet</div>
-              <div style={{ fontSize: 11, marginTop: 6, color: 'var(--text3)' }}>Hover a message and click 📌 to pin it</div>
+              <div style={{ fontSize: 11, marginTop: 6, color: 'var(--text3)' }}>Hover a message and click <Pin size={11} style={{ verticalAlign: '-1px' }} /> to pin it</div>
             </div>
           ) : (
             messages.map(msg => (

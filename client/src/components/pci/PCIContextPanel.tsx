@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { User } from '@/components/ui/Icon';
 import { usePCIStore } from '../../store/pciStore';
 import { useUIStore } from '../../store/uiStore';
 import { useChatStore } from '../../store/chatStore';
@@ -168,7 +169,7 @@ export default function PCIContextPanel() {
   if (!data) {
     return (
       <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text3)', fontSize: 12 }}>
-        <div style={{ fontSize: 28, marginBottom: 10 }}>👤</div>
+        <div style={{ marginBottom: 10 }}><User size={28} /></div>
         Select a conversation to see PCI context
       </div>
     );

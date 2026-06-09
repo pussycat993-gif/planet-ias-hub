@@ -7,6 +7,7 @@ import { useAskIASStore } from '../../store/askIASStore';
 import NotifDropdown from './NotifDropdown';
 import AskIASButton from '../ai/AskIASButton';
 import { retrySocketNow } from '../../hooks/useSocket';
+import { Search, X, Bell, ChevronDown, Pin } from '@/components/ui/Icon';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 const BLUE_DARK = 'var(--blue-dark)';
@@ -80,7 +81,7 @@ function HelpModal({ onClose }: { onClose: () => void }) {
         style={{ background: 'var(--surface)', width: 460, maxWidth: '92vw', borderRadius: 12, boxShadow: '0 16px 60px rgba(0,0,0,.3)', overflow: 'hidden' }}>
         <div style={{ background: BLUE_DARK, color: '#fff', padding: '12px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span style={{ fontWeight: 700, fontSize: 14 }}>Keyboard shortcuts</span>
-          <span onClick={onClose} style={{ cursor: 'pointer', fontSize: 18, opacity: .8 }}>✕</span>
+          <span onClick={onClose} style={{ cursor: 'pointer', opacity: .8, display: 'inline-flex' }}><X size={18} /></span>
         </div>
         <div style={{ padding: '8px 18px 18px' }}>
           {rows.map(([key, desc]) => (
@@ -566,7 +567,7 @@ function SearchDropdown({ query, onSelect, onClose }: {
       {matchedPinned.length > 0 && (
         <div>
           <div style={{ padding: '6px 12px 3px', fontSize: 10, fontWeight: 700, color: '#f9a825', textTransform: 'uppercase', letterSpacing: '.06em', background: '#fffde7', borderBottom: '1px solid #ffe082', display: 'flex', alignItems: 'center', gap: 5 }}>
-            <span>📌</span> Pinned Messages
+            <span style={{ display: 'inline-flex' }}><Pin size={12} /></span> Pinned Messages
           </div>
           {matchedPinned.map(p => {
             const fmtDate = (iso: string) => {
@@ -782,7 +783,7 @@ export default function Header({ onSearch, searchQuery }: HeaderProps) {
         {/* Search with dropdown */}
         <div ref={searchRef} style={{ flex: 1, maxWidth: 400, margin: '0 auto', position: 'relative' }}>
           <div style={{ display: 'flex', alignItems: 'center', background: localSearch ? 'rgba(255,255,255,.25)' : 'rgba(255,255,255,.15)', borderRadius: 20, padding: '4px 12px', gap: 6, border: localSearch ? '1px solid rgba(255,255,255,.4)' : '1px solid transparent', transition: 'all .2s' }}>
-            <span style={{ color: 'rgba(255,255,255,.7)', fontSize: 13 }}>🔍</span>
+            <span style={{ color: 'rgba(255,255,255,.7)', display: 'inline-flex' }}><Search size={15} /></span>
             <input
               className="ias-search"
               type="text"
@@ -793,7 +794,7 @@ export default function Header({ onSearch, searchQuery }: HeaderProps) {
               style={{ background: 'transparent', border: 'none', outline: 'none', color: '#fff', fontSize: 12, width: '100%' }}
             />
             {localSearch && (
-              <span onClick={handleClear} style={{ color: 'rgba(255,255,255,.7)', cursor: 'pointer', fontSize: 14, flexShrink: 0 }}>✕</span>
+              <span onClick={handleClear} style={{ color: 'rgba(255,255,255,.7)', cursor: 'pointer', flexShrink: 0, display: 'inline-flex' }}><X size={15} /></span>
             )}
           </div>
 
@@ -817,7 +818,7 @@ export default function Header({ onSearch, searchQuery }: HeaderProps) {
           style={{ width: 34, height: 34, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 15, color: dnd ? '#ff9800' : 'rgba(255,255,255,.85)', background: dnd ? 'rgba(255,152,0,.18)' : 'transparent', transition: 'all .15s', position: 'relative' }}
           onMouseEnter={e => { if (!dnd) e.currentTarget.style.background = 'rgba(255,255,255,.15)'; }}
           onMouseLeave={e => { if (!dnd) e.currentTarget.style.background = 'transparent'; }}>
-          {dnd ? '🔕' : '🔔'}
+          <Bell size={17} />
         </div>
 
         {/* Notifications bell */}
@@ -825,7 +826,7 @@ export default function Header({ onSearch, searchQuery }: HeaderProps) {
           <div title="Notifications" style={{ position: 'relative', width: 34, height: 34, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 15, color: 'rgba(255,255,255,.85)', transition: 'background .15s' }}
             onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,.15)')}
             onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-            📬
+            <Bell size={17} />
             {unreadNotifs > 0 && (
               <div style={{ position: 'absolute', top: 3, right: 3, minWidth: 16, height: 16, padding: '0 4px', borderRadius: 8, background: '#e53935', color: '#fff', fontSize: 9, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1.5px solid ${BLUE_DARK}` }}>
                 {unreadNotifs > 9 ? '9+' : unreadNotifs}
@@ -858,7 +859,7 @@ export default function Header({ onSearch, searchQuery }: HeaderProps) {
               <span style={{ fontSize: 12, color: '#fff', fontWeight: 500 }}>{user?.name}</span>
               <span style={{ fontSize: 10, color: autoStatus === 'focus' ? '#ffcc80' : autoStatus === 'in_call' ? '#a5d6a7' : 'rgba(255,255,255,.7)', fontWeight: autoStatus ? 600 : 400 }}>{statusLine}</span>
             </div>
-            <span style={{ color: 'rgba(255,255,255,.5)', fontSize: 10 }}>▾</span>
+            <span style={{ color: 'rgba(255,255,255,.5)', display: 'inline-flex' }}><ChevronDown size={14} /></span>
           </div>
         }>
           {close => <ProfileDropdown onClose={close} onOpenHelp={() => setShowHelp(true)} />}

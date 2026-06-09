@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Search, X } from '@/components/ui/Icon';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 const BLUE = 'var(--blue-primary)';
@@ -128,15 +129,15 @@ export default function MembersPanel({ channelId, onClose, onMessageUser }: Prop
             <div style={{ fontWeight: 700, fontSize: 14, color: BLUE_DARK }}>Members</div>
             <div style={{ fontSize: 11, color: 'var(--text3)', marginTop: 1 }}>{members.length} total · {online.length} online</div>
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: 'var(--text3)' }}>✕</button>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text3)', display: 'inline-flex' }}><X size={18} /></button>
         </div>
 
         <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--neutral-light-active)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'var(--grey-light)', borderRadius: 8, padding: '5px 10px', border: '1px solid var(--border)' }}>
-            <span style={{ color: 'var(--text3)', fontSize: 13 }}>🔍</span>
+            <span style={{ color: 'var(--text3)', display: 'inline-flex' }}><Search size={14} /></span>
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search members..."
               style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: 12, flex: 1, fontFamily: 'inherit', color: 'var(--text)' }} />
-            {search && <span onClick={() => setSearch('')} style={{ color: 'var(--text3)', cursor: 'pointer', fontSize: 14 }}>✕</span>}
+            {search && <span onClick={() => setSearch('')} style={{ color: 'var(--text3)', cursor: 'pointer', display: 'inline-flex' }}><X size={14} /></span>}
           </div>
         </div>
 
