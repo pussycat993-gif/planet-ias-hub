@@ -4,6 +4,7 @@ import { useUIStore } from '../../store/uiStore';
 import { useChatStore } from '../../store/chatStore';
 import SetStatusModal from './SetStatusModal';
 import ProfileAccountModal from './ProfileAccountModal';
+import Icon from '@/components/ui/Icon';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 const BLUE = 'var(--blue-primary)';
@@ -11,7 +12,7 @@ const BLUE_DARK = 'var(--blue-dark)';
 
 // ── Shared Modal Shell ────────────────────────────────────
 function Modal({ title, onClose, children, width = 480 }: {
-  title: string; onClose: () => void; children: React.ReactNode; width?: number;
+  title: React.ReactNode; onClose: () => void; children: React.ReactNode; width?: number;
 }) {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
@@ -23,8 +24,8 @@ function Modal({ title, onClose, children, width = 480 }: {
     <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(6,25,43,.45)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div onClick={e => e.stopPropagation()} style={{ background: 'var(--surface)', borderRadius: 12, width, maxWidth: '95vw', boxShadow: '0 8px 40px rgba(6,25,43,.2)', fontFamily: 'var(--font-sans)', display: 'flex', flexDirection: 'column', maxHeight: '90vh' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', background: BLUE }}>
-          <span style={{ fontWeight: 600, fontSize: 15, color: '#fff' }}>{title}</span>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: 'rgba(255,255,255,.85)', lineHeight: 1, padding: '0 4px' }}>✕</button>
+          <span style={{ fontWeight: 600, fontSize: 15, color: '#fff', display: 'inline-flex', alignItems: 'center', gap: 8 }}>{title}</span>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', lineHeight: 1, padding: '0 4px', display: 'inline-flex', alignItems: 'center' }}><Icon name="close" size={18} color="rgba(255,255,255,.85)" /></button>
         </div>
         <div style={{ padding: '18px', overflowY: 'auto', flex: 1 }}>{children}</div>
       </div>
@@ -61,8 +62,8 @@ function LogoUpload({ value, onChange }: { value: string | null; onChange: (url:
   };
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-      <div onClick={() => ref.current?.click()} style={{ width: 56, height: 56, borderRadius: 10, border: '2px dashed var(--blue-300)', background: value ? 'transparent' : 'var(--blue-xlight)', backgroundImage: value ? `url(${value})` : 'none', backgroundSize: 'cover', backgroundPosition: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 22, color: BLUE, flexShrink: 0 }}>
-        {!value && '📷'}
+      <div onClick={() => ref.current?.click()} style={{ width: 56, height: 56, borderRadius: 10, border: '2px dashed var(--blue-300)', background: value ? 'transparent' : 'var(--blue-xlight)', backgroundImage: value ? `url(${value})` : 'none', backgroundSize: 'cover', backgroundPosition: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: BLUE, flexShrink: 0 }}>
+        {!value && <Icon name="camera" size={22} />}
       </div>
       <div>
         <button onClick={() => ref.current?.click()} style={{ fontSize: 12, color: BLUE, border: `1px solid ${BLUE}`, background: 'var(--surface)', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontFamily: 'inherit' }}>
@@ -97,7 +98,7 @@ function MemberPicker({ selected, onChange }: { selected: HubUser[]; onChange: (
             <div key={u.id} style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'var(--blue-xlight)', border: '1px solid var(--blue-300)', borderRadius: 20, padding: '3px 8px 3px 6px', fontSize: 12 }}>
               <div style={{ width: 18, height: 18, borderRadius: '50%', background: BLUE, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 700 }}>{u.name.charAt(0)}</div>
               <span style={{ color: BLUE_DARK }}>{u.name}</span>
-              <span onClick={() => remove(u.id)} style={{ cursor: 'pointer', color: 'var(--text3)', fontSize: 14, lineHeight: 1 }}>×</span>
+              <span onClick={() => remove(u.id)} style={{ cursor: 'pointer', lineHeight: 1, display: 'inline-flex', alignItems: 'center' }}><Icon name="close" size={14} color="var(--text3)" /></span>
             </div>
           ))}
         </div>
@@ -166,8 +167,8 @@ function NewChannelModal({ onClose }: { onClose: () => void }) {
       <Field label="Type">
         <div style={{ display: 'flex', gap: 8 }}>
           {(['public', 'private'] as const).map(t => (
-            <div key={t} onClick={() => setType(t)} style={{ flex: 1, padding: '8px 12px', border: `2px solid ${type === t ? BLUE : 'var(--border)'}`, borderRadius: 7, cursor: 'pointer', fontSize: 12, textAlign: 'center', background: type === t ? 'var(--blue-xlight)' : 'var(--surface)', color: type === t ? BLUE_DARK : 'var(--text2)', fontWeight: type === t ? 700 : 400 }}>
-              {t === 'public' ? '🌐 Public' : '🔒 Private'}
+            <div key={t} onClick={() => setType(t)} style={{ flex: 1, padding: '8px 12px', border: `2px solid ${type === t ? BLUE : 'var(--border)'}`, borderRadius: 7, cursor: 'pointer', fontSize: 12, textAlign: 'center', background: type === t ? 'var(--blue-xlight)' : 'var(--surface)', color: type === t ? BLUE_DARK : 'var(--text2)', fontWeight: type === t ? 700 : 400, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+              {t === 'public' ? <><Icon name="globe" size={14} /> Public</> : <><Icon name="lock" size={14} /> Private</>}
             </div>
           ))}
         </div>
@@ -212,7 +213,7 @@ function NewGroupModal({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <Modal title="⬡ New Group" onClose={onClose}>
+    <Modal title={<><Icon name="hexagon" size={15} /> New Group</>} onClose={onClose}>
       {error && <ErrorBox msg={error} />}
       <Field label="Group name" required>
         <input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Design Team" style={inputStyle} autoFocus />
@@ -257,7 +258,7 @@ function NewMessageModal({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <Modal title="✎ New Message" onClose={onClose} width={400}>
+    <Modal title={<><Icon name="edit" size={15} /> New Message</>} onClose={onClose} width={400}>
       <Field label="Search people">
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Name or email..." autoFocus style={inputStyle} />
       </Field>
@@ -271,7 +272,7 @@ function NewMessageModal({ onClose }: { onClose: () => void }) {
               <div style={{ fontWeight: 600, fontSize: 13, color: 'var(--text)' }}>{u.name}</div>
               <div style={{ fontSize: 11, color: 'var(--text3)' }}>{u.email}</div>
             </div>
-            <span style={{ fontSize: 12, color: BLUE }}>💬 Message</span>
+            <span style={{ fontSize: 12, color: BLUE, display: 'inline-flex', alignItems: 'center', gap: 5 }}><Icon name="message" size={14} /> Message</span>
           </div>
         ))}
       </div>

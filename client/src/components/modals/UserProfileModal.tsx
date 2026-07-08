@@ -1,4 +1,5 @@
 import React from 'react';
+import Icon from '@/components/ui/Icon';
 
 interface UserProfileModalProps {
   user: {
@@ -66,12 +67,12 @@ export default function UserProfileModal({ user, onClose, onMessage }: UserProfi
   const statusColor = autoStatus === 'focus' ? 'var(--orange)'
     : autoStatus === 'in_call' ? 'var(--green)'
     : manualColor;
-  const primaryStatusLabel = autoStatus === 'focus' ? '🎯 Focus mode'
-    : autoStatus === 'in_call' ? '📞 In a call'
-    : autoStatus === 'in_meeting' ? '🎥 In a meeting'
-    : user.status === 'online' ? '● Online'
-    : user.status === 'away' ? '● Away'
-    : '● Offline';
+  const primaryStatusLabel = autoStatus === 'focus' ? <><Icon name="target" size={11} /> Focus mode</>
+    : autoStatus === 'in_call' ? <><Icon name="phone" size={11} /> In a call</>
+    : autoStatus === 'in_meeting' ? <><Icon name="video" size={11} /> In a meeting</>
+    : user.status === 'online' ? <><Icon name="circle" size={11} color={statusColor} /> Online</>
+    : user.status === 'away' ? <><Icon name="circle" size={11} color={statusColor} /> Away</>
+    : <><Icon name="circle" size={11} color={statusColor} /> Offline</>;
 
   const BLUE = 'var(--blue-primary)';
   const localTime = user.timezone ? localTimeIn(user.timezone) : null;
@@ -82,7 +83,7 @@ export default function UserProfileModal({ user, onClose, onMessage }: UserProfi
 
         {/* Banner */}
         <div style={{ height: 70, background: `linear-gradient(135deg, ${stringToColor(user.name)}, ${BLUE})`, position: 'relative' }}>
-          <button onClick={onClose} style={{ position: 'absolute', top: 8, right: 10, background: 'rgba(0,0,0,.2)', border: 'none', color: '#fff', fontSize: 16, cursor: 'pointer', width: 26, height: 26, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+          <button onClick={onClose} style={{ position: 'absolute', top: 8, right: 10, background: 'rgba(0,0,0,.2)', border: 'none', color: '#fff', fontSize: 16, cursor: 'pointer', width: 26, height: 26, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Icon name="close" size={16} color="#fff" /></button>
         </div>
 
         {/* Avatar */}
@@ -114,7 +115,7 @@ export default function UserProfileModal({ user, onClose, onMessage }: UserProfi
           {user.role && <div style={{ fontSize: 12, color: 'var(--text3)', marginBottom: 4 }}>{user.role}</div>}
 
           {/* Primary status label (auto_status or manual) */}
-          <div style={{ fontSize: 11, color: statusColor, marginBottom: 6, fontWeight: autoStatus ? 600 : 400 }}>
+          <div style={{ fontSize: 11, color: statusColor, marginBottom: 6, fontWeight: autoStatus ? 600 : 400, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
             {primaryStatusLabel}
           </div>
 
@@ -135,7 +136,7 @@ export default function UserProfileModal({ user, onClose, onMessage }: UserProfi
           {/* Timezone + local time chip for distributed teams */}
           {user.timezone && (
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 9px', background: 'var(--blue-xlight)', border: '1px solid var(--blue-200)', borderRadius: 12, fontSize: 10, color: BLUE, marginBottom: 8 }}>
-              <span>🌍</span>
+              <Icon name="globe" size={10} />
               <span>{localTime || user.timezone}</span>
               {localTime && <span style={{ color: 'var(--text3)' }}>· {user.timezone}</span>}
             </div>
@@ -143,18 +144,18 @@ export default function UserProfileModal({ user, onClose, onMessage }: UserProfi
 
           {user.email && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '6px 10px', background: 'var(--grey-light)', borderRadius: 8, marginBottom: 8, textAlign: 'left' }}>
-              <span style={{ fontSize: 14 }}>📧</span>
+              <Icon name="mail" size={14} />
               <a href={`mailto:${user.email}`} style={{ fontSize: 12, color: BLUE, textDecoration: 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.email}</a>
             </div>
           )}
 
           {/* Actions */}
           <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
-            <button onClick={onMessage} style={{ flex: 1, padding: '8px', background: BLUE, color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontFamily: 'inherit', fontWeight: 600 }}>
-              💬 Message
+            <button onClick={onMessage} style={{ flex: 1, padding: '8px', background: BLUE, color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontFamily: 'inherit', fontWeight: 600, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+              <Icon name="message" size={13} color="#fff" /> Message
             </button>
-            <button style={{ flex: 1, padding: '8px', background: 'var(--surface)', color: 'var(--green)', border: '1px solid #a5d6a7', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontFamily: 'inherit' }}>
-              📞 Call
+            <button style={{ flex: 1, padding: '8px', background: 'var(--surface)', color: 'var(--green)', border: '1px solid #a5d6a7', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+              <Icon name="phone" size={13} /> Call
             </button>
           </div>
         </div>

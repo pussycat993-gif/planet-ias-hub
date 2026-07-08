@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useAuthStore } from '../../store/authStore';
 import { useUIStore } from '../../store/uiStore';
 import { applyTheme } from '../../utils/theme';
+import Icon, { IconName } from '@/components/ui/Icon';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 const FONT = "'Merriweather Sans', 'Segoe UI', Arial, sans-serif";
@@ -45,21 +46,20 @@ const ffLabel: React.CSSProperties = { display: 'block', fontSize: 12, color: 'v
 const sectionLabel: React.CSSProperties = { fontSize: 11, color: 'var(--text3)', margin: '16px 0 6px' };
 
 // ── Top-level helpers (kept outside the component to avoid remounts) ──
-function Icon({ name }: { name: string }) {
-  const paths: Record<string, React.ReactNode> = {
-    user: <><circle cx="12" cy="8" r="3.5" /><path d="M5 20c0-3.3 3.1-5 7-5s7 1.7 7 5" /></>,
-    shield: <><path d="M12 3l7 3v5c0 4-3 7-7 8-4-1-7-4-7-8V6z" /><path d="M9.5 12l2 2 3.5-3.5" /></>,
-    bell: <><path d="M10 5a2 2 0 1 1 4 0c3 1 4 3 4 6v3l1 2H5l1-2v-3c0-3 1-5 4-6" /><path d="M9 17a3 3 0 0 0 6 0" /></>,
-    video: <><rect x="3" y="6" width="13" height="12" rx="2" /><path d="M16 10l5-3v10l-5-3z" /></>,
-    sparkles: <><path d="M12 4l1.5 4.5L18 10l-4.5 1.5L12 16l-1.5-4.5L6 10l4.5-1.5z" /></>,
-    plug: <><path d="M9 7V3M15 7V3M7 7h10v4a5 5 0 0 1-10 0z" /><path d="M12 16v5" /></>,
-    palette: <><circle cx="12" cy="12" r="9" /><circle cx="8.5" cy="10" r="1" fill="currentColor" stroke="none" /><circle cx="12" cy="8" r="1" fill="currentColor" stroke="none" /><circle cx="15.5" cy="10" r="1" fill="currentColor" stroke="none" /></>,
-  };
-  return (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      {paths[name]}
-    </svg>
-  );
+// Thin adapter over the central Icon registry: maps this modal's local nav
+// names to registry names, preserving the size (17) and strokeWidth (1.8)
+// the old inline-SVG rendered at.
+const NAV_ICON_MAP: Record<string, IconName> = {
+  user: 'user',
+  shield: 'shield-check',
+  bell: 'bell',
+  video: 'video',
+  sparkles: 'sparkles',
+  plug: 'plug',
+  palette: 'palette',
+};
+function NavIcon({ name }: { name: string }) {
+  return <Icon name={NAV_ICON_MAP[name] ?? 'circle'} size={17} strokeWidth={1.8} aria-hidden="true" />;
 }
 
 function Toggle({ on, onChange, label }: { on: boolean; onChange: (v: boolean) => void; label?: string }) {
@@ -235,14 +235,14 @@ export default function ProfileAccountModal({ onClose }: { onClose: () => void }
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', background: 'var(--blue-primary)' }}>
           <span style={{ fontSize: 16, fontWeight: 600, color: '#fff' }}>Profile &amp; account</span>
-          <button onClick={onClose} aria-label="Close" style={{ width: 30, height: 30, border: 'none', background: 'transparent', borderRadius: 6, cursor: 'pointer', color: 'rgba(255,255,255,.85)', fontSize: 18 }}>✕</button>
+          <button onClick={onClose} aria-label="Close" style={{ width: 30, height: 30, border: 'none', background: 'transparent', borderRadius: 6, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><Icon name="close" size={18} color="rgba(255,255,255,.85)" /></button>
         </div>
 
         <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
           <div style={{ width: 190, borderRight: '0.5px solid var(--border)', padding: 10, flexShrink: 0, overflowY: 'auto' }}>
             {NAV.map(n => (
               <button key={n.id} onClick={() => setSection(n.id)} style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '8px 10px', border: 'none', borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, textAlign: 'left', marginBottom: 2, background: section === n.id ? 'var(--bg)' : 'transparent', color: section === n.id ? 'var(--text)' : 'var(--text2)', fontWeight: section === n.id ? 600 : 400 }}>
-                <Icon name={n.icon} />{n.label}
+                <NavIcon name={n.icon} />{n.label}
               </button>
             ))}
           </div>

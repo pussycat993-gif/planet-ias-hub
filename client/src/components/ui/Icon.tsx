@@ -139,6 +139,7 @@ const REGISTRY = {
   'smile-plus': L.SmilePlus,
   calendar: L.Calendar,
   clapperboard: L.Clapperboard,
+  target: L.Target,
 } as const;
 
 export type IconName = keyof typeof REGISTRY;

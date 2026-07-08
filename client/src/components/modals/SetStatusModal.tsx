@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import Icon from '@/components/ui/Icon';
 import { useAuthStore } from '../../store/authStore';
 import { useUIStore } from '../../store/uiStore';
 
@@ -133,7 +134,7 @@ export default function SetStatusModal({ onClose }: { onClose: () => void }) {
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid var(--border)' }}>
           <span style={{ fontWeight: 700, fontSize: 15, color: BLUE_DARK }}>Set your status</span>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: 'var(--text3)', lineHeight: 1, padding: '0 4px' }}>✕</button>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text3)', lineHeight: 1, padding: '0 4px', display: 'inline-flex', alignItems: 'center' }}><Icon name="close" size={18} /></button>
         </div>
 
         {/* Body */}
@@ -242,7 +243,7 @@ export default function SetStatusModal({ onClose }: { onClose: () => void }) {
               borderRadius: 10, cursor: 'pointer',
             }}
           >
-            <div style={{ fontSize: 22 }}>🎯</div>
+            <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><Icon name="target" size={22} /></div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: focusMode ? '#e65100' : 'var(--text)' }}>
                 Focus mode

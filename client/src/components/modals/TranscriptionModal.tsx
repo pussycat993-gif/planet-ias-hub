@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import LogActivityModal from './LogActivityModal';
+import Icon from '@/components/ui/Icon';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 const BLUE = 'var(--blue-primary)';
@@ -97,7 +98,7 @@ export default function TranscriptionModal({ fileId, fileName, mimeType, streamU
           <div style={{ padding: '14px 18px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
             <div>
               <div style={{ fontWeight: 700, fontSize: 15, color: BLUE_DARK, display: 'flex', alignItems: 'center', gap: 7 }}>
-                <span>{isVideo ? '🎬' : '🎙️'}</span>
+                <Icon name={isVideo ? 'clapperboard' : 'mic'} size={15} />
                 <span>Transcription</span>
                 {data?.provider === 'mock' && (
                   <span style={{ fontSize: 10, background: 'rgba(230,81,0,.18)', color: 'var(--orange)', padding: '2px 7px', borderRadius: 10, fontWeight: 600, letterSpacing: '.04em' }}>
@@ -110,7 +111,7 @@ export default function TranscriptionModal({ fileId, fileName, mimeType, streamU
                 {data && ` · ${fmtDur(data.duration)} · ${data.language.toUpperCase()}`}
               </div>
             </div>
-            <span onClick={onClose} style={{ cursor: 'pointer', fontSize: 20, color: 'var(--text3)' }}>✕</span>
+            <span onClick={onClose} style={{ cursor: 'pointer', color: 'var(--text3)', display: 'inline-flex' }}><Icon name="close" size={20} /></span>
           </div>
 
           {/* Media player */}
@@ -124,8 +125,8 @@ export default function TranscriptionModal({ fileId, fileName, mimeType, streamU
 
           {/* Transcript area */}
           <div style={{ flex: 1, padding: '12px 18px', display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text2)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.05em', flexShrink: 0 }}>
-              📝 Transcript
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text2)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.05em', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 5 }}>
+              <Icon name="file-text" size={11} /> Transcript
             </div>
 
             {loading ? (
@@ -141,7 +142,7 @@ export default function TranscriptionModal({ fileId, fileName, mimeType, streamU
               </div>
             ) : error ? (
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, color: '#c62828' }}>
-                <div style={{ fontSize: 32 }}>⚠️</div>
+                <Icon name="alert" size={32} color="#c62828" />
                 <div style={{ fontSize: 13, fontWeight: 600 }}>{error}</div>
                 <button onClick={onClose} style={{ marginTop: 8, padding: '6px 14px', border: '1px solid var(--border)', borderRadius: 6, background: 'var(--surface)', cursor: 'pointer', fontSize: 12, fontFamily: 'inherit' }}>
                   Close
@@ -163,18 +164,18 @@ export default function TranscriptionModal({ fileId, fileName, mimeType, streamU
                 style={{ padding: '8px 14px', border: '1px solid var(--border)', borderRadius: 7, background: 'var(--surface)', cursor: 'pointer', fontSize: 12, fontFamily: 'inherit', color: 'var(--text2)', display: 'flex', alignItems: 'center', gap: 5 }}
                 onMouseEnter={e => (e.currentTarget.style.background = 'var(--neutral-light-active)')}
                 onMouseLeave={e => (e.currentTarget.style.background = 'var(--surface)')}>
-                {copied ? '✓ Copied!' : '📋 Copy'}
+                {copied ? <><Icon name="check" size={12} /> Copied!</> : <><Icon name="clipboard" size={12} /> Copy</>}
               </button>
               <button onClick={downloadAsText}
                 style={{ padding: '8px 14px', border: '1px solid var(--border)', borderRadius: 7, background: 'var(--surface)', cursor: 'pointer', fontSize: 12, fontFamily: 'inherit', color: 'var(--text2)', display: 'flex', alignItems: 'center', gap: 5 }}
                 onMouseEnter={e => (e.currentTarget.style.background = 'var(--neutral-light-active)')}
                 onMouseLeave={e => (e.currentTarget.style.background = 'var(--surface)')}>
-                💾 Download .txt
+                <Icon name="download" size={12} /> Download .txt
               </button>
               <div style={{ flex: 1 }} />
               <button onClick={() => setShowLogModal(true)}
                 style={{ padding: '8px 18px', border: 'none', borderRadius: 7, background: BLUE, cursor: 'pointer', fontSize: 12, fontFamily: 'inherit', color: '#fff', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5 }}>
-                🔗 Log to PCI →
+                <Icon name="link" size={12} color="#fff" /> Log to PCI →
               </button>
             </div>
           )}

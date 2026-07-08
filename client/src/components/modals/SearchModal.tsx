@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useUIStore } from '../../store/uiStore';
 import { useChatStore } from '../../store/chatStore';
 import { useAuthStore } from '../../store/authStore';
+import Icon from '@/components/ui/Icon';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 const BLUE = 'var(--blue-primary)';
@@ -123,7 +124,7 @@ function ChannelLogo({ channel, size = 28 }: { channel: { name: string; type: st
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       fontSize: size * 0.5,
     }}>
-      {channel.type === 'dm' ? '💬' : '#'}
+      <Icon name={channel.type === 'dm' ? 'message' : 'hash'} size={size * 0.5} />
     </div>
   );
 }
@@ -162,7 +163,7 @@ function FilterPill({ active, onClick, onRemove, children }: {
     }}>
       <span onClick={onClick}>{children}</span>
       {active && onRemove && (
-        <span onClick={onRemove} style={{ color: 'var(--text3)', fontSize: 12, marginLeft: 1, lineHeight: 1, padding: '0 2px' }}>✕</span>
+        <span onClick={onRemove} style={{ color: 'var(--text3)', marginLeft: 1, lineHeight: 1, padding: '0 2px', display: 'inline-flex' }}><Icon name="close" size={12} /></span>
       )}
     </div>
   );
@@ -329,7 +330,7 @@ export default function SearchModal() {
 
         {/* Search input row */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 16px', borderBottom: '1px solid var(--border)' }}>
-          <span style={{ fontSize: 18, color: 'var(--text3)' }}>🔍</span>
+          <span style={{ color: 'var(--text3)', display: 'inline-flex' }}><Icon name="search" size={18} /></span>
           <input
             ref={inputRef}
             type="text"
@@ -348,8 +349,8 @@ export default function SearchModal() {
             <span style={{ fontSize: 10, color: 'var(--text3)' }}>to close</span>
           </span>
           <span onClick={closeGlobalSearch} style={{
-            cursor: 'pointer', color: 'var(--text3)', fontSize: 18, lineHeight: 1, padding: '0 4px',
-          }}>✕</span>
+            cursor: 'pointer', color: 'var(--text3)', lineHeight: 1, padding: '0 4px', display: 'inline-flex',
+          }}><Icon name="close" size={18} /></span>
         </div>
 
         {/* Filter pills row */}
@@ -401,14 +402,14 @@ export default function SearchModal() {
             onClick={() => setHasFilter(h => (h === 'file' ? null : 'file'))}
             onRemove={hasFilter === 'file' ? () => setHasFilter(null) : undefined}
           >
-            📎 Has file
+            <Icon name="attach" size={11} /> Has file
           </FilterPill>
           <FilterPill
             active={hasFilter === 'link'}
             onClick={() => setHasFilter(h => (h === 'link' ? null : 'link'))}
             onRemove={hasFilter === 'link' ? () => setHasFilter(null) : undefined}
           >
-            🔗 Has link
+            <Icon name="link" size={11} /> Has link
           </FilterPill>
 
           {/* Date range (inline) */}
@@ -440,7 +441,7 @@ export default function SearchModal() {
 
           {!loading && totalResults === 0 && (query.trim() || hasAnyFilter) && (
             <div style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--text3)' }}>
-              <div style={{ fontSize: 32, marginBottom: 8 }}>🔍</div>
+              <div style={{ marginBottom: 8 }}><Icon name="search" size={32} /></div>
               <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text3)' }}>No results</div>
               <div style={{ fontSize: 12, marginTop: 4 }}>Try different keywords or remove some filters.</div>
             </div>
@@ -448,7 +449,7 @@ export default function SearchModal() {
 
           {!loading && totalResults === 0 && !query.trim() && !hasAnyFilter && (
             <div style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--text3)' }}>
-              <div style={{ fontSize: 32, marginBottom: 8 }}>💬</div>
+              <div style={{ marginBottom: 8 }}><Icon name="message" size={32} /></div>
               <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text3)' }}>Search your workspace</div>
               <div style={{ fontSize: 12, marginTop: 4 }}>
                 Messages, files, channels, and people — filter by who sent it, where, and when.
@@ -473,7 +474,7 @@ export default function SearchModal() {
                       <span style={{ fontWeight: 700, color: 'var(--text)' }}>{m.sender?.name || 'System'}</span>
                       <span style={{ color: 'var(--text3)' }}>in</span>
                       <span style={{ color: BLUE, fontWeight: 500 }}>
-                        {m.channel.type === 'dm' ? '💬 DM'
+                        {m.channel.type === 'dm' ? <><Icon name="message" size={12} /> DM</>
                           : m.channel.type === 'group' ? m.channel.name
                           : '#' + m.channel.name}
                       </span>
@@ -481,7 +482,7 @@ export default function SearchModal() {
                     </div>
                     <div style={{ fontSize: 13, color: 'var(--text2)', marginTop: 2, lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
                       {m.message_type === 'file' && m.file
-                        ? <span><span style={{ marginRight: 4 }}>📎</span>{m.file.name}</span>
+                        ? <span><span style={{ marginRight: 4 }}><Icon name="attach" size={13} /></span>{m.file.name}</span>
                         : highlight(snippet(m.body || '', query), query)}
                     </div>
                   </div>
@@ -532,8 +533,8 @@ export default function SearchModal() {
                     </div>
                     <div style={{ fontSize: 11, color: 'var(--text3)' }}>{u.email}</div>
                   </div>
-                  <span style={{ fontSize: 10, color: u.status === 'online' ? '#4caf50' : 'var(--text3)' }}>
-                    ● {u.status || 'offline'}
+                  <span style={{ fontSize: 10, color: u.status === 'online' ? '#4caf50' : 'var(--text3)', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                    <Icon name="circle" size={10} fill={u.status === 'online' ? '#4caf50' : 'var(--text3)'} /> {u.status || 'offline'}
                   </span>
                 </div>
               ))}

@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { Search, X } from '@/components/ui/Icon';
+import Icon, { IconName } from '@/components/ui/Icon';
 
 const BLUE = 'var(--blue-primary)';
 const BLUE_DARK = 'var(--blue-dark)';
@@ -32,16 +32,16 @@ const KIND_LABELS: Record<PickerKind, string> = {
   tag:    'Add Tag to Activity',
 };
 
-// ── Type → emoji fallback ──────────────────────────────────────
-const TYPE_EMOJI: Record<string, string> = {
-  Company:              '🏢',
-  Event:                '🎫',
-  Project:              '📁',
-  'Award & Grant Program': '🏆',
-  Software:             '💻',
-  Person:               '👤',
-  Tag:                  '🏷️',
-  Organization:         '🏛️',
+// ── Type → icon fallback (UI chrome, not data) ─────────────────
+const TYPE_ICON: Record<string, IconName> = {
+  Company:              'building',
+  Event:                'ticket',
+  Project:              'folder',
+  'Award & Grant Program': 'trophy',
+  Software:             'laptop',
+  Person:               'user',
+  Tag:                  'tag',
+  Organization:         'landmark',
 };
 
 // ── Component ──────────────────────────────────────────────────
@@ -72,6 +72,7 @@ export default function EntityPickerModal({ kind, items, onSelect, onClose, maxV
 
   const renderLogo = (item: PickerItem) => {
     const size = 44;
+    // Per-record emoji from picker data — rendered as the emoji string (DATA).
     if (item.iconEmoji) {
       return (
         <div style={{ width: size, height: size, borderRadius: 6, background: 'var(--grey-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>
@@ -79,10 +80,29 @@ export default function EntityPickerModal({ kind, items, onSelect, onClose, maxV
         </div>
       );
     }
-    const bg = item.logoColor || '#cfd8dc';
-    const abbr = item.logoAbbr || item.name.slice(0, 2).toUpperCase();
+    // Provided logo avatar (color + abbreviation).
+    if (item.logoColor || item.logoAbbr) {
+      const bg = item.logoColor || '#cfd8dc';
+      const abbr = item.logoAbbr || item.name.slice(0, 2).toUpperCase();
+      return (
+        <div style={{ width: size, height: size, borderRadius: 6, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 800, color: '#fff', flexShrink: 0 }}>
+          {abbr}
+        </div>
+      );
+    }
+    // Entity-type icon fallback (UI chrome).
+    const typeIcon = TYPE_ICON[item.type];
+    if (typeIcon) {
+      return (
+        <div style={{ width: size, height: size, borderRadius: 6, background: 'var(--grey-light)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <Icon name={typeIcon} size={22} />
+        </div>
+      );
+    }
+    // Final default: initials avatar.
+    const abbr = item.name.slice(0, 2).toUpperCase();
     return (
-      <div style={{ width: size, height: size, borderRadius: 6, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 800, color: '#fff', flexShrink: 0 }}>
+      <div style={{ width: size, height: size, borderRadius: 6, background: '#cfd8dc', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 800, color: '#fff', flexShrink: 0 }}>
         {abbr}
       </div>
     );
@@ -100,7 +120,7 @@ export default function EntityPickerModal({ kind, items, onSelect, onClose, maxV
         {/* Header */}
         <div style={{ background: BLUE, color: '#fff', padding: '12px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
           <span style={{ fontWeight: 700, fontSize: 15 }}>{KIND_LABELS[kind]}</span>
-          <span onClick={onClose} style={{ cursor: 'pointer', opacity: .9, display: 'inline-flex' }}><X size={20} /></span>
+          <span onClick={onClose} style={{ cursor: 'pointer', opacity: .9, display: 'inline-flex' }}><Icon name="close" size={20} color="#fff" /></span>
         </div>
 
         {/* Search */}
@@ -117,7 +137,7 @@ export default function EntityPickerModal({ kind, items, onSelect, onClose, maxV
               <span
                 onClick={() => { setQuery(''); inputRef.current?.focus(); }}
                 style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', width: 22, height: 22, borderRadius: '50%', background: '#bbb', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, cursor: 'pointer' }}
-              ><X size={13} /></span>
+              ><Icon name="close" size={13} /></span>
             )}
           </div>
         </div>
@@ -138,13 +158,11 @@ export default function EntityPickerModal({ kind, items, onSelect, onClose, maxV
         <div style={{ flex: 1, overflowY: 'auto', padding: '0 12px 12px' }}>
           {visible.length === 0 ? (
             <div style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--text3)', fontSize: 13 }}>
-              <div style={{ marginBottom: 6 }}><Search size={28} /></div>
+              <div style={{ marginBottom: 6 }}><Icon name="search" size={28} /></div>
               {query ? `No results for "${query}"` : 'No items available'}
             </div>
           ) : visible.map(item => {
             const isSelected = alreadySelected.includes(item.name) || alreadySelected.includes(item.id);
-            const emoji = item.iconEmoji || TYPE_EMOJI[item.type];
-            const resolvedItem = emoji && !item.logoColor && !item.logoAbbr ? { ...item, iconEmoji: emoji } : item;
             return (
               <div
                 key={item.id}
@@ -161,7 +179,7 @@ export default function EntityPickerModal({ kind, items, onSelect, onClose, maxV
                 onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = 'var(--blue-xlight)'; }}
                 onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = 'var(--surface)'; }}
               >
-                {renderLogo(resolvedItem)}
+                {renderLogo(item)}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {item.name}
