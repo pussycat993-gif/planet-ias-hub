@@ -181,31 +181,3 @@ export function fileTypeIcon(name: string, mime?: string): IconName {
   const ext = name.split('.').pop()?.toLowerCase() || '';
   return FILE_EXT_ICON[ext] || 'attach';
 }
-
-// ── DEPRECATED: legacy per-name exports ────────────────────────
-// TEMPORARY back-compat for call sites not yet migrated to <Icon name>.
-// Remove this whole block in the final cleanup commit once every
-// consumer uses the <Icon name="..." /> API. Do not add new usages.
-const legacy = (LucideIcon: (typeof REGISTRY)[IconName]) =>
-  forwardRef<SVGSVGElement, Omit<LucideProps, 'ref'>>(function LegacyIcon(props, ref) {
-    return <LucideIcon ref={ref} size={18} strokeWidth={2} color="currentColor" {...props} />;
-  });
-
-/** @deprecated use <Icon name="pin" /> */          export const Pin = legacy(REGISTRY.pin);
-/** @deprecated use <Icon name="building" /> */     export const Building2 = legacy(REGISTRY.building);
-/** @deprecated use <Icon name="user" /> */         export const User = legacy(REGISTRY.user);
-/** @deprecated use <Icon name="users" /> */        export const Users = legacy(REGISTRY.users);
-/** @deprecated use <Icon name="tag" /> */          export const Tag = legacy(REGISTRY.tag);
-/** @deprecated use <Icon name="zap" /> */          export const Zap = legacy(REGISTRY.zap);
-/** @deprecated use <Icon name="sparkles" /> */     export const Sparkles = legacy(REGISTRY.sparkles);
-/** @deprecated use <Icon name="mic" /> */          export const Mic = legacy(REGISTRY.mic);
-/** @deprecated use <Icon name="video" /> */        export const Video = legacy(REGISTRY.video);
-/** @deprecated use <Icon name="phone" /> */        export const Phone = legacy(REGISTRY.phone);
-/** @deprecated use <Icon name="search" /> */       export const Search = legacy(REGISTRY.search);
-/** @deprecated use <Icon name="bell" /> */         export const Bell = legacy(REGISTRY.bell);
-/** @deprecated use <Icon name="settings" /> */     export const Settings = legacy(REGISTRY.settings);
-/** @deprecated use <Icon name="check" /> */        export const Check = legacy(REGISTRY.check);
-/** @deprecated use <Icon name="close" /> */        export const X = legacy(REGISTRY.close);
-/** @deprecated use <Icon name="calendar" /> */     export const Calendar = legacy(REGISTRY.calendar);
-/** @deprecated use <Icon name="clipboard" /> */    export const Clipboard = legacy(REGISTRY.clipboard);
-/** @deprecated use <Icon name="chevron-down" /> */ export const ChevronDown = legacy(REGISTRY['chevron-down']);
