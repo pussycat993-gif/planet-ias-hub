@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
+import Icon from '@/components/ui/Icon';
 
 const BLUE = '#1964AC';
 const BLUE_DARK = '#155592';
@@ -213,7 +214,7 @@ export default function VoiceNotePlayer({ src, variant = 'voice' }: Props) {
         onMouseEnter={e => (e.currentTarget.style.background = BLUE_DARK)}
         onMouseLeave={e => (e.currentTarget.style.background = BLUE)}
       >
-        {playing ? '❚❚' : '▶'}
+        {playing ? <Icon name="pause" size={14} color="#fff" /> : <Icon name="play" size={14} color="#fff" />}
       </button>
 
       {/* Waveform + time */}

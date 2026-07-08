@@ -10,6 +10,7 @@ import TranscriptionModal from '../modals/TranscriptionModal';
 import LogActivityModal from '../modals/LogActivityModal';
 import VoiceNotePlayer from './VoiceNotePlayer';
 import { renderMarkdown } from '../../utils/markdown';
+import Icon, { fileTypeIcon } from '@/components/ui/Icon';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 const BLUE = 'var(--blue-primary)';
@@ -133,7 +134,7 @@ function CardBtn({ children, primary, danger, purple, onClick }: {
 function MeetingCard({ p }: { p: any }) {
   return (
     <div style={{ border: '1px solid var(--blue-300)', borderRadius: 8, overflow: 'hidden', maxWidth: 420 }}>
-      <div style={{ background: BLUE, color: '#fff', padding: '7px 12px', fontSize: 12, fontWeight: 700 }}>📅 Scheduled Meeting</div>
+      <div style={{ background: BLUE, color: '#fff', padding: '7px 12px', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6 }}><Icon name="calendar" size={14} /> Scheduled Meeting</div>
       <div style={{ padding: '8px 12px', fontSize: 12 }}>
         <Row label="Subject">{p.subject}</Row>
         <Row label="Date">{new Date(p.meeting_date).toLocaleString()}</Row>
@@ -142,8 +143,8 @@ function MeetingCard({ p }: { p: any }) {
         {p.entities?.length > 0 && <Row label="Entities">{p.entities.join(', ')}</Row>}
       </div>
       <div style={{ padding: '6px 12px', borderTop: '1px solid var(--border)', display: 'flex', gap: 8 }}>
-        <CardBtn primary>📹 Join Call</CardBtn>
-        <CardBtn>↗ Open in PCI</CardBtn>
+        <CardBtn primary><span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Icon name="video" size={12} /> Join Call</span></CardBtn>
+        <CardBtn><span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Icon name="external-link" size={12} /> Open in PCI</span></CardBtn>
       </div>
     </div>
   );
@@ -160,22 +161,22 @@ function DWMCard({ p }: { p: any; messageId: number }) {
   }, [p.pci_workflow_step_id]);
   return (
     <div style={{ border: '1px solid #ce93d8', borderRadius: 8, overflow: 'hidden', background: '#f3e5f5', maxWidth: 420 }}>
-      <div style={{ background: 'var(--purple)', color: '#fff', padding: '7px 12px', fontSize: 12, fontWeight: 700 }}>🔄 DWM Workflow Trigger</div>
+      <div style={{ background: 'var(--purple)', color: '#fff', padding: '7px 12px', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6 }}><Icon name="refresh" size={14} /> DWM Workflow Trigger</div>
       <div style={{ padding: '8px 12px', fontSize: 12 }}>
         <Row label="Workflow">{p.workflow_name}</Row>
         <Row label="Document">{p.document}</Row>
         <Row label="Step">{p.step}</Row>
         <Row label="Status">
-          {status === 'pending' && <span style={{ color: '#e65100', fontWeight: 600 }}>⏳ Awaiting</span>}
+          {status === 'pending' && <span style={{ color: '#e65100', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 4 }}><Icon name="hourglass" size={12} /> Awaiting</span>}
           {status === 'processing' && <span style={{ color: '#888' }}>Processing...</span>}
-          {status === 'approved' && <span style={{ color: '#2e7d32', fontWeight: 600 }}>✅ Approved</span>}
-          {status === 'rejected' && <span style={{ color: '#c62828', fontWeight: 600 }}>✕ Rejected</span>}
+          {status === 'approved' && <span style={{ color: '#2e7d32', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 4 }}><Icon name="check" size={12} /> Approved</span>}
+          {status === 'rejected' && <span style={{ color: '#c62828', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 4 }}><Icon name="close" size={12} /> Rejected</span>}
         </Row>
       </div>
       {status === 'pending' && (
         <div style={{ padding: '6px 12px', borderTop: '1px solid rgba(0,0,0,.06)', display: 'flex', gap: 8 }}>
-          <CardBtn primary purple onClick={() => handleAction('approve')}>✅ Approve</CardBtn>
-          <CardBtn danger onClick={() => handleAction('reject')}>✕ Reject</CardBtn>
+          <CardBtn primary purple onClick={() => handleAction('approve')}><span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Icon name="check" size={12} /> Approve</span></CardBtn>
+          <CardBtn danger onClick={() => handleAction('reject')}><span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Icon name="close" size={12} /> Reject</span></CardBtn>
         </div>
       )}
     </div>
@@ -197,13 +198,6 @@ function FileCard({ file, fileName }: { file?: Message['file']; fileName: string
   const [showTranscription, setShowTranscription] = useState(false);
   const [showLogToPCI, setShowLogToPCI] = useState(false);
 
-  const icons: Record<string, string> = {
-    pdf: '📄', doc: '📝', docx: '📝', xls: '📊', xlsx: '📊',
-    png: '🖼️', jpg: '🖼️', jpeg: '🖼️', gif: '🖼️', webp: '🖼️',
-    sql: '🗄️', md: '📋', txt: '📋', fig: '🎨',
-    webm: '🎙️', ogg: '🎙️', mp3: '🎙️', wav: '🎙️', m4a: '🎙️',
-    mp4: '🎬', mov: '🎬',
-  };
   const fmtBytes = (b?: number) => {
     if (!b) return '';
     if (b < 1024) return `${b} B`;
@@ -254,13 +248,13 @@ function FileCard({ file, fileName }: { file?: Message['file']; fileName: string
               don't need this chrome because the label is implicit) */}
           {!isVoiceNote && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '0 4px', fontSize: 10, color: '#888' }}>
-              <span style={{ fontWeight: 600, color: BLUE_DARK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>🔊 {file.name}</span>
+              <span style={{ fontWeight: 600, color: BLUE_DARK, display: 'flex', alignItems: 'center', gap: 4, overflow: 'hidden', flex: 1 }}><Icon name="volume" size={12} style={{ flexShrink: 0 }} /><span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.name}</span></span>
               <span>{fmtBytes(file.size)}</span>
               {downloadUrl && (
                 <a href={downloadUrl} download={file.name} title="Download"
-                  style={{ color: '#888', textDecoration: 'none', fontSize: 12 }}
+                  style={{ color: '#888', textDecoration: 'none', fontSize: 12, display: 'inline-flex' }}
                   onMouseEnter={e => (e.currentTarget.style.color = BLUE)}
-                  onMouseLeave={e => (e.currentTarget.style.color = '#888')}>⬇</a>
+                  onMouseLeave={e => (e.currentTarget.style.color = '#888')}><Icon name="download" size={12} /></a>
               )}
             </div>
           )}
@@ -268,14 +262,14 @@ function FileCard({ file, fileName }: { file?: Message['file']; fileName: string
           {/* Voice note label + size + download row */}
           {isVoiceNote && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '0 4px', fontSize: 10, color: '#888' }}>
-              <span style={{ fontWeight: 600, color: BLUE_DARK }}>🎙️ Voice note</span>
+              <span style={{ fontWeight: 600, color: BLUE_DARK, display: 'inline-flex', alignItems: 'center', gap: 4 }}><Icon name="mic" size={12} /> Voice note</span>
               <span>· {fmtBytes(file.size)}</span>
               <div style={{ flex: 1 }} />
               {downloadUrl && (
                 <a href={downloadUrl} download={file.name} title="Download"
-                  style={{ color: '#888', textDecoration: 'none', fontSize: 12 }}
+                  style={{ color: '#888', textDecoration: 'none', fontSize: 12, display: 'inline-flex' }}
                   onMouseEnter={e => (e.currentTarget.style.color = BLUE)}
-                  onMouseLeave={e => (e.currentTarget.style.color = '#888')}>⬇</a>
+                  onMouseLeave={e => (e.currentTarget.style.color = '#888')}><Icon name="download" size={12} /></a>
               )}
             </div>
           )}
@@ -285,12 +279,12 @@ function FileCard({ file, fileName }: { file?: Message['file']; fileName: string
             <button onClick={() => setShowTranscription(true)} style={actionBtnStyle}
               onMouseEnter={e => { e.currentTarget.style.background = 'var(--blue-xlight)'; e.currentTarget.style.borderColor = 'var(--blue-300)'; e.currentTarget.style.color = BLUE; }}
               onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text2)'; }}>
-              <span>📝</span> Transcribe
+              <Icon name="file-text" size={12} /> Transcribe
             </button>
             <button onClick={() => setShowLogToPCI(true)} style={actionBtnStyle}
               onMouseEnter={e => { e.currentTarget.style.background = 'var(--blue-xlight)'; e.currentTarget.style.borderColor = 'var(--blue-300)'; e.currentTarget.style.color = BLUE; }}
               onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text2)'; }}>
-              <span>🔗</span> Log to PCI
+              <Icon name="link" size={12} /> Log to PCI
             </button>
           </div>
         </div>
@@ -312,16 +306,16 @@ function FileCard({ file, fileName }: { file?: Message['file']; fileName: string
             <span style={{ fontSize: 10, color: '#888' }}>{fmtBytes(file.size)}</span>
             {downloadUrl && (
               <a href={downloadUrl} download={file.name} title="Download"
-                style={{ color: '#888', textDecoration: 'none', fontSize: 13, padding: '0 2px' }}
+                style={{ color: '#888', textDecoration: 'none', fontSize: 13, padding: '0 2px', display: 'inline-flex' }}
                 onMouseEnter={e => (e.currentTarget.style.color = BLUE)}
-                onMouseLeave={e => (e.currentTarget.style.color = '#888')}>⬇</a>
+                onMouseLeave={e => (e.currentTarget.style.color = '#888')}><Icon name="download" size={13} /></a>
             )}
           </div>
           <div style={{ display: 'flex', gap: 6, padding: '4px 10px 8px', background: 'var(--surface)', borderTop: '1px solid rgba(0,0,0,.04)' }}>
             <button onClick={() => setShowLogToPCI(true)} style={actionBtnStyle}
               onMouseEnter={e => { e.currentTarget.style.background = 'var(--blue-xlight)'; e.currentTarget.style.borderColor = 'var(--blue-300)'; e.currentTarget.style.color = BLUE; }}
               onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text2)'; }}>
-              <span>🔗</span> Log to PCI
+              <Icon name="link" size={12} /> Log to PCI
             </button>
           </div>
         </div>
@@ -341,21 +335,21 @@ function FileCard({ file, fileName }: { file?: Message['file']; fileName: string
             <span style={{ fontSize: 10, color: '#888' }}>{fmtBytes(file.size)}</span>
             {downloadUrl && (
               <a href={downloadUrl} download={file.name} title="Download"
-                style={{ color: '#888', textDecoration: 'none', fontSize: 13, padding: '0 2px' }}
+                style={{ color: '#888', textDecoration: 'none', fontSize: 13, padding: '0 2px', display: 'inline-flex' }}
                 onMouseEnter={e => (e.currentTarget.style.color = BLUE)}
-                onMouseLeave={e => (e.currentTarget.style.color = '#888')}>⬇</a>
+                onMouseLeave={e => (e.currentTarget.style.color = '#888')}><Icon name="download" size={13} /></a>
             )}
           </div>
           <div style={{ display: 'flex', gap: 6, padding: '4px 10px 8px', background: 'var(--surface)', borderTop: '1px solid rgba(0,0,0,.04)' }}>
             <button onClick={() => setShowTranscription(true)} style={actionBtnStyle}
               onMouseEnter={e => { e.currentTarget.style.background = 'var(--blue-xlight)'; e.currentTarget.style.borderColor = 'var(--blue-300)'; e.currentTarget.style.color = BLUE; }}
               onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text2)'; }}>
-              <span>📝</span> Transcribe
+              <Icon name="file-text" size={12} /> Transcribe
             </button>
             <button onClick={() => setShowLogToPCI(true)} style={actionBtnStyle}
               onMouseEnter={e => { e.currentTarget.style.background = 'var(--blue-xlight)'; e.currentTarget.style.borderColor = 'var(--blue-300)'; e.currentTarget.style.color = BLUE; }}
               onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text2)'; }}>
-              <span>🔗</span> Log to PCI
+              <Icon name="link" size={12} /> Log to PCI
             </button>
           </div>
         </div>
@@ -373,7 +367,7 @@ function FileCard({ file, fileName }: { file?: Message['file']; fileName: string
           style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 12px', border: '1px solid var(--border)', borderRadius: 8, background: 'var(--grey-light)', cursor: 'pointer', textDecoration: 'none', color: 'inherit' }}
           onMouseEnter={e => (e.currentTarget.style.background = 'var(--blue-xlight)')}
           onMouseLeave={e => (e.currentTarget.style.background = 'var(--grey-light)')}>
-          <span style={{ fontSize: 22 }}>{icons[ext] || '📎'}</span>
+          <Icon name={fileTypeIcon(displayName, mime)} size={22} />
           <div style={{ minWidth: 0, flex: 1 }}>
             <div style={{ fontSize: 12, fontWeight: 600, color: BLUE_DARK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{displayName}</div>
             <div style={{ fontSize: 10, color: '#888', marginTop: 1 }}>
@@ -385,7 +379,7 @@ function FileCard({ file, fileName }: { file?: Message['file']; fileName: string
           <button onClick={() => setShowLogToPCI(true)} style={{ ...actionBtnStyle, alignSelf: 'flex-start' }}
             onMouseEnter={e => { e.currentTarget.style.background = 'var(--blue-xlight)'; e.currentTarget.style.borderColor = 'var(--blue-300)'; e.currentTarget.style.color = BLUE; }}
             onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text2)'; }}>
-            <span>🔗</span> Log to PCI
+            <Icon name="link" size={12} /> Log to PCI
           </button>
         )}
       </div>
@@ -508,7 +502,7 @@ function MessageRow({ msg, prevMsg, isGroup, onReply, onPin, onProfileClick, pin
               {isMine ? 'You' : senderName}
             </span>
             <span style={{ fontSize: 10, color: '#bbb' }}>{formatTime(msg.created_at)}</span>
-            {isPinned && <span style={{ fontSize: 9, color: '#f9a825', fontWeight: 700 }}>📌 PINNED</span>}
+            {isPinned && <span style={{ fontSize: 9, color: '#f9a825', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 3 }}><Icon name="pin" size={10} /> PINNED</span>}
           </div>
         )}
 
@@ -593,7 +587,7 @@ function MessageRow({ msg, prevMsg, isGroup, onReply, onPin, onProfileClick, pin
                   ))}
                 </div>
               ) : (
-                <span style={{ fontSize: 12, marginLeft: 2 }}>💬</span>
+                <Icon name="message-circle" size={12} style={{ marginLeft: 2 }} />
               )}
               <span>{msg.thread_count} {msg.thread_count === 1 ? 'reply' : 'replies'}</span>
               {msg.thread_last_reply_at && (
@@ -616,15 +610,15 @@ function MessageRow({ msg, prevMsg, isGroup, onReply, onPin, onProfileClick, pin
 
       {hovered && !editing && (
         <div style={{ position: 'absolute', top: -14, right: 12, display: 'flex', gap: 4, background: 'var(--surface)', border: '1px solid var(--neutral-light-active)', borderRadius: 10, padding: '3px 6px', boxShadow: '0 2px 8px rgba(0,0,0,.1)', zIndex: 10 }}>
-          <span onClick={() => setShowEmoji(s => !s)} style={{ fontSize: 16, cursor: 'pointer', padding: '1px 3px' }} title="React">😊</span>
-          <span onClick={() => useUIStore.getState().openThread(msg.id)} style={{ fontSize: 14, cursor: 'pointer', padding: '1px 3px', color: '#888' }} title="Reply in thread">↩</span>
-          <span onClick={() => togglePinMessageAction(msg.id, !isPinned)} style={{ fontSize: 14, cursor: 'pointer', padding: '1px 3px', color: isPinned ? '#f9a825' : '#888' }} title={isPinned ? 'Unpin' : 'Pin'}>📌</span>
+          <span onClick={() => setShowEmoji(s => !s)} style={{ cursor: 'pointer', padding: '1px 3px', display: 'inline-flex', alignItems: 'center' }} title="React"><Icon name="smile-plus" size={16} /></span>
+          <span onClick={() => useUIStore.getState().openThread(msg.id)} style={{ cursor: 'pointer', padding: '1px 3px', color: '#888', display: 'inline-flex', alignItems: 'center' }} title="Reply in thread"><Icon name="reply" size={14} /></span>
+          <span onClick={() => togglePinMessageAction(msg.id, !isPinned)} style={{ cursor: 'pointer', padding: '1px 3px', color: isPinned ? '#f9a825' : '#888', display: 'inline-flex', alignItems: 'center' }} title={isPinned ? 'Unpin' : 'Pin'}><Icon name="pin" size={14} /></span>
           <div ref={actionsRef} style={{ position: 'relative' }}>
             <span
               onClick={() => setShowActions(s => !s)}
-              style={{ fontSize: 18, cursor: 'pointer', padding: '0 4px', color: '#555', lineHeight: 1, fontWeight: 700, userSelect: 'none' }}
+              style={{ cursor: 'pointer', padding: '0 4px', color: '#555', lineHeight: 1, userSelect: 'none', display: 'inline-flex', alignItems: 'center' }}
               title="More"
-            >⋮</span>
+            ><Icon name="more" size={18} /></span>
             {showActions && (
               <div style={{
                 position: 'absolute', top: 'calc(100% + 6px)', right: 0, zIndex: 50,
@@ -642,7 +636,7 @@ function MessageRow({ msg, prevMsg, isGroup, onReply, onPin, onProfileClick, pin
                     onMouseEnter={e => (e.currentTarget.style.background = 'var(--neutral-light-active)')}
                     onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                   >
-                    <span style={{ fontSize: 14, width: 18, textAlign: 'center' }}>📋</span>
+                    <span style={{ width: 18, display: 'inline-flex', justifyContent: 'center' }}><Icon name="clipboard" size={14} /></span>
                     <span>Copy text</span>
                   </div>
                 )}
@@ -655,7 +649,7 @@ function MessageRow({ msg, prevMsg, isGroup, onReply, onPin, onProfileClick, pin
                     onMouseEnter={e => (e.currentTarget.style.background = 'var(--neutral-light-active)')}
                     onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                   >
-                    <span style={{ fontSize: 14, width: 18, textAlign: 'center' }}>✏️</span>
+                    <span style={{ width: 18, display: 'inline-flex', justifyContent: 'center' }}><Icon name="edit" size={14} /></span>
                     <span>Edit</span>
                   </div>
                 )}
@@ -670,7 +664,7 @@ function MessageRow({ msg, prevMsg, isGroup, onReply, onPin, onProfileClick, pin
                   onMouseEnter={e => (e.currentTarget.style.background = 'var(--neutral-light-active)')}
                   onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                 >
-                  <span style={{ fontSize: 14, width: 18, textAlign: 'center' }}>📌</span>
+                  <span style={{ width: 18, display: 'inline-flex', justifyContent: 'center' }}><Icon name="pin" size={14} /></span>
                   <span>{isPinned ? 'Unpin' : 'Pin'}</span>
                 </div>
 
@@ -684,7 +678,7 @@ function MessageRow({ msg, prevMsg, isGroup, onReply, onPin, onProfileClick, pin
                         onMouseEnter={e => (e.currentTarget.style.background = '#fff5f5')}
                         onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                       >
-                        <span style={{ fontSize: 14, width: 18, textAlign: 'center' }}>🗑️</span>
+                        <span style={{ width: 18, display: 'inline-flex', justifyContent: 'center' }}><Icon name="trash" size={14} /></span>
                         <span>Delete</span>
                       </div>
                     ) : (
@@ -790,7 +784,7 @@ function JumpToLatestChip({ newCount, onClick }: { newCount: number; onClick: ()
       onMouseEnter={e => (e.currentTarget.style.transform = 'translateY(-1px)')}
       onMouseLeave={e => (e.currentTarget.style.transform = 'translateY(0)')}
     >
-      <span style={{ fontSize: 14 }}>↓</span>
+      <Icon name="arrow-down" size={14} />
       <span>{newCount > 0 ? `${newCount} new message${newCount === 1 ? '' : 's'}` : 'Jump to latest'}</span>
     </div>
   );
@@ -934,7 +928,7 @@ export default function MessageList({ onReply, searchQuery = '' }: MessageListPr
   if (!activeChannelId) {
     return (
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#bbb', gap: 8 }}>
-        <div style={{ fontSize: 36 }}>💬</div>
+        <Icon name="message-circle" size={36} />
         <div style={{ fontSize: 14, fontWeight: 600, color: '#888' }}>Select a conversation</div>
         <div style={{ fontSize: 12 }}>Choose a channel or DM from the sidebar</div>
       </div>
@@ -977,10 +971,10 @@ export default function MessageList({ onReply, searchQuery = '' }: MessageListPr
         style={{ flex: 1, overflowY: 'auto', paddingBottom: 4, background: 'var(--surface)' }}>
         {activeSearch && (
           <div style={{ padding: '8px 14px', background: '#fff3e0', borderBottom: '1px solid #ffe0b2', fontSize: 12, color: '#e65100', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span>🔍</span>
+            <Icon name="search" size={14} />
             <span>{filteredMessages.length} result{filteredMessages.length !== 1 ? 's' : ''} for "<strong>{activeSearch}</strong>"</span>
             {inlineSearchOpen && (
-              <span onClick={toggleInlineSearch} style={{ marginLeft: 'auto', cursor: 'pointer', fontSize: 14 }} title="Close search">✕</span>
+              <span onClick={toggleInlineSearch} style={{ marginLeft: 'auto', cursor: 'pointer', display: 'inline-flex' }} title="Close search"><Icon name="close" size={14} /></span>
             )}
           </div>
         )}
@@ -989,7 +983,7 @@ export default function MessageList({ onReply, searchQuery = '' }: MessageListPr
           <div style={{ textAlign: 'center', padding: 10 }}>
             <button onClick={() => fetchMessages(activeChannelId, messages[0]?.created_at)} disabled={loadingMessages}
               style={{ border: '1px solid var(--border)', background: 'var(--surface)', borderRadius: 6, padding: '4px 14px', fontSize: 11, cursor: 'pointer', color: 'var(--text2)' }}>
-              {loadingMessages ? 'Loading...' : '↑ Load older messages'}
+              {loadingMessages ? 'Loading...' : <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Icon name="arrow-up" size={12} /> Load older messages</span>}
             </button>
           </div>
         )}

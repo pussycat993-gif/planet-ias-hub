@@ -9,6 +9,7 @@ import { ReplyContext } from './MessageList';
 import EmojiPicker from './EmojiPicker';
 import ChatAutocomplete, { AutocompleteItem, AutocompleteKind } from './ChatAutocomplete';
 import ScheduleMeetModal from './ScheduleMeetModal';
+import Icon, { fileTypeIcon, IconName } from '../ui/Icon';
 import axios from 'axios';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
@@ -20,16 +21,6 @@ interface AttachedFile {
   preview?: string;
 }
 
-function fileIcon(name: string): string {
-  const ext = name.split('.').pop()?.toLowerCase() || '';
-  const map: Record<string, string> = {
-    pdf: '📄', doc: '📝', docx: '📝', xls: '📊', xlsx: '📊',
-    png: '🖼️', jpg: '🖼️', jpeg: '🖼️', gif: '🖼️', webp: '🖼️',
-    sql: '🗄️', md: '📋', txt: '📋', fig: '🎨', zip: '🗜️', mp4: '🎬',
-    webm: '🎙️', ogg: '🎙️', wav: '🎙️', mp3: '🎙️',
-  };
-  return map[ext] || '📎';
-}
 function isImage(name: string): boolean { return /\.(png|jpg|jpeg|gif|webp)$/i.test(name); }
 function fmtSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -87,7 +78,8 @@ interface CommandDef {
   command: string;
   label: string;
   sublabel: string;
-  icon: string;
+  icon?: IconName;   // Lucide icon (most commands)
+  emoji?: string;    // fallback glyph for commands with no Lucide equivalent (/shrug)
   hotkey?: string;
   action: (args: string, ctx: CommandContext) => string | null;
 }
@@ -103,37 +95,37 @@ interface CommandContext {
 const COMMANDS: CommandDef[] = [
   {
     command: 'schedule', label: '/schedule [title]', sublabel: 'Open the Schedule Meeting dialog',
-    icon: '📅', hotkey: '/sch',
+    icon: 'calendar', hotkey: '/sch',
     action: (_args, ctx) => { ctx.openScheduleModal(); return null; },
   },
   {
     command: 'audio', label: '/audio', sublabel: 'Start an audio call in this channel',
-    icon: '📞', hotkey: '/au',
+    icon: 'phone', hotkey: '/au',
     action: (_args, ctx) => { ctx.startCall(ctx.channelId, 'audio'); return null; },
   },
   {
     command: 'video', label: '/video', sublabel: 'Start a video call in this channel',
-    icon: '📹', hotkey: '/vi',
+    icon: 'video', hotkey: '/vi',
     action: (_args, ctx) => { ctx.startCall(ctx.channelId, 'video'); return null; },
   },
   {
     command: 'members', label: '/members', sublabel: 'Show channel members panel',
-    icon: '👥', hotkey: '/mem',
+    icon: 'users', hotkey: '/mem',
     action: (_args, ctx) => { ctx.openMembersPanel(); return null; },
   },
   {
     command: 'ai', label: '/ai [question]', sublabel: 'Ask IAS AI assistant',
-    icon: '🤖', hotkey: '/ai',
+    icon: 'bot', hotkey: '/ai',
     action: (args, ctx) => { ctx.openAIPanel(); return args ? `🤖 Ask IAS: ${args}` : null; },
   },
   {
     command: 'shrug', label: '/shrug', sublabel: 'Send ¯\\_(ツ)_/¯',
-    icon: '🤷', hotkey: '',
+    emoji: '🤷', hotkey: '',  // no Lucide equivalent — documented exception
     action: (_args) => `¯\\_(ツ)_/¯`,
   },
   {
     command: 'me', label: '/me [action]', sublabel: 'Send an action in third person',
-    icon: '✨', hotkey: '',
+    icon: 'sparkles', hotkey: '',
     action: (args) => args ? `_${args}_` : null,
   },
 ];
@@ -222,6 +214,7 @@ export default function MessageInput({ replyContext, onClearReply }: MessageInpu
         label: c.label,
         sublabel: c.sublabel,
         icon: c.icon,
+        emoji: c.emoji,
         hotkey: c.hotkey,
       }));
   }, [autocomplete, members, user?.id]);
@@ -715,14 +708,14 @@ export default function MessageInput({ replyContext, onClearReply }: MessageInpu
         {/* Reply context bar */}
         {replyContext && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px', background: 'var(--blue-xlight)', borderBottom: '1px solid var(--border)', fontSize: 12 }}>
-            <span style={{ color: BLUE, fontSize: 14 }}>↩</span>
+            <span style={{ color: BLUE, display: 'inline-flex', alignItems: 'center' }}><Icon name="reply" size={14} /></span>
             <div style={{ flex: 1, minWidth: 0 }}>
               <span style={{ fontWeight: 700, color: 'var(--blue-dark)' }}>Replying to {replyContext.senderName}</span>
               <span style={{ color: 'var(--text3)', marginLeft: 6 }}>
                 {replyContext.body.slice(0, 60)}{replyContext.body.length > 60 ? '...' : ''}
               </span>
             </div>
-            <span onClick={onClearReply} style={{ cursor: 'pointer', color: 'var(--text3)', fontSize: 16 }}>✕</span>
+            <span onClick={onClearReply} style={{ cursor: 'pointer', color: 'var(--text3)', display: 'inline-flex', alignItems: 'center' }}><Icon name="close" size={16} /></span>
           </div>
         )}
 
@@ -760,11 +753,11 @@ export default function MessageInput({ replyContext, onClearReply }: MessageInpu
               </button>
               <button onClick={togglePause} title={paused ? 'Resume recording' : 'Pause recording'}
                 style={{ padding: '5px 12px', border: '1px solid var(--border)', background: 'var(--surface)', cursor: 'pointer', fontSize: 12, borderRadius: 6, fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 4 }}>
-                {paused ? <><span>▶</span> Resume</> : <><span>❚❚</span> Pause</>}
+                {paused ? <><Icon name="play" size={13} /> Resume</> : <><Icon name="pause" size={13} /> Pause</>}
               </button>
               <button onClick={() => stopRecording(true)}
-                style={{ padding: '5px 14px', background: '#c62828', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 12, borderRadius: 6, fontFamily: 'inherit', fontWeight: 600 }}>
-                ⏹ Send
+                style={{ padding: '5px 14px', background: '#c62828', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 12, borderRadius: 6, fontFamily: 'inherit', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                <Icon name="stop" size={12} /> Send
               </button>
             </div>
           </div>
@@ -781,7 +774,7 @@ export default function MessageInput({ replyContext, onClearReply }: MessageInpu
                   </div>
                 ) : (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '8px 10px', maxWidth: 180 }}>
-                    <span style={{ fontSize: 22, flexShrink: 0 }}>{fileIcon(att.file.name)}</span>
+                    <span style={{ flexShrink: 0, display: 'inline-flex', alignItems: 'center', color: 'var(--text2)' }}><Icon name={fileTypeIcon(att.file.name)} size={22} /></span>
                     <div style={{ minWidth: 0 }}>
                       <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 120 }}>{att.file.name}</div>
                       <div style={{ fontSize: 10, color: 'var(--text3)' }}>{fmtSize(att.file.size)}</div>
@@ -789,8 +782,8 @@ export default function MessageInput({ replyContext, onClearReply }: MessageInpu
                   </div>
                 )}
                 <div onClick={() => removeAttachment(att.id)}
-                  style={{ position: 'absolute', top: 3, right: 3, width: 18, height: 18, borderRadius: '50%', background: 'rgba(0,0,0,.55)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 11, fontWeight: 700, lineHeight: 1 }}
-                >✕</div>
+                  style={{ position: 'absolute', top: 3, right: 3, width: 18, height: 18, borderRadius: '50%', background: 'rgba(0,0,0,.55)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', lineHeight: 1 }}
+                ><Icon name="close" size={11} /></div>
                 {att.preview && (
                   <div style={{ padding: '2px 6px', fontSize: 9, color: 'var(--text3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 72, background: 'var(--surface)' }}>
                     {att.file.name}
@@ -802,7 +795,7 @@ export default function MessageInput({ replyContext, onClearReply }: MessageInpu
               style={{ width: 72, height: 72, borderRadius: 8, border: '2px dashed var(--border)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text3)', fontSize: 22, gap: 3, transition: 'all .15s' }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = BLUE; e.currentTarget.style.color = BLUE; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text3)'; }}>
-              <span>+</span>
+              <Icon name="add" size={22} />
               <span style={{ fontSize: 9 }}>Add more</span>
             </div>
           </div>
@@ -818,7 +811,7 @@ export default function MessageInput({ replyContext, onClearReply }: MessageInpu
             <div style={{ width: 1, height: 16, background: 'var(--border)', margin: '0 4px' }} />
             <FormatBtn title="Inline code  (Cmd/Ctrl+E)" onClick={() => wrapSelection('`',  '`')} style={{ fontFamily: 'SF Mono, Consolas, Menlo, monospace', fontSize: 11 }}>{'<>'}</FormatBtn>
             <FormatBtn title="Code block"                onClick={() => wrapSelection('\n```\n', '\n```\n')} style={{ fontFamily: 'SF Mono, Consolas, Menlo, monospace', fontSize: 11 }}>{'{ }'}</FormatBtn>
-            <FormatBtn title="Insert link"               onClick={insertLink}>🔗</FormatBtn>
+            <FormatBtn title="Insert link"               onClick={insertLink}><Icon name="link" size={15} /></FormatBtn>
             <div style={{ flex: 1 }} />
             <span style={{ fontSize: 10, color: 'var(--text3)' }}>
               <kbd style={kbdStyle}>Shift</kbd>+<kbd style={kbdStyle}>Enter</kbd> for newline
@@ -851,13 +844,13 @@ export default function MessageInput({ replyContext, onClearReply }: MessageInpu
 
             {/* Attach */}
             <span
-              style={{ cursor: 'pointer', color: 'var(--text3)', fontSize: 16, position: 'relative' }}
+              style={{ cursor: 'pointer', color: 'var(--text3)', position: 'relative', display: 'inline-flex', alignItems: 'center' }}
               onClick={() => fileRef.current?.click()}
               title="Attach files"
               onMouseEnter={e => (e.currentTarget.style.color = BLUE)}
               onMouseLeave={e => (e.currentTarget.style.color = 'var(--text3)')}
             >
-              📎
+              <Icon name="attach" size={16} />
               {attachments.length > 0 && (
                 <span style={{ position: 'absolute', top: -6, right: -6, width: 14, height: 14, borderRadius: '50%', background: BLUE, color: '#fff', fontSize: 8, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   {attachments.length}
@@ -871,11 +864,11 @@ export default function MessageInput({ replyContext, onClearReply }: MessageInpu
             <span
               onClick={() => setShowEmoji(s => !s)}
               title="Emoji picker"
-              style={{ cursor: 'pointer', color: showEmoji ? '#f9a825' : 'var(--text3)', fontSize: 16, transition: 'color .15s' }}
+              style={{ cursor: 'pointer', color: showEmoji ? '#f9a825' : 'var(--text3)', display: 'inline-flex', alignItems: 'center', transition: 'color .15s' }}
               onMouseEnter={e => (e.currentTarget.style.color = '#f9a825')}
               onMouseLeave={e => (e.currentTarget.style.color = showEmoji ? '#f9a825' : 'var(--text3)')}
             >
-              😊
+              <Icon name="smile" size={16} color={showEmoji ? '#f9a825' : 'currentColor'} />
             </span>
 
             <textarea
@@ -906,7 +899,7 @@ export default function MessageInput({ replyContext, onClearReply }: MessageInpu
             />
 
             {/* Mention shortcut */}
-            <span style={{ cursor: 'pointer', color: 'var(--text3)', fontSize: 13 }}
+            <span style={{ cursor: 'pointer', color: 'var(--text3)', display: 'inline-flex', alignItems: 'center' }}
               onClick={() => {
                 const cur = inputRef.current?.selectionStart || text.length;
                 const newText = text.slice(0, cur) + '@' + text.slice(cur);
@@ -919,7 +912,7 @@ export default function MessageInput({ replyContext, onClearReply }: MessageInpu
               }}
               title="Mention someone"
               onMouseEnter={e => (e.currentTarget.style.color = BLUE)}
-              onMouseLeave={e => (e.currentTarget.style.color = 'var(--text3)')}>@</span>
+              onMouseLeave={e => (e.currentTarget.style.color = 'var(--text3)')}><Icon name="at" size={16} /></span>
           </div>
 
           {/* Log to PCI toggle */}
@@ -928,7 +921,7 @@ export default function MessageInput({ replyContext, onClearReply }: MessageInpu
             color: logEnabled ? BLUE : '#aaa', cursor: 'pointer', padding: '4px 7px',
             borderRadius: 6, border: `1px solid ${logEnabled ? 'var(--blue-300)' : 'var(--neutral-light-active)'}`,
             background: logEnabled ? 'var(--blue-xlight)' : 'var(--surface)', fontFamily: 'inherit',
-          }}>🔗 Log</button>
+          }}><Icon name="link" size={12} /> Log</button>
 
           {/* Send button, OR voice + video record buttons when there's no text */}
           {text.trim() || attachments.length > 0 ? (
@@ -944,7 +937,7 @@ export default function MessageInput({ replyContext, onClearReply }: MessageInpu
                 fontSize: 13, fontWeight: 700, fontFamily: 'inherit',
               }}
             >
-              {uploading ? '⏳' : 'Send'}
+              {uploading ? <Icon name="loader" size={16} style={{ verticalAlign: 'middle' }} /> : 'Send'}
             </button>
           ) : recording ? (
             <button
@@ -957,7 +950,7 @@ export default function MessageInput({ replyContext, onClearReply }: MessageInpu
                 borderRadius: 8, cursor: 'pointer', fontSize: 16, fontFamily: 'inherit',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}
-            >⏹</button>
+            ><Icon name="stop" size={16} /></button>
           ) : (
             <>
               <button
@@ -973,7 +966,7 @@ export default function MessageInput({ replyContext, onClearReply }: MessageInpu
                 }}
                 onMouseEnter={e => { e.currentTarget.style.background = 'var(--blue-xlight)'; e.currentTarget.style.borderColor = BLUE; }}
                 onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.borderColor = 'var(--border)'; }}
-              >🎙️</button>
+              ><Icon name="mic" size={15} /></button>
               <button
                 onClick={() => startRecording('video')}
                 disabled={!activeChannelId || uploading}
@@ -987,7 +980,7 @@ export default function MessageInput({ replyContext, onClearReply }: MessageInpu
                 }}
                 onMouseEnter={e => { e.currentTarget.style.background = 'var(--blue-xlight)'; e.currentTarget.style.borderColor = BLUE; }}
                 onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.borderColor = 'var(--border)'; }}
-              >📹</button>
+              ><Icon name="video" size={15} /></button>
             </>
           )}
         </div>

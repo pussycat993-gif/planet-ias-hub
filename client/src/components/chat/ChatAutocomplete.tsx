@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import Icon, { IconName } from '../ui/Icon';
 
 const BLUE = 'var(--blue-primary)';
 const BLUE_DARK = 'var(--blue-dark)';
@@ -11,7 +12,8 @@ export interface AutocompleteItem {
   avatarUrl?: string;     // for mention
   avatarInitials?: string;
   avatarColor?: string;
-  icon?: string;          // for slash command
+  icon?: IconName;        // Lucide icon for slash command
+  emoji?: string;         // fallback glyph for commands with no Lucide equivalent (/shrug)
   hotkey?: string;        // shortcut hint
 }
 
@@ -91,7 +93,7 @@ export default function ChatAutocomplete({ kind, items, highlightedIndex, onHigh
                 )
               ) : (
                 <div style={{ width: 28, height: 28, borderRadius: 6, background: 'var(--blue-xlight)', color: BLUE, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, flexShrink: 0 }}>
-                  {item.icon || '/'}
+                  {item.icon ? <Icon name={item.icon} size={15} /> : item.emoji ? <span>{item.emoji}</span> : '/'}
                 </div>
               )}
 

@@ -6,6 +6,7 @@ import { useUIStore } from '../../store/uiStore';
 import { useThreadLastViewed } from '../../hooks/useThreadLastViewed';
 import { getSocket } from '../../hooks/useSocket';
 import { renderMarkdown } from '../../utils/markdown';
+import Icon from '@/components/ui/Icon';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 const BLUE = 'var(--blue-primary)';
@@ -185,14 +186,14 @@ export default function ThreadPanel() {
       <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
         <div>
           <div style={{ fontWeight: 700, fontSize: 14, color: BLUE_DARK, display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span>💬</span>
+            <Icon name="message-circle" size={16} />
             <span>Thread</span>
           </div>
           <div style={{ fontSize: 11, color: 'var(--text3)', marginTop: 1 }}>
             {replies.length} {replies.length === 1 ? 'reply' : 'replies'}
           </div>
         </div>
-        <span onClick={closeThread} style={{ cursor: 'pointer', fontSize: 20, color: 'var(--text3)' }} title="Close thread">✕</span>
+        <span onClick={closeThread} style={{ cursor: 'pointer', display: 'flex' }} title="Close thread"><Icon name="close" size={20} color="var(--text3)" /></span>
       </div>
 
       {/* Body */}

@@ -4,6 +4,7 @@ import { useAuthStore } from '../../store/authStore';
 import { toLocalDateTimeString } from '../../utils/meetingDetector';
 import EntityPickerModal, { PickerKind } from '../modals/EntityPickerModal';
 import { MOCK_ENTITIES, MOCK_PEOPLE, MOCK_TAGS } from '../../utils/pickerData';
+import Icon, { IconName } from '../ui/Icon';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 const BLUE = 'var(--blue-primary)';
@@ -156,15 +157,15 @@ export default function ScheduleMeetModal({ channelId, channelName, onClose, ini
       <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 12, width: 500, maxWidth: '95vw', maxHeight: '90vh', boxShadow: '0 8px 40px rgba(6,25,43,.2)', fontFamily: 'var(--font-sans)', display: 'flex', flexDirection: 'column' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #eee' }}>
           <div>
-            <div style={{ fontWeight: 700, fontSize: 15, color: BLUE_DARK }}>📅 Schedule Meeting</div>
+            <div style={{ fontWeight: 700, fontSize: 15, color: BLUE_DARK, display: 'inline-flex', alignItems: 'center', gap: 6 }}><Icon name="calendar" size={15} />Schedule Meeting</div>
             <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>in {channelName}</div>
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#888' }}>✕</button>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888', display: 'inline-flex', alignItems: 'center' }}><Icon name="close" size={18} /></button>
         </div>
 
         {detectedFrom && (
           <div style={{ margin: '10px 18px 0', padding: '8px 12px', background: '#fffde7', border: '1px solid #ffe082', borderRadius: 8, fontSize: 11, color: '#5d4037', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-            <span style={{ fontSize: 14, flexShrink: 0 }}>💡</span>
+            <span style={{ flexShrink: 0, display: 'inline-flex' }}><Icon name="lightbulb" size={14} /></span>
             <div>
               <div style={{ fontWeight: 600, marginBottom: 2 }}>Auto-detected from message</div>
               <div style={{ opacity: 0.85, fontStyle: 'italic' }}>"{detectedFrom}"</div>
@@ -203,7 +204,7 @@ export default function ScheduleMeetModal({ channelId, channelName, onClose, ini
                 onClick={() => setPickerOpen('entity')}
                 title="Add entity"
                 style={{ width: 20, height: 20, borderRadius: '50%', background: BLUE, color: '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, cursor: 'pointer', lineHeight: 1, fontWeight: 700, flexShrink: 0 }}
-              >+</span>
+              ><Icon name="add" size={14} /></span>
             </label>
             {(() => {
               // Union of selected + not-yet-selected suggestions, deduped by name
@@ -225,14 +226,14 @@ export default function ScheduleMeetModal({ channelId, channelName, onClose, ini
                     return (
                       <div key={e.name} onClick={() => toggleEntity(e)}
                         style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 20, cursor: 'pointer', fontSize: 12, border: `1px solid ${sel ? BLUE : 'var(--border)'}`, background: sel ? 'var(--blue-xlight)' : 'var(--surface)', color: sel ? BLUE_DARK : 'var(--text2)' }}>
-                        <span>{e.type === 'Company' ? '🏢' : e.type === 'Event' ? '🎫' : e.type === 'Organization' ? '🏛️' : e.type === 'Software' ? '💻' : e.type === 'Award & Grant Program' ? '🏆' : '📁'}</span>
+                        <Icon name={(e.type === 'Company' ? 'building' : e.type === 'Event' ? 'ticket' : e.type === 'Organization' ? 'landmark' : e.type === 'Software' ? 'laptop' : e.type === 'Award & Grant Program' ? 'trophy' : 'folder') as IconName} size={13} />
                         <span style={{ fontWeight: sel ? 700 : 400 }}>{e.name}</span>
                         {sel && (
                           <span
                             onClick={evt => { evt.stopPropagation(); setSelectedEntities(prev => prev.filter(x => x.name !== e.name)); }}
                             title="Remove"
                             style={{ fontSize: 12, color: BLUE_DARK, marginLeft: 2, padding: '0 2px', lineHeight: 1 }}
-                          >✕</span>
+                          ><Icon name="close" size={12} /></span>
                         )}
                       </div>
                     );
@@ -255,7 +256,7 @@ export default function ScheduleMeetModal({ channelId, channelName, onClose, ini
                     <div key={m.id} onClick={() => toggleMember(m.id)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '4px 10px 4px 6px', borderRadius: 20, cursor: 'pointer', border: `1px solid ${sel ? BLUE : 'var(--border)'}`, background: sel ? 'var(--blue-xlight)' : 'var(--surface)' }}>
                       <MemberAvatar member={m} size={22} />
                       <span style={{ fontSize: 12, color: sel ? BLUE_DARK : '#555', fontWeight: sel ? 700 : 400 }}>{m.name}</span>
-                      {sel && <span style={{ fontSize: 10, color: BLUE }}>✓</span>}
+                      {sel && <span style={{ color: BLUE, display: 'inline-flex' }}><Icon name="check" size={12} /></span>}
                     </div>
                   );
                 })}
@@ -271,7 +272,7 @@ export default function ScheduleMeetModal({ channelId, channelName, onClose, ini
                 onClick={() => setPickerOpen('people')}
                 title="Add person"
                 style={{ width: 20, height: 20, borderRadius: '50%', background: BLUE, color: '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, cursor: 'pointer', lineHeight: 1, fontWeight: 700, flexShrink: 0 }}
-              >+</span>
+              ><Icon name="add" size={14} /></span>
             </label>
             {selectedPeople.length === 0 ? (
               <div style={{ fontSize: 11, color: '#aaa', fontStyle: 'italic' }}>Click + to add PCI contacts (clients, prospects, external attendees)</div>
@@ -280,13 +281,13 @@ export default function ScheduleMeetModal({ channelId, channelName, onClose, ini
                 {selectedPeople.map(p => (
                   <div key={p}
                     style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 20, fontSize: 12, border: `1px solid ${BLUE}`, background: 'var(--blue-xlight)', color: BLUE_DARK }}>
-                    <span>👤</span>
+                    <Icon name="user" size={13} />
                     <span style={{ fontWeight: 700 }}>{p}</span>
                     <span
                       onClick={() => setSelectedPeople(prev => prev.filter(x => x !== p))}
                       title="Remove"
                       style={{ cursor: 'pointer', fontSize: 12, color: BLUE_DARK, marginLeft: 2, padding: '0 2px', lineHeight: 1 }}
-                    >✕</span>
+                    ><Icon name="close" size={12} /></span>
                   </div>
                 ))}
               </div>
@@ -301,7 +302,7 @@ export default function ScheduleMeetModal({ channelId, channelName, onClose, ini
                 onClick={() => setPickerOpen('tag')}
                 title="Add tag"
                 style={{ width: 20, height: 20, borderRadius: '50%', background: BLUE, color: '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, cursor: 'pointer', lineHeight: 1, fontWeight: 700, flexShrink: 0 }}
-              >+</span>
+              ><Icon name="add" size={14} /></span>
             </label>
             {selectedTags.length === 0 ? (
               <div style={{ fontSize: 11, color: '#aaa', fontStyle: 'italic' }}>Click + to tag this meeting</div>
@@ -310,13 +311,13 @@ export default function ScheduleMeetModal({ channelId, channelName, onClose, ini
                 {selectedTags.map(t => (
                   <div key={t}
                     style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 20, fontSize: 12, border: `1px solid ${BLUE}`, background: 'var(--blue-xlight)', color: BLUE_DARK }}>
-                    <span>🏷️</span>
+                    <Icon name="tag" size={13} />
                     <span style={{ fontWeight: 700 }}>{t}</span>
                     <span
                       onClick={() => setSelectedTags(prev => prev.filter(x => x !== t))}
                       title="Remove"
                       style={{ cursor: 'pointer', fontSize: 12, color: BLUE_DARK, marginLeft: 2, padding: '0 2px', lineHeight: 1 }}
-                    >✕</span>
+                    ><Icon name="close" size={12} /></span>
                   </div>
                 ))}
               </div>
@@ -325,14 +326,14 @@ export default function ScheduleMeetModal({ channelId, channelName, onClose, ini
 
           {title && selectedMembers.length > 0 && (
             <div style={{ background: 'var(--blue-xlight)', border: '1px solid var(--blue-200)', borderRadius: 8, padding: '10px 12px', fontSize: 12 }}>
-              <div style={{ fontWeight: 700, color: BLUE_DARK, marginBottom: 4 }}>📋 Meeting Summary</div>
+              <div style={{ fontWeight: 700, color: BLUE_DARK, marginBottom: 4, display: 'inline-flex', alignItems: 'center', gap: 6 }}><Icon name="clipboard" size={13} />Meeting Summary</div>
               <div style={{ color: '#555' }}>
                 <b>{title}</b><br />
-                📅 {new Date(date).toLocaleString()}<br />
-                ⏱ {duration >= 60 ? `${duration / 60}h` : `${duration} min`} · 👤 {selectedMembers.length} participants<br />
-                {selectedEntities.length > 0 && <>🏢 {selectedEntities.map(e => e.name).join(', ')}<br /></>}
-                {selectedPeople.length > 0 && <>👥 {selectedPeople.join(', ')}<br /></>}
-                {selectedTags.length > 0 && <>🏷️ {selectedTags.join(', ')}</>}
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, verticalAlign: 'middle' }}><Icon name="calendar" size={13} />{new Date(date).toLocaleString()}</span><br />
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, verticalAlign: 'middle' }}><Icon name="clock" size={13} />{duration >= 60 ? `${duration / 60}h` : `${duration} min`} · <Icon name="user" size={13} />{selectedMembers.length} participants</span><br />
+                {selectedEntities.length > 0 && <><span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, verticalAlign: 'middle' }}><Icon name="building" size={13} />{selectedEntities.map(e => e.name).join(', ')}</span><br /></>}
+                {selectedPeople.length > 0 && <><span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, verticalAlign: 'middle' }}><Icon name="users" size={13} />{selectedPeople.join(', ')}</span><br /></>}
+                {selectedTags.length > 0 && <><span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, verticalAlign: 'middle' }}><Icon name="tag" size={13} />{selectedTags.join(', ')}</span></>}
               </div>
             </div>
           )}
@@ -343,8 +344,8 @@ export default function ScheduleMeetModal({ channelId, channelName, onClose, ini
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={onClose} style={{ padding: '8px 16px', border: '1px solid #dde1e7', borderRadius: 7, background: '#fff', cursor: 'pointer', fontSize: 13, fontFamily: 'inherit' }}>Cancel</button>
             <button onClick={handleSchedule} disabled={saving || !title.trim() || selectedMembers.length === 0}
-              style={{ padding: '8px 20px', background: saving || !title.trim() ? 'var(--blue-300)' : BLUE, color: '#fff', border: 'none', borderRadius: 7, cursor: saving ? 'not-allowed' : 'pointer', fontSize: 13, fontFamily: 'inherit', fontWeight: 600 }}>
-              {saving ? 'Scheduling...' : '📅 Schedule Meeting'}
+              style={{ padding: '8px 20px', background: saving || !title.trim() ? 'var(--blue-300)' : BLUE, color: '#fff', border: 'none', borderRadius: 7, cursor: saving ? 'not-allowed' : 'pointer', fontSize: 13, fontFamily: 'inherit', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              {saving ? 'Scheduling...' : <><Icon name="calendar" size={13} />Schedule Meeting</>}
             </button>
           </div>
         </div>
