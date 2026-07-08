@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuthStore } from '../store/authStore';
+import Icon from '@/components/ui/Icon';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -60,7 +61,7 @@ export default function LoginPage() {
             borderRadius: 6, fontSize: 12, marginBottom: 12, border: '1px solid #ef9a9a',
           }}>
             {error}
-            <span onClick={clearError} style={{ float: 'right', cursor: 'pointer' }}>✕</span>
+            <span onClick={clearError} style={{ float: 'right', cursor: 'pointer' }}><Icon name="close" size={14} /></span>
           </div>
         )}
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import Icon from '@/components/ui/Icon';
 import { PINNED_CHIP } from '../../hooks/useAskIASPrefs';
 
 interface Props {
@@ -105,7 +106,7 @@ function Chip({ text, pinned = false, compact = false, onClick }: ChipProps) {
         Object.assign(e.currentTarget.style, baseStyle);
       }}
     >
-      {pinned && <span style={{ fontSize: 10, opacity: .85 }}>⭐</span>}
+      {pinned && <span style={{ opacity: .85, display: 'inline-flex' }}><Icon name="star" size={12} /></span>}
       <span>{text}</span>
     </button>
   );

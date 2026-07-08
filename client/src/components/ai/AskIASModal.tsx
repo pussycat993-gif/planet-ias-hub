@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import Icon from '@/components/ui/Icon';
 import { useAskIASStore } from '../../store/askIASStore';
 import { useAskIASPrefs } from '../../hooks/useAskIASPrefs';
 import { useAskIAS } from '../../hooks/useAskIAS';
@@ -163,7 +164,9 @@ export default function AskIASModal() {
               whiteSpace: 'nowrap',
             }}
           >
-            {editing ? '✕ Close editor' : '✏️ Edit questions'}
+            {editing
+              ? <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Icon name="close" size={12} />Close editor</span>
+              : <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Icon name="edit" size={12} />Edit questions</span>}
           </button>
           <button
             type="button"
@@ -177,8 +180,10 @@ export default function AskIASModal() {
               color: 'var(--text3)',
               padding: '0 4px',
               lineHeight: 1,
+              display: 'inline-flex',
+              alignItems: 'center',
             }}
-          >✕</button>
+          ><Icon name="close" size={18} /></button>
         </div>
 
         {/* Scrollable chat body (grows to fill) */}
@@ -248,7 +253,7 @@ export default function AskIASModal() {
           <span>
             Tip: <Kbd>⌘K</Kbd> or <Kbd>Ctrl+K</Kbd> to toggle · <Kbd>Esc</Kbd> to close
           </span>
-          <span style={{ fontSize: 10 }}>🔌 Powered by {MODEL_LABEL}</span>
+          <span style={{ fontSize: 10, display: 'inline-flex', alignItems: 'center', gap: 4 }}><Icon name="plug" size={11} />Powered by {MODEL_LABEL}</span>
         </div>
       </div>
     </div>
@@ -338,7 +343,7 @@ const PromptInput = React.forwardRef<HTMLTextAreaElement, PromptInputProps>(
           }}
           onMouseEnter={e => { if (canSend) e.currentTarget.style.background = BLUE_DARK; }}
           onMouseLeave={e => { if (canSend) e.currentTarget.style.background = BLUE; }}
-        >→</button>
+        ><Icon name="send" size={16} /></button>
       </div>
     );
   }

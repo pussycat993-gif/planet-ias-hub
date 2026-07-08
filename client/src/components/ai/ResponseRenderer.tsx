@@ -1,4 +1,5 @@
 import React from 'react';
+import Icon from '@/components/ui/Icon';
 import { useAskIASStore } from '../../store/askIASStore';
 import { useAskIASActions } from '../../hooks/useAskIASActions';
 
@@ -91,7 +92,9 @@ function ListResponse({ content }: { content: any }) {
         textAlign: 'center',
         color: INK_MUTE,
       }}>
-        <div style={{ fontSize: 26, marginBottom: 6, opacity: .5 }}>{allItems.length > 0 ? '✅' : '☕'}</div>
+        <div style={{ marginBottom: 6, opacity: .5, display: 'flex', justifyContent: 'center' }}>
+          {allItems.length > 0 ? <Icon name="check-circle" size={26} /> : <Icon name="coffee" size={26} />}
+        </div>
         <div style={{ fontSize: 12, fontWeight: 600, color: INK_DIM }}>
           {allItems.length > 0 ? 'All caught up!' : 'Nothing urgent right now'}
         </div>
@@ -185,10 +188,10 @@ function ListRow({ index, item, isLast }: { index: number; item: ListItem; isLas
         style={{ display: 'flex', gap: 5, flexShrink: 0, alignItems: 'flex-start', marginTop: 1 }}
       >
         {showJoin
-          ? <ActionButton variant="join" onClick={handleJoin}>📹 Join</ActionButton>
+          ? <ActionButton variant="join" onClick={handleJoin}><span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Icon name="video" size={12} />Join</span></ActionButton>
           : <ActionButton variant="open" onClick={handleOpen}>Open</ActionButton>}
         {showDone && (
-          <ActionButton variant="done" onClick={handleDone}>✓ Done</ActionButton>
+          <ActionButton variant="done" onClick={handleDone}><span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Icon name="check" size={12} />Done</span></ActionButton>
         )}
       </div>
     </div>
@@ -247,7 +250,7 @@ function SummaryResponse({ content }: { content: any }) {
               marginBottom: 5,
               lineHeight: 1.5,
             }}>
-              <span style={{ color: BLUE, marginTop: 2, flexShrink: 0 }}>▸</span>
+              <span style={{ color: BLUE, marginTop: 2, flexShrink: 0, display: 'inline-flex' }}><Icon name="chevron-right" size={14} /></span>
               <span>{parseInline(h)}</span>
             </li>
           ))}

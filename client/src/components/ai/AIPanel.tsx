@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import Icon from '@/components/ui/Icon';
 import { useUIStore } from '../../store/uiStore';
 import { useChatStore } from '../../store/chatStore';
 import axios from 'axios';
@@ -105,11 +106,11 @@ export default function AIPanel() {
         color: '#fff', padding: '7px 12px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0,
       }}>
-        <span style={{ fontSize: 12, fontWeight: 700 }}>🤖 IAS Hub AI</span>
+        <span style={{ fontSize: 12, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 6 }}><Icon name="bot" size={14} />IAS Hub AI</span>
         <span
-          style={{ cursor: 'pointer', fontSize: 14, opacity: .8 }}
+          style={{ cursor: 'pointer', opacity: .8, display: 'inline-flex', alignItems: 'center' }}
           onClick={toggleAIPanel}
-        >✕</span>
+        ><Icon name="close" size={14} /></span>
       </div>
 
       {/* Messages */}
@@ -220,8 +221,9 @@ export default function AIPanel() {
             color: '#fff', border: 'none', borderRadius: 6,
             cursor: input.trim() ? 'pointer' : 'default',
             fontSize: 11, fontFamily: 'inherit',
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
           }}
-        >▶</button>
+        ><Icon name="send" size={14} /></button>
       </div>
     </div>
   );

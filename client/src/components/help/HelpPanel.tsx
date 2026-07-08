@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import Icon, { IconName } from '@/components/ui/Icon';
 
 const BLUE = 'var(--blue-primary)';
 const BLUE_DARK = 'var(--blue-dark)';
@@ -7,7 +8,8 @@ const BLUE_DARK = 'var(--blue-dark)';
 const SECTIONS = [
   {
     id: 'getting-started',
-    title: '🚀 Getting Started',
+    icon: 'rocket' as IconName,
+    title: 'Getting Started',
     articles: [
       {
         id: 'login',
@@ -23,7 +25,8 @@ const SECTIONS = [
   },
   {
     id: 'navigation',
-    title: '🗺️ Navigation',
+    icon: 'map' as IconName,
+    title: 'Navigation',
     articles: [
       {
         id: 'tabs',
@@ -44,7 +47,8 @@ const SECTIONS = [
   },
   {
     id: 'messaging',
-    title: '💬 Messaging',
+    icon: 'message' as IconName,
+    title: 'Messaging',
     articles: [
       {
         id: 'sending',
@@ -85,7 +89,8 @@ const SECTIONS = [
   },
   {
     id: 'channels-groups',
-    title: '📢 Channels & Groups',
+    icon: 'megaphone' as IconName,
+    title: 'Channels & Groups',
     articles: [
       {
         id: 'channels-overview',
@@ -111,7 +116,8 @@ const SECTIONS = [
   },
   {
     id: 'calls',
-    title: '📹 Audio & Video Calls',
+    icon: 'video' as IconName,
+    title: 'Audio & Video Calls',
     articles: [
       {
         id: 'starting-call',
@@ -137,7 +143,8 @@ const SECTIONS = [
   },
   {
     id: 'schedule-meet',
-    title: '📅 Schedule Meeting',
+    icon: 'calendar' as IconName,
+    title: 'Schedule Meeting',
     articles: [
       {
         id: 'schedule-overview',
@@ -148,7 +155,8 @@ const SECTIONS = [
   },
   {
     id: 'pci-integration',
-    title: '🔗 PLANet Contact IAS Integration',
+    icon: 'link' as IconName,
+    title: 'PLANet Contact IAS Integration',
     articles: [
       {
         id: 'pci-panel',
@@ -164,7 +172,8 @@ const SECTIONS = [
   },
   {
     id: 'automations',
-    title: '⚡ Automations',
+    icon: 'zap' as IconName,
+    title: 'Automations',
     articles: [
       {
         id: 'automations-overview',
@@ -175,7 +184,8 @@ const SECTIONS = [
   },
   {
     id: 'ai-assistant',
-    title: '🤖 AI Assistant',
+    icon: 'bot' as IconName,
+    title: 'AI Assistant',
     articles: [
       {
         id: 'ai-overview',
@@ -186,7 +196,8 @@ const SECTIONS = [
   },
   {
     id: 'keyboard-shortcuts',
-    title: '⌨️ Keyboard Shortcuts',
+    icon: 'keyboard' as IconName,
+    title: 'Keyboard Shortcuts',
     articles: [
       {
         id: 'shortcuts',
@@ -232,13 +243,13 @@ export default function HelpPanel({ onClose }: { onClose: () => void }) {
             <div style={{ fontWeight: 700, fontSize: 17 }}>IAS Hub — Help & Documentation</div>
             <div style={{ fontSize: 11, opacity: .7, marginTop: 2 }}>Everything you need to know about IAS Hub</div>
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#fff', fontSize: 20, cursor: 'pointer', opacity: .8 }}>✕</button>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', opacity: .8, display: 'flex', alignItems: 'center' }}><Icon name="close" size={20} color="#fff" /></button>
         </div>
 
         {/* Search bar */}
         <div style={{ padding: '12px 20px', borderBottom: '1px solid #eee', flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#f5f6f8', borderRadius: 10, padding: '8px 14px', border: '1px solid #eee' }}>
-            <span style={{ color: '#aaa', fontSize: 16 }}>🔍</span>
+            <Icon name="search" size={16} color="#aaa" />
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
@@ -246,7 +257,7 @@ export default function HelpPanel({ onClose }: { onClose: () => void }) {
               autoFocus
               style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: 14, fontFamily: 'inherit', color: '#1a1a2e' }}
             />
-            {search && <span onClick={() => setSearch('')} style={{ color: '#bbb', cursor: 'pointer', fontSize: 16 }}>✕</span>}
+            {search && <span onClick={() => setSearch('')} style={{ color: '#bbb', cursor: 'pointer', display: 'flex', alignItems: 'center' }}><Icon name="close" size={16} /></span>}
           </div>
         </div>
 
@@ -258,7 +269,7 @@ export default function HelpPanel({ onClose }: { onClose: () => void }) {
             <div style={{ flex: 1, overflowY: 'auto', padding: '8px 20px' }}>
               {results.length === 0 ? (
                 <div style={{ padding: '40px 0', textAlign: 'center', color: '#aaa' }}>
-                  <div style={{ fontSize: 32, marginBottom: 10 }}>🔍</div>
+                  <div style={{ marginBottom: 10, display: 'flex', justifyContent: 'center' }}><Icon name="search" size={32} /></div>
                   <div style={{ fontSize: 14 }}>No results for "{search}"</div>
                   <div style={{ fontSize: 12, marginTop: 6 }}>Try different keywords</div>
                 </div>
@@ -293,6 +304,7 @@ export default function HelpPanel({ onClose }: { onClose: () => void }) {
                       style={{ padding: '9px 16px', cursor: 'pointer', fontSize: 13, fontWeight: 500, color: '#333', display: 'flex', alignItems: 'center', gap: 6 }}
                       onMouseEnter={e => (e.currentTarget.style.background = '#f0f7ff')}
                       onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+                      <Icon name={s.icon} size={16} />
                       {s.title}
                     </div>
                   ))
@@ -301,7 +313,7 @@ export default function HelpPanel({ onClose }: { onClose: () => void }) {
                     <div onClick={() => { setActiveSection(null); setActiveArticle(null); }} style={{ padding: '8px 16px', cursor: 'pointer', fontSize: 12, color: BLUE, display: 'flex', alignItems: 'center', gap: 5, borderBottom: '1px solid #f0f0f0', marginBottom: 4 }}
                       onMouseEnter={e => (e.currentTarget.style.background = '#f0f7ff')}
                       onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-                      ← All topics
+                      <Icon name="arrow-left" size={12} /> All topics
                     </div>
                     {currentSection?.articles.map(a => (
                       <div key={a.id}
@@ -330,7 +342,7 @@ export default function HelpPanel({ onClose }: { onClose: () => void }) {
                           style={{ padding: '14px 16px', border: '1px solid #eee', borderRadius: 10, cursor: 'pointer', transition: 'all .15s' }}
                           onMouseEnter={e => { e.currentTarget.style.background = '#f0f7ff'; e.currentTarget.style.borderColor = '#90caf9'; }}
                           onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#eee'; }}>
-                          <div style={{ fontSize: 15, marginBottom: 4 }}>{s.title}</div>
+                          <div style={{ fontSize: 15, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8 }}><Icon name={s.icon} size={18} />{s.title}</div>
                           <div style={{ fontSize: 11, color: '#888' }}>{s.articles.length} article{s.articles.length !== 1 ? 's' : ''}</div>
                         </div>
                       ))}
@@ -368,7 +380,7 @@ export default function HelpPanel({ onClose }: { onClose: () => void }) {
                             <div style={{ fontSize: 11, color: '#888', marginBottom: 2 }}>Next article</div>
                             <div style={{ fontSize: 13, fontWeight: 600, color: BLUE }}>{next.title}</div>
                           </div>
-                          <span style={{ color: BLUE, fontSize: 18 }}>→</span>
+                          <Icon name="arrow-right" size={18} color={BLUE} />
                         </div>
                       ) : null;
                     })()}

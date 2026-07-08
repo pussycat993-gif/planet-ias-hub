@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pin, X } from '@/components/ui/Icon';
+import Icon from '@/components/ui/Icon';
 
 const BLUE_DARK = 'var(--blue-dark)';
 
@@ -33,18 +33,18 @@ export default function PinnedPanel({ messages, onClose, onJump }: Props) {
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderBottom: '1px solid var(--border)' }}>
           <div>
-            <div style={{ fontWeight: 700, fontSize: 14, color: BLUE_DARK, display: 'flex', alignItems: 'center', gap: 6 }}><Pin size={15} /> Pinned Messages</div>
+            <div style={{ fontWeight: 700, fontSize: 14, color: BLUE_DARK, display: 'flex', alignItems: 'center', gap: 6 }}><Icon name="pin" size={15} /> Pinned Messages</div>
             <div style={{ fontSize: 11, color: 'var(--text3)', marginTop: 1 }}>{messages.length} pinned</div>
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text3)', display: 'inline-flex' }}><X size={18} /></button>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text3)', display: 'inline-flex' }}><Icon name="close" size={18} /></button>
         </div>
 
         <div style={{ flex: 1, overflowY: 'auto' }}>
           {messages.length === 0 ? (
             <div style={{ padding: '32px 20px', textAlign: 'center', color: 'var(--text3)' }}>
-              <div style={{ marginBottom: 10 }}><Pin size={32} /></div>
+              <div style={{ marginBottom: 10 }}><Icon name="pin" size={32} /></div>
               <div style={{ fontSize: 13 }}>No pinned messages yet</div>
-              <div style={{ fontSize: 11, marginTop: 6, color: 'var(--text3)' }}>Hover a message and click <Pin size={11} style={{ verticalAlign: '-1px' }} /> to pin it</div>
+              <div style={{ fontSize: 11, marginTop: 6, color: 'var(--text3)' }}>Hover a message and click <Icon name="pin" size={11} style={{ verticalAlign: '-1px' }} /> to pin it</div>
             </div>
           ) : (
             messages.map(msg => (
@@ -66,7 +66,9 @@ export default function PinnedPanel({ messages, onClose, onJump }: Props) {
 
                 {/* Body */}
                 <div style={{ fontSize: 12, color: 'var(--text2)', lineHeight: 1.5, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
-                  {msg.message_type === 'file' ? `📎 ${msg.body}` : msg.body || 'Message'}
+                  {msg.message_type === 'file'
+                    ? <><Icon name="attach" size={12} style={{ verticalAlign: '-1px', marginRight: 4 }} />{msg.body}</>
+                    : msg.body || 'Message'}
                 </div>
 
                 <div style={{ fontSize: 10, color: 'var(--blue-primary)', marginTop: 5 }}>Jump to message →</div>

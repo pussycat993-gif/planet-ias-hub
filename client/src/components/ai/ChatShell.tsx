@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import Icon from '@/components/ui/Icon';
 import { useAskIASStore, type Turn } from '../../store/askIASStore';
 import { useAskIAS } from '../../hooks/useAskIAS';
 import ResponseRenderer from './ResponseRenderer';
@@ -71,7 +72,7 @@ function EmptyState() {
       color: 'var(--text3)',
       textAlign: 'center',
     }}>
-      <div style={{ fontSize: 34, marginBottom: 10, opacity: .45 }}>✨</div>
+      <div style={{ marginBottom: 10, opacity: .45, display: 'flex', justifyContent: 'center' }}><Icon name="sparkles" size={34} /></div>
       <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text2)', marginBottom: 4 }}>
         What can I help you with?
       </div>
@@ -244,7 +245,7 @@ function ErrorBody({ error, turnId }: { error: string; turnId: string }) {
         onMouseEnter={e => { if (!retrying) e.currentTarget.style.background = '#ffebee'; }}
         onMouseLeave={e => { if (!retrying) e.currentTarget.style.background = 'var(--surface)'; }}
       >
-        {retrying ? 'Retrying…' : '↻ Retry'}
+        {retrying ? 'Retrying…' : <><Icon name="rotate" size={12} />Retry</>}
       </button>
     </div>
   );

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { useChatStore } from '../../store/chatStore';
 import { useCallStore } from '../../store/callStore';
+import Icon from '@/components/ui/Icon';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
@@ -91,10 +92,10 @@ export default function UpcomingMeetingBanner() {
     const minsElapsed   = Math.floor((now - startMs) / 60_000);
     const minsRemaining = Math.ceil((endMs - now) / 60_000);
     label = minsRemaining <= 1
-      ? '🔴 In progress · ending soon'
+      ? 'In progress · ending soon'
       : minsElapsed === 0
-        ? '🔴 In progress · just started'
-        : `🔴 In progress · ${minsElapsed} min elapsed`;
+        ? 'In progress · just started'
+        : `In progress · ${minsElapsed} min elapsed`;
   }
 
   const handleJoin = () => {
@@ -144,27 +145,29 @@ export default function UpcomingMeetingBanner() {
       flexShrink: 0,
       borderBottom: '1px solid rgba(255,255,255,.15)',
     }}>
-      <span style={{ fontSize: 16, animation: shouldPulse ? 'ias-meet-pulse 1.2s infinite' : undefined }}>📅</span>
+      <span style={{ display: 'inline-flex', animation: shouldPulse ? 'ias-meet-pulse 1.2s infinite' : undefined }}><Icon name="calendar" size={16} color="#fff" /></span>
       <style>{`@keyframes ias-meet-pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.2)} }`}</style>
 
       <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
-        <span style={{ fontWeight: 700, marginRight: 8 }}>{label}:</span>
+        <span style={{ fontWeight: 700, marginRight: 8 }}>
+          {isInProgress && <Icon name="circle" size={13} color="#c62828" fill="#c62828" style={{ verticalAlign: '-1px', marginRight: 5 }} />}
+          {label}:</span>
         <span style={{ fontWeight: 600 }}>{imminent.subject}</span>
         <span style={{ opacity: 0.85, marginLeft: 6 }}>
           · {channelLabel} · {imminent.duration_minutes} min
         </span>
       </div>
 
-      <button onClick={handleJoin} style={btn('#fff', joinBtnColor, true)}>
-        📹 Join{isInProgress ? ' now' : ''}
+      <button onClick={handleJoin} style={{ ...btn('#fff', joinBtnColor, true), display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+        <Icon name="video" size={12} /> Join{isInProgress ? ' now' : ''}
       </button>
       {activeChannelId !== imminent.channel_id && (
         <button onClick={handleView} style={btn('transparent', '#fff')}>
           View
         </button>
       )}
-      <button onClick={handleDismiss} style={btn('transparent', '#fff')} title="Dismiss">
-        ✕
+      <button onClick={handleDismiss} style={{ ...btn('transparent', '#fff'), display: 'inline-flex', alignItems: 'center' }} title="Dismiss">
+        <Icon name="close" size={12} color="#fff" />
       </button>
     </div>
   );

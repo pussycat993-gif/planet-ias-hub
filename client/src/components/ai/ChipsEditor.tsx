@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import Icon from '@/components/ui/Icon';
 import { DEFAULT_CUSTOM_CHIPS, PINNED_CHIP } from '../../hooks/useAskIASPrefs';
 
 const BLUE = 'var(--blue-primary)';
@@ -100,7 +101,7 @@ export default function ChipsEditor({ chips, saving, onSave, onReset, onClose }:
         num={1}
         value={PINNED_CHIP}
         readonly
-        rightLabel="⭐ Pinned"
+        rightLabel={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}><Icon name="star" size={12} />Pinned</span>}
       />
 
       {/* Rows 2-4 — editable */}
@@ -200,7 +201,7 @@ interface RowProps {
   num: number;
   value: string;
   readonly?: boolean;
-  rightLabel?: string;
+  rightLabel?: React.ReactNode;
   onChange?: (v: string) => void;
   error?: boolean;
   maxLength?: number;

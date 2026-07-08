@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User } from '@/components/ui/Icon';
+import Icon, { IconName } from '@/components/ui/Icon';
 import { usePCIStore } from '../../store/pciStore';
 import { useUIStore } from '../../store/uiStore';
 import { useChatStore } from '../../store/chatStore';
@@ -53,12 +53,12 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 function ActivityRow({ act }: { act: typeof MOCK_CONTEXT.recent_activities[0] }) {
-  const typeIcon: Record<string, string> = { Meeting: '📅', Call: '📞', Email: '📧', Task: '✅', Note: '📝' };
+  const typeIcon: Record<string, IconName> = { Meeting: 'calendar', Call: 'phone', Email: 'mail', Task: 'check-circle', Note: 'file-text' };
   return (
     <div style={{ display: 'flex', padding: '5px 11px', borderBottom: '1px solid var(--neutral-light-active)', gap: 6, cursor: 'pointer', alignItems: 'center', background: act.status === 'Active' ? 'var(--blue-xlight)' : 'var(--surface)' }}
       onMouseEnter={e => (e.currentTarget.style.filter = 'brightness(.97)')}
       onMouseLeave={e => (e.currentTarget.style.filter = 'none')}>
-      <span style={{ fontSize: 11, width: 18, flexShrink: 0 }}>{typeIcon[act.type] || '•'}</span>
+      <span style={{ fontSize: 11, width: 18, flexShrink: 0, display: 'inline-flex', alignItems: 'center' }}>{typeIcon[act.type] ? <Icon name={typeIcon[act.type]} size={11} /> : '•'}</span>
       <span style={{ color: 'var(--text3)', fontSize: 10, width: 50, flexShrink: 0 }}>{act.date.slice(5).replace('-', '/')}</span>
       <span style={{ color: BLUE, fontSize: 11, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{act.subject}</span>
       <StatusBadge status={act.status} />
@@ -169,7 +169,7 @@ export default function PCIContextPanel() {
   if (!data) {
     return (
       <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text3)', fontSize: 12 }}>
-        <div style={{ marginBottom: 10 }}><User size={28} /></div>
+        <div style={{ marginBottom: 10 }}><Icon name="user" size={28} /></div>
         Select a conversation to see PCI context
       </div>
     );
@@ -195,9 +195,9 @@ export default function PCIContextPanel() {
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontWeight: 700, fontSize: 13, color: BLUE_DARK }}>{person.name}</div>
           <div style={{ fontSize: 10, color: 'var(--text3)', marginTop: 1 }}>{person.role}</div>
-          <span style={{ display: 'inline-block', padding: '1px 7px', background: 'rgba(76,175,80,.15)', color: 'var(--green)', borderRadius: 10, fontSize: 9, fontWeight: 700, border: '1px solid rgba(76,175,80,.4)', marginTop: 3 }}>● {person.status}</span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '1px 7px', background: 'rgba(76,175,80,.15)', color: 'var(--green)', borderRadius: 10, fontSize: 9, fontWeight: 700, border: '1px solid rgba(76,175,80,.4)', marginTop: 3 }}><Icon name="circle" size={9} color="var(--green)" fill="var(--green)" /> {person.status}</span>
         </div>
-        <span title="Demo data — PCI not connected" style={{ fontSize: 10, color: 'var(--text3)' }}>🔌</span>
+        <span title="Demo data — PCI not connected" style={{ display: 'inline-flex', color: 'var(--text3)' }}><Icon name="unplug" size={10} /></span>
       </div>
 
       {/* Fields */}
@@ -220,8 +220,8 @@ export default function PCIContextPanel() {
       {/* Entity tags */}
       <div style={{ padding: '6px 11px', display: 'flex', flexWrap: 'wrap', gap: 4 }}>
         {entities.map(e => (
-          <span key={e.id} style={{ background: 'var(--blue-xlight)', color: BLUE_DARK, border: '1px solid var(--blue-300)', borderRadius: 10, padding: '2px 8px', fontSize: 10, fontWeight: 600, cursor: 'pointer' }}>
-            {e.type === 'Project' ? '📁' : '🏢'} {e.name}
+          <span key={e.id} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'var(--blue-xlight)', color: BLUE_DARK, border: '1px solid var(--blue-300)', borderRadius: 10, padding: '2px 8px', fontSize: 10, fontWeight: 600, cursor: 'pointer' }}>
+            <Icon name={e.type === 'Project' ? 'folder' : 'building'} size={10} /> {e.name}
           </span>
         ))}
       </div>
@@ -232,7 +232,7 @@ export default function PCIContextPanel() {
           style={{ width: '100%', padding: '5px', border: `1px solid ${BLUE}`, color: BLUE, background: 'var(--surface)', cursor: 'pointer', fontSize: 11, borderRadius: 6, fontFamily: 'inherit' }}
           onMouseEnter={e => { e.currentTarget.style.background = BLUE; e.currentTarget.style.color = '#fff'; }}
           onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.color = BLUE; }}>
-          ↗ Open in PCI
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><Icon name="external-link" size={11} /> Open in PCI</span>
         </button>
       </div>
 

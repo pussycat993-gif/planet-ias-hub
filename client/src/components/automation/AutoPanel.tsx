@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { Zap, Settings, Clipboard } from '@/components/ui/Icon';
+import Icon, { IconName } from '@/components/ui/Icon';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 const BLUE = 'var(--blue-primary)';
@@ -28,9 +28,9 @@ interface AutoEvent {
   payload: any;
 }
 
-const EVENT_ICONS: Record<string, string> = {
-  meeting_briefing: '📅', dwm_trigger: '🔄', auto_channel: '⬡',
-  smart_logger: '📝', smart_notif: '🔔', call_summary: '📋', task_due_reminder: '⏰',
+const EVENT_ICONS: Record<string, IconName> = {
+  meeting_briefing: 'calendar', dwm_trigger: 'refresh', auto_channel: 'hexagon',
+  smart_logger: 'file-text', smart_notif: 'bell', call_summary: 'clipboard', task_due_reminder: 'clock',
 };
 const EVENT_LABELS: Record<string, string> = {
   meeting_briefing: 'Meeting Briefing', dwm_trigger: 'DWM Trigger', auto_channel: 'Auto Channel',
@@ -39,7 +39,7 @@ const EVENT_LABELS: Record<string, string> = {
 };
 
 function Toggle({ label, description, value, onChange }: {
-  label: string; description?: string; value: boolean; onChange: (v: boolean) => void;
+  label: React.ReactNode; description?: string; value: boolean; onChange: (v: boolean) => void;
 }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid var(--neutral-light-active)', gap: 8 }}>
@@ -63,12 +63,12 @@ function SectionLabel({ label }: { label: string }) {
 }
 
 function EventRow({ event }: { event: AutoEvent }) {
-  const icon = EVENT_ICONS[event.event_type] || '⚙️';
+  const icon: IconName = EVENT_ICONS[event.event_type] || 'settings';
   const label = EVENT_LABELS[event.event_type] || event.event_type;
   const time = new Date(event.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '6px 11px', borderBottom: '1px solid var(--neutral-light-active)', fontSize: 11 }}>
-      <span style={{ fontSize: 14, flexShrink: 0 }}>{icon}</span>
+      <span style={{ flexShrink: 0, display: 'inline-flex' }}><Icon name={icon} size={14} /></span>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontWeight: 600, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</div>
         <div style={{ fontSize: 10, color: 'var(--text3)' }}>by {event.triggered_by} · {time}</div>
@@ -132,18 +132,18 @@ export default function AutoPanel() {
 
       <div style={{ background: GRAY, color: '#fff', padding: '7px 11px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-          <span style={{ fontWeight: 700, fontSize: 12, display: 'inline-flex', alignItems: 'center', gap: 6 }}><Zap size={13} /> Automations</span>
+          <span style={{ fontWeight: 700, fontSize: 12, display: 'inline-flex', alignItems: 'center', gap: 6 }}><Icon name="zap" size={13} /> Automations</span>
           <span style={{ background: 'rgba(255,255,255,.2)', padding: '1px 6px', borderRadius: 8, fontSize: 10 }}>{activeCount} active</span>
         </div>
-        <button onClick={fetchData} title="Refresh" style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,.7)', cursor: 'pointer', fontSize: 14 }}>↻</button>
+        <button onClick={fetchData} title="Refresh" style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,.7)', cursor: 'pointer', display: 'inline-flex', alignItems: 'center' }}><Icon name="refresh" size={14} /></button>
       </div>
 
       <div style={{ display: 'flex', borderBottom: `2px solid ${GRAY}`, background: 'var(--grey-light)', flexShrink: 0 }}>
         {(['settings', 'events'] as const).map(tab => (
           <div key={tab} onClick={() => setActiveTab(tab)} style={{ flex: 1, textAlign: 'center', padding: '6px 2px', fontSize: 11, cursor: 'pointer', fontWeight: 500, background: activeTab === tab ? GRAY : 'transparent', color: activeTab === tab ? '#fff' : 'var(--text2)' }}>
             {tab === 'settings'
-              ? <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><Settings size={12} /> Settings</span>
-              : <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><Clipboard size={12} /> Events</span>}
+              ? <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><Icon name="settings" size={12} /> Settings</span>
+              : <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><Icon name="clipboard" size={12} /> Events</span>}
           </div>
         ))}
       </div>
@@ -154,21 +154,21 @@ export default function AutoPanel() {
             {saving && <div style={{ fontSize: 10, color: BLUE, padding: '4px 0', textAlign: 'center' }}>Saving...</div>}
 
             <SectionLabel label="Core Modules" />
-            <Toggle label="📝 Smart Activity Logger" description="After each call, suggests a PCI activity log with detected people, entities and action items from the transcript" value={settings.smart_logger} onChange={v => updateSetting('smart_logger', v)} />
-            <Toggle label="📅 Meeting Prep Briefing" description="Posts a briefing card in the channel with PCI context before upcoming meetings" value={settings.meeting_briefing} onChange={v => updateSetting('meeting_briefing', v)} />
-            <Toggle label="🔄 DWM Workflow Trigger" description="Approve or reject PCI document workflow steps directly from the chat" value={settings.dwm_trigger} onChange={v => updateSetting('dwm_trigger', v)} />
-            <Toggle label="⬡ Auto-Channel from PCI" description="Creates a group channel when a new Client project or entity is added in PLANet Contact IAS" value={settings.auto_channel} onChange={v => updateSetting('auto_channel', v)} />
-            <Toggle label="🔔 Smart Notifications" description="Suppresses muted channel noise, elevates @mentions and Jira task references" value={settings.smart_notif} onChange={v => updateSetting('smart_notif', v)} />
+            <Toggle label={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><Icon name="file-text" size={12} /> Smart Activity Logger</span>} description="After each call, suggests a PCI activity log with detected people, entities and action items from the transcript" value={settings.smart_logger} onChange={v => updateSetting('smart_logger', v)} />
+            <Toggle label={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><Icon name="calendar" size={12} /> Meeting Prep Briefing</span>} description="Posts a briefing card in the channel with PCI context before upcoming meetings" value={settings.meeting_briefing} onChange={v => updateSetting('meeting_briefing', v)} />
+            <Toggle label={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><Icon name="refresh" size={12} /> DWM Workflow Trigger</span>} description="Approve or reject PCI document workflow steps directly from the chat" value={settings.dwm_trigger} onChange={v => updateSetting('dwm_trigger', v)} />
+            <Toggle label={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><Icon name="hexagon" size={12} /> Auto-Channel from PCI</span>} description="Creates a group channel when a new Client project or entity is added in PLANet Contact IAS" value={settings.auto_channel} onChange={v => updateSetting('auto_channel', v)} />
+            <Toggle label={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><Icon name="bell" size={12} /> Smart Notifications</span>} description="Suppresses muted channel noise, elevates @mentions and Jira task references" value={settings.smart_notif} onChange={v => updateSetting('smart_notif', v)} />
 
             <SectionLabel label="New Modules" />
             <Toggle
-              label="📋 Call Summary to Channel"
+              label={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><Icon name="clipboard" size={12} /> Call Summary to Channel</span>}
               description="After a call ends, automatically posts a summary card in the channel — duration, participants, and key action items from the transcript"
               value={settings.call_summary}
               onChange={v => updateSetting('call_summary', v)}
             />
             <Toggle
-              label="⏰ Task Due Reminder"
+              label={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><Icon name="clock" size={12} /> Task Due Reminder</span>}
               description="Sends a notification and posts a reminder card in the relevant channel when a Jira task deadline is approaching"
               value={settings.task_due_reminder}
               onChange={v => updateSetting('task_due_reminder', v)}
@@ -207,8 +207,10 @@ export default function AutoPanel() {
               {MODULE_LIST.map(({ key, label }) => (
                 <div key={key} style={{ display: 'flex', justifyContent: 'space-between', padding: '2px 0', color: 'var(--text2)' }}>
                   <span>{label}</span>
-                  <span style={{ fontWeight: 700, color: (settings as any)[key] ? 'var(--green)' : 'var(--text3)' }}>
-                    {(settings as any)[key] ? '● ON' : '○ OFF'}
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontWeight: 700, color: (settings as any)[key] ? 'var(--green)' : 'var(--text3)' }}>
+                    {(settings as any)[key]
+                      ? <><Icon name="circle" size={10} color="var(--green)" fill="var(--green)" /> ON</>
+                      : <><Icon name="circle-dot" size={10} color="var(--text3)" /> OFF</>}
                   </span>
                 </div>
               ))}
@@ -219,7 +221,7 @@ export default function AutoPanel() {
         {activeTab === 'events' && (
           events.length === 0 ? (
             <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text3)', fontSize: 12 }}>
-              <div style={{ marginBottom: 8 }}><Zap size={28} /></div>
+              <div style={{ marginBottom: 8 }}><Icon name="zap" size={28} /></div>
               No automation events yet
             </div>
           ) : events.map(e => <EventRow key={e.id} event={e} />)

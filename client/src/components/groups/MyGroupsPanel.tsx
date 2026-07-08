@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useChatStore } from '../../store/chatStore';
+import Icon from '@/components/ui/Icon';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 const BLUE = 'var(--blue-primary)';
@@ -122,7 +123,7 @@ function EditGroupModal({ group, onClose, onSaved }: {
             <GroupLogo group={{ ...group, logo_color: logoColor, logo_abbr: logoAbbr || name.slice(0, 2).toUpperCase(), logo_url: logoUrl }} size={32} />
             <span style={{ fontWeight: 700, fontSize: 15, color: BLUE_DARK }}>Edit Group</span>
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: 'var(--text3)' }}>✕</button>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text3)', display: 'inline-flex' }}><Icon name="close" size={18} /></button>
         </div>
 
         <div style={{ padding: 18, overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -156,7 +157,7 @@ function EditGroupModal({ group, onClose, onSaved }: {
               <div>
                 <div style={{ fontSize: 11, color: 'var(--text3)', marginBottom: 5 }}>Image</div>
                 <div onClick={() => fileRef.current?.click()} style={{ width: 44, height: 44, borderRadius: 8, border: '2px dashed var(--blue-300)', background: logoUrl ? 'transparent' : 'var(--blue-xlight)', backgroundImage: logoUrl ? `url(${logoUrl})` : 'none', backgroundSize: 'cover', backgroundPosition: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 20 }}>
-                  {!logoUrl && '📷'}
+                  {!logoUrl && <Icon name="camera" size={20} />}
                 </div>
                 <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleLogoFile} />
                 {logoUrl && <div onClick={() => setLogoUrl(null)} style={{ fontSize: 10, color: 'var(--text3)', cursor: 'pointer', marginTop: 3, textAlign: 'center' }}>Remove</div>}
@@ -186,10 +187,10 @@ function EditGroupModal({ group, onClose, onSaved }: {
                       <div style={{ fontSize: 12, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name}</div>
                       <div style={{ fontSize: 10, color: 'var(--text3)' }}>{m.role || m.email}</div>
                     </div>
-                    <span onClick={() => removeMember(m.id)} title="Remove" style={{ color: 'var(--text3)', cursor: 'pointer', fontSize: 16, lineHeight: 1 }}
+                    <span onClick={() => removeMember(m.id)} title="Remove" style={{ color: 'var(--text3)', cursor: 'pointer', lineHeight: 1, display: 'inline-flex' }}
                       onMouseEnter={e => (e.currentTarget.style.color = '#c62828')}
                       onMouseLeave={e => (e.currentTarget.style.color = 'var(--text3)')}
-                    >✕</span>
+                    ><Icon name="close" size={16} /></span>
                   </div>
                 ))}
               </div>
@@ -261,7 +262,7 @@ export default function MyGroupsPanel() {
 
       {groups.length === 0 ? (
         <div style={{ padding: '28px 16px', textAlign: 'center', color: 'var(--text3)' }}>
-          <div style={{ fontSize: 28, marginBottom: 8 }}>⬡</div>
+          <div style={{ marginBottom: 8, display: 'flex', justifyContent: 'center' }}><Icon name="hexagon" size={28} /></div>
           <div style={{ fontSize: 13 }}>No groups yet</div>
           <div style={{ fontSize: 11, marginTop: 4, color: 'var(--text3)' }}>Create one from the toolbar</div>
         </div>
@@ -280,7 +281,7 @@ export default function MyGroupsPanel() {
           <div onClick={() => setEditingGroup(group)} title="Edit group" style={{ width: 28, height: 28, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text3)', fontSize: 13, flexShrink: 0 }}
             onMouseEnter={e => { e.currentTarget.style.background = 'var(--blue-xlight)'; e.currentTarget.style.color = BLUE; }}
             onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text3)'; }}
-          >✏️</div>
+          ><Icon name="edit" size={13} /></div>
         </div>
       ))}
     </div>
