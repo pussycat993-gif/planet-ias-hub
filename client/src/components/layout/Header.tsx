@@ -7,7 +7,7 @@ import { useAskIASStore } from '../../store/askIASStore';
 import NotifDropdown from './NotifDropdown';
 import AskIASButton from '../ai/AskIASButton';
 import { retrySocketNow } from '../../hooks/useSocket';
-import { Search, X, Bell, ChevronDown, Pin } from '@/components/ui/Icon';
+import Icon, { IconName } from '@/components/ui/Icon';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 const BLUE_DARK = 'var(--blue-dark)';
@@ -81,7 +81,7 @@ function HelpModal({ onClose }: { onClose: () => void }) {
         style={{ background: 'var(--surface)', width: 460, maxWidth: '92vw', borderRadius: 12, boxShadow: '0 16px 60px rgba(0,0,0,.3)', overflow: 'hidden' }}>
         <div style={{ background: BLUE_DARK, color: '#fff', padding: '12px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span style={{ fontWeight: 700, fontSize: 14 }}>Keyboard shortcuts</span>
-          <span onClick={onClose} style={{ cursor: 'pointer', opacity: .8, display: 'inline-flex' }}><X size={18} /></span>
+          <span onClick={onClose} style={{ cursor: 'pointer', opacity: .8, display: 'inline-flex' }}><Icon name="close" size={18} /></span>
         </div>
         <div style={{ padding: '8px 18px 18px' }}>
           {rows.map(([key, desc]) => (
@@ -100,26 +100,16 @@ function HelpModal({ onClose }: { onClose: () => void }) {
 }
 
 // ── Profile dropdown ──────────────────────────────────────
+// Thin adapter mapping the dropdown's local icon names to the central
+// Icon registry, so the many <MenuIcon name="..."/> call sites below stay
+// unchanged while the icons now come from Lucide (was an inline <svg> set).
+const MENU_ICONS: Record<string, IconName> = {
+  bell: 'bell', bellOff: 'bell-off', user: 'user', settings: 'settings',
+  help: 'help', logout: 'logout', schedule: 'calendar', smile: 'smile',
+  copy: 'copy', check: 'check', chevron: 'chevron-right',
+};
 function MenuIcon({ name, color }: { name: string; color?: string }) {
-  const c = color || 'var(--text2)';
-  const paths: Record<string, React.ReactNode> = {
-    bell: <><path d="M10 5a2 2 0 1 1 4 0c3 1 4 3 4 6v3l1 2H5l1-2v-3c0-3 1-5 4-6"/><path d="M9 17a3 3 0 0 0 6 0"/></>,
-    bellOff: <><path d="M3 3l18 18"/><path d="M17 17H5l1-2v-3c0-1 .2-2 .5-2.9M9 5c.3-.3.6-.5 1-.7A2 2 0 0 1 14 5c3 1 4 3 4 6v1"/><path d="M9 17a3 3 0 0 0 6 0"/></>,
-    user: <><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.3 3.1-5 7-5s7 1.7 7 5"/></>,
-    settings: <><circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M5 5l1.5 1.5M17.5 17.5L19 19M3 12h2M19 12h2M5 19l1.5-1.5M17.5 6.5L19 5"/></>,
-    help: <><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 4 1.5c0 1.5-2 1.8-2 3.2"/><circle cx="12" cy="17" r=".7" fill={c} stroke="none"/></>,
-    logout: <><path d="M14 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8"/><path d="M16 16l4-4-4-4M20 12H9"/></>,
-    schedule: <><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 9h16M8 3v4M16 3v4"/></>,
-    smile: <><circle cx="12" cy="12" r="9"/><path d="M8.5 14a4 4 0 0 0 7 0"/><circle cx="9" cy="10" r=".7" fill={c} stroke="none"/><circle cx="15" cy="10" r=".7" fill={c} stroke="none"/></>,
-    copy: <><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></>,
-    check: <path d="M5 12l5 5L20 6"/>,
-    chevron: <path d="M9 6l6 6-6 6"/>,
-  };
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      {paths[name]}
-    </svg>
-  );
+  return <Icon name={MENU_ICONS[name]} size={18} strokeWidth={1.8} color={color || 'var(--text2)'} />;
 }
 
 function ProfileDropdown({ onClose, onOpenHelp }: { onClose: () => void; onOpenHelp: () => void }) {
@@ -273,162 +263,13 @@ function ProfileDropdown({ onClose, onOpenHelp }: { onClose: () => void; onOpenH
   );
 }
 
-function ProfileDropdown_OLD_UNUSED({ onClose, onOpenHelp }: { onClose: () => void; onOpenHelp: () => void }) {
-  const { user, logout, setAutoStatus } = useAuthStore();
-  const { myStatus, myStatusMessage, setMyStatus, setMyStatusMessage, dnd, toggleDnd, openModal } = useUIStore();
-
-  // Auto-status takes precedence over the manual status.
-  const autoStatus = user?.auto_status;
-  const manualColor = myStatus === 'online' ? '#4caf50' : myStatus === 'away' ? '#ff9800' : '#bbb';
-  const statusColor = autoStatus === 'focus' ? '#e65100'
-    : autoStatus === 'in_call' ? '#2e7d32'
-    : manualColor;
-  const autoLabel = autoStatus === 'focus' ? '🎯 Focus mode'
-    : autoStatus === 'in_call' ? '📞 In a call'
-    : autoStatus === 'in_meeting' ? '🎥 In a meeting'
-    : null;
-
-  const applyStatus = (s: 'online' | 'away' | 'offline') => {
-    setMyStatus(s);
-    if (user) axios.patch(`${API}/users/${user.id}/status`, { status: s }).catch(() => {});
-  };
-
-  const clearAutoStatus = async () => {
-    await setAutoStatus(null, null);
-    if (autoStatus === 'focus' && dnd) toggleDnd();
-  };
-
-  const initials = (user?.name || 'U').split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2);
-
-  return (
-    <div style={{ width: 300, background: '#fff', borderRadius: 12, boxShadow: '0 8px 40px rgba(0,0,0,.18)', border: '1px solid #e8e8e8', fontFamily: 'Segoe UI, Arial, sans-serif', overflow: 'hidden' }}>
-      {/* Avatar + name + email */}
-      <div style={{ padding: '20px 16px 14px', textAlign: 'center', borderBottom: '1px solid #f0f0f0' }}>
-        <div style={{ width: 72, height: 72, borderRadius: '50%', margin: '0 auto 10px', position: 'relative', overflow: 'hidden', background: user?.avatar_url ? 'transparent' : stringToColor(user?.name || 'U'), display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, fontWeight: 700, color: '#fff', boxShadow: '0 2px 12px rgba(0,0,0,.12)' }}>
-          {user?.avatar_url ? (
-            <img src={user.avatar_url} alt={user.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          ) : initials}
-          {/* Emoji overlay if set, else status dot */}
-          {user?.status_emoji ? (
-            <div style={{ position: 'absolute', bottom: -2, right: -2, width: 26, height: 26, borderRadius: '50%', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, boxShadow: '0 1px 3px rgba(0,0,0,.2)' }}>
-              {user.status_emoji}
-            </div>
-          ) : (
-            <div style={{ position: 'absolute', bottom: 3, right: 3, width: 14, height: 14, borderRadius: '50%', background: statusColor, border: '2.5px solid #fff' }} />
-          )}
-        </div>
-        <div style={{ fontWeight: 700, fontSize: 16, color: '#1a1a2e', marginBottom: 3 }}>{user?.name || 'User'}</div>
-        <div style={{ fontSize: 12, color: '#888' }}>{user?.email || ''}</div>
-
-        {(autoLabel || myStatusMessage) && (
-          <div style={{ marginTop: 8, display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 10px', background: autoStatus === 'focus' ? '#fff3e0' : '#f0f7ff', border: `1px solid ${autoStatus === 'focus' ? '#ffcc80' : '#c5def9'}`, borderRadius: 12, fontSize: 11, color: autoStatus === 'focus' ? '#e65100' : BLUE_DARK, fontWeight: 600 }}>
-            {autoLabel ? <span>{autoLabel}</span> : <span>💬 {myStatusMessage}</span>}
-          </div>
-        )}
-
-        <button style={{ marginTop: 12, width: '100%', padding: '8px 12px', border: '1px solid #dde1e7', borderRadius: 8, background: '#fff', cursor: 'pointer', fontSize: 13, fontFamily: 'inherit', fontWeight: 600, color: '#1a1a2e' }}
-          onMouseEnter={e => (e.currentTarget.style.background = '#f5f5f5')}
-          onMouseLeave={e => (e.currentTarget.style.background = '#fff')}>
-          Manage account
-        </button>
-      </div>
-
-      {/* Status section */}
-      <div style={{ borderBottom: '1px solid #f0f0f0' }}>
-        <div
-          onClick={() => { openModal('setStatus'); onClose(); }}
-          style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', cursor: 'pointer' }}
-          onMouseEnter={e => (e.currentTarget.style.background = '#f5f5f5')}
-          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-          <span style={{ fontSize: 18, width: 22, textAlign: 'center' }}>
-            {user?.status_emoji || '😊'}
-          </span>
-          <span style={{ fontSize: 14, color: '#1a1a2e', flex: 1 }}>
-            {user?.status_emoji || myStatusMessage ? 'Update status & emoji' : 'Set a status & emoji'}
-          </span>
-          <span style={{ fontSize: 12, color: '#bbb' }}>›</span>
-        </div>
-
-        {autoLabel && (
-          <div
-            onClick={clearAutoStatus}
-            style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', cursor: 'pointer', background: '#fff8e1' }}
-            onMouseEnter={e => (e.currentTarget.style.background = '#fff3e0')}
-            onMouseLeave={e => (e.currentTarget.style.background = '#fff8e1')}>
-            <span style={{ fontSize: 18, width: 22, textAlign: 'center' }}>{autoStatus === 'focus' ? '🎯' : autoStatus === 'in_call' ? '📞' : '🎥'}</span>
-            <span style={{ fontSize: 12, color: '#e65100', flex: 1, fontWeight: 600 }}>{autoLabel}</span>
-            <span style={{ fontSize: 11, color: '#888' }}>Clear</span>
-          </div>
-        )}
-
-        <div onClick={() => applyStatus(myStatus === 'away' ? 'online' : 'away')} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', cursor: 'pointer' }}
-          onMouseEnter={e => (e.currentTarget.style.background = '#f5f5f5')}
-          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-          <span style={{ width: 22, textAlign: 'center' }}>
-            <span style={{ width: 12, height: 12, borderRadius: '50%', background: manualColor, display: 'inline-block' }} />
-          </span>
-          <span style={{ fontSize: 14, color: '#1a1a2e' }}>Set yourself as <strong>{myStatus === 'away' ? 'online' : 'away'}</strong></span>
-        </div>
-
-        {/* DND toggle */}
-        <div onClick={toggleDnd} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', cursor: 'pointer' }}
-          onMouseEnter={e => (e.currentTarget.style.background = '#f5f5f5')}
-          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-          <span style={{ fontSize: 18, width: 22, textAlign: 'center' }}>{dnd ? '🔕' : '🔔'}</span>
-          <span style={{ fontSize: 14, color: '#1a1a2e', flex: 1 }}>Do not disturb</span>
-          <span style={{
-            width: 32, height: 18, borderRadius: 9, background: dnd ? BLUE : '#ddd', position: 'relative', transition: 'background .15s', flexShrink: 0,
-          }}>
-            <span style={{
-              position: 'absolute', top: 2, left: dnd ? 16 : 2, width: 14, height: 14, borderRadius: '50%', background: '#fff', transition: 'left .15s', boxShadow: '0 1px 3px rgba(0,0,0,.2)',
-            }} />
-          </span>
-        </div>
-      </div>
-
-      {/* Menu items */}
-      <div style={{ borderBottom: '1px solid #f0f0f0' }}>
-        {[['👤', 'My profile'], ['⚙️', 'Preferences']].map(([icon, label]) => (
-          <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', cursor: 'pointer', fontSize: 14, color: '#1a1a2e' }}
-            onMouseEnter={e => (e.currentTarget.style.background = '#f5f5f5')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-            <span style={{ fontSize: 18, width: 22, textAlign: 'center' }}>{icon}</span>
-            <span>{label}</span>
-          </div>
-        ))}
-        <div onClick={() => { onOpenHelp(); onClose(); }} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', cursor: 'pointer', fontSize: 14, color: '#1a1a2e' }}
-          onMouseEnter={e => (e.currentTarget.style.background = '#f5f5f5')}
-          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-          <span style={{ fontSize: 18, width: 22, textAlign: 'center' }}>❓</span>
-          <span>Help & shortcuts</span>
-        </div>
-      </div>
-      <div style={{ borderBottom: '1px solid #f0f0f0' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', cursor: 'pointer', fontSize: 14, color: '#1a1a2e' }}
-          onMouseEnter={e => (e.currentTarget.style.background = '#f5f5f5')}
-          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-          <span style={{ fontSize: 18, width: 22, textAlign: 'center' }}>📥</span>
-          <span>Download apps</span>
-        </div>
-      </div>
-      <div onClick={() => { logout(); onClose(); }}
-        style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', cursor: 'pointer', fontSize: 14, color: '#c62828' }}
-        onMouseEnter={e => (e.currentTarget.style.background = '#fff5f5')}
-        onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-        <span style={{ fontSize: 18, width: 22, textAlign: 'center' }}>↪</span>
-        <span>Log out of PLANet Systems Group</span>
-      </div>
-    </div>
-  );
-}
-
 // ── Global search dropdown ────────────────────────────────
 interface SearchResult {
   type: 'channel' | 'group' | 'dm' | 'message' | 'file' | 'pinned';
   id: number;
   label: string;
   sublabel?: string;
-  icon?: string;
+  icon?: IconName;
   logoColor?: string;
   logoAbbr?: string;
   channelId?: number;
@@ -468,7 +309,7 @@ function SearchDropdown({ query, onSelect, onClose }: {
 
     channels.public.concat(channels.private).forEach(ch => {
       if (ch.name.toLowerCase().includes(q)) {
-        out.push({ type: 'channel', id: ch.id, label: ch.name, sublabel: 'Channel', icon: '#' });
+        out.push({ type: 'channel', id: ch.id, label: ch.name, sublabel: 'Channel', icon: 'hash' });
       }
     });
 
@@ -481,13 +322,13 @@ function SearchDropdown({ query, onSelect, onClose }: {
     channels.dms.forEach(ch => {
       const name = ch.other_user?.name || ch.name;
       if (name.toLowerCase().includes(q)) {
-        out.push({ type: 'dm', id: ch.id, label: name, sublabel: 'Direct Message', icon: '💬' });
+        out.push({ type: 'dm', id: ch.id, label: name, sublabel: 'Direct Message', icon: 'message' });
       }
     });
 
     messages.forEach(msg => {
       if (msg.body?.toLowerCase().includes(q) && msg.sender) {
-        out.push({ type: 'message', id: msg.id, label: msg.body?.slice(0, 60) || '', sublabel: `from ${msg.sender.name}`, icon: '💬' });
+        out.push({ type: 'message', id: msg.id, label: msg.body?.slice(0, 60) || '', sublabel: `from ${msg.sender.name}`, icon: 'message' });
       }
     });
 
@@ -543,8 +384,8 @@ function SearchDropdown({ query, onSelect, onClose }: {
                   {r.label.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
                 </div>
               ) : (
-                <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--blue-xlight)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, color: BLUE, flexShrink: 0 }}>
-                  {r.icon || '#'}
+                <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--blue-xlight)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: BLUE, flexShrink: 0 }}>
+                  <Icon name={r.icon || 'hash'} size={14} />
                 </div>
               )}
 
@@ -567,7 +408,7 @@ function SearchDropdown({ query, onSelect, onClose }: {
       {matchedPinned.length > 0 && (
         <div>
           <div style={{ padding: '6px 12px 3px', fontSize: 10, fontWeight: 700, color: '#f9a825', textTransform: 'uppercase', letterSpacing: '.06em', background: '#fffde7', borderBottom: '1px solid #ffe082', display: 'flex', alignItems: 'center', gap: 5 }}>
-            <span style={{ display: 'inline-flex' }}><Pin size={12} /></span> Pinned Messages
+            <span style={{ display: 'inline-flex' }}><Icon name="pin" size={12} /></span> Pinned Messages
           </div>
           {matchedPinned.map(p => {
             const fmtDate = (iso: string) => {
@@ -596,7 +437,7 @@ function SearchDropdown({ query, onSelect, onClose }: {
                     {(p.sender?.name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
                   </div>
                 ) : (
-                  <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--blue-xlight)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, color: BLUE, flexShrink: 0 }}>#</div>
+                  <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--blue-xlight)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: BLUE, flexShrink: 0 }}><Icon name="hash" size={14} /></div>
                 )}
 
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -608,7 +449,9 @@ function SearchDropdown({ query, onSelect, onClose }: {
                     </span>
                   </div>
                   <div style={{ fontSize: 12, color: 'var(--text2)', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: 1.4 }}>
-                    {p.message_type === 'file' ? `📎 ${p.body || p.file?.name || 'File'}` : p.body}
+                    {p.message_type === 'file'
+                      ? <><Icon name="attach" size={12} style={{ verticalAlign: '-2px' }} /> {p.body || p.file?.name || 'File'}</>
+                      : p.body}
                   </div>
                   <div style={{ fontSize: 10, color: 'var(--text3)', marginTop: 3 }}>{fmtDate(p.created_at)}</div>
                 </div>
@@ -667,7 +510,9 @@ export default function Header({ onSearch, searchQuery }: HeaderProps) {
     : autoStatus === 'in_meeting' ? 'In a meeting'
     : myStatusMessage
       ? myStatusMessage
-      : myStatus === 'online' ? '● Online' : myStatus === 'away' ? '● Away' : '● Offline';
+      : myStatus === 'online' ? 'Online' : myStatus === 'away' ? 'Away' : 'Offline';
+  // Status dot only shows for the plain online/away/offline fallback labels.
+  const showStatusDot = !autoStatus && !myStatusMessage;
 
   // Load initial unread count
   useEffect(() => {
@@ -783,7 +628,7 @@ export default function Header({ onSearch, searchQuery }: HeaderProps) {
         {/* Search with dropdown */}
         <div ref={searchRef} style={{ flex: 1, maxWidth: 400, margin: '0 auto', position: 'relative' }}>
           <div style={{ display: 'flex', alignItems: 'center', background: localSearch ? 'rgba(255,255,255,.25)' : 'rgba(255,255,255,.15)', borderRadius: 20, padding: '4px 12px', gap: 6, border: localSearch ? '1px solid rgba(255,255,255,.4)' : '1px solid transparent', transition: 'all .2s' }}>
-            <span style={{ color: 'rgba(255,255,255,.7)', display: 'inline-flex' }}><Search size={15} /></span>
+            <span style={{ color: 'rgba(255,255,255,.7)', display: 'inline-flex' }}><Icon name="search" size={15} /></span>
             <input
               className="ias-search"
               type="text"
@@ -794,7 +639,7 @@ export default function Header({ onSearch, searchQuery }: HeaderProps) {
               style={{ background: 'transparent', border: 'none', outline: 'none', color: '#fff', fontSize: 12, width: '100%' }}
             />
             {localSearch && (
-              <span onClick={handleClear} style={{ color: 'rgba(255,255,255,.7)', cursor: 'pointer', flexShrink: 0, display: 'inline-flex' }}><X size={15} /></span>
+              <span onClick={handleClear} style={{ color: 'rgba(255,255,255,.7)', cursor: 'pointer', flexShrink: 0, display: 'inline-flex' }}><Icon name="close" size={15} /></span>
             )}
           </div>
 
@@ -818,7 +663,7 @@ export default function Header({ onSearch, searchQuery }: HeaderProps) {
           style={{ width: 34, height: 34, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 15, color: dnd ? '#ff9800' : 'rgba(255,255,255,.85)', background: dnd ? 'rgba(255,152,0,.18)' : 'transparent', transition: 'all .15s', position: 'relative' }}
           onMouseEnter={e => { if (!dnd) e.currentTarget.style.background = 'rgba(255,255,255,.15)'; }}
           onMouseLeave={e => { if (!dnd) e.currentTarget.style.background = 'transparent'; }}>
-          <Bell size={17} />
+          <Icon name="bell" size={17} />
         </div>
 
         {/* Notifications bell */}
@@ -826,7 +671,7 @@ export default function Header({ onSearch, searchQuery }: HeaderProps) {
           <div title="Notifications" style={{ position: 'relative', width: 34, height: 34, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 15, color: 'rgba(255,255,255,.85)', transition: 'background .15s' }}
             onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,.15)')}
             onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-            <Bell size={17} />
+            <Icon name="bell" size={17} />
             {unreadNotifs > 0 && (
               <div style={{ position: 'absolute', top: 3, right: 3, minWidth: 16, height: 16, padding: '0 4px', borderRadius: 8, background: '#e53935', color: '#fff', fontSize: 9, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1.5px solid ${BLUE_DARK}` }}>
                 {unreadNotifs > 9 ? '9+' : unreadNotifs}
@@ -857,9 +702,9 @@ export default function Header({ onSearch, searchQuery }: HeaderProps) {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <span style={{ fontSize: 12, color: '#fff', fontWeight: 500 }}>{user?.name}</span>
-              <span style={{ fontSize: 10, color: autoStatus === 'focus' ? '#ffcc80' : autoStatus === 'in_call' ? '#a5d6a7' : 'rgba(255,255,255,.7)', fontWeight: autoStatus ? 600 : 400 }}>{statusLine}</span>
+              <span style={{ fontSize: 10, color: autoStatus === 'focus' ? '#ffcc80' : autoStatus === 'in_call' ? '#a5d6a7' : 'rgba(255,255,255,.7)', fontWeight: autoStatus ? 600 : 400, display: 'inline-flex', alignItems: 'center', gap: 3 }}>{showStatusDot && <Icon name="circle" size={7} fill="currentColor" />}{statusLine}</span>
             </div>
-            <span style={{ color: 'rgba(255,255,255,.5)', display: 'inline-flex' }}><ChevronDown size={14} /></span>
+            <span style={{ color: 'rgba(255,255,255,.5)', display: 'inline-flex' }}><Icon name="chevron-down" size={14} /></span>
           </div>
         }>
           {close => <ProfileDropdown onClose={close} onOpenHelp={() => setShowHelp(true)} />}

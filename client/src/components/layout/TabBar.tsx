@@ -2,14 +2,15 @@ import React from 'react';
 import { useUIStore } from '../../store/uiStore';
 import { useChatStore } from '../../store/chatStore';
 import { useCallStore } from '../../store/callStore';
+import Icon, { type IconName } from '@/components/ui/Icon';
 
 type MainTab = 'all' | 'dms' | 'calls' | 'files';
 
-const TABS: { key: MainTab; icon: string; label: string }[] = [
-  { key: 'all',   icon: '🏠', label: 'All'      },
-  { key: 'dms',   icon: '💬', label: 'Messages' },
-  { key: 'calls', icon: '📞', label: 'Calls'    },
-  { key: 'files', icon: '📁', label: 'Files'    },
+const TABS: { key: MainTab; icon: IconName; label: string }[] = [
+  { key: 'all',   icon: 'home',    label: 'All'      },
+  { key: 'dms',   icon: 'message', label: 'Messages' },
+  { key: 'calls', icon: 'phone',   label: 'Calls'    },
+  { key: 'files', icon: 'folder',  label: 'Files'    },
 ];
 
 export default function TabBar() {
@@ -52,7 +53,7 @@ export default function TabBar() {
             onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = 'var(--blue-xlight)'; e.currentTarget.style.color = 'var(--blue-primary)'; } }}
             onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text2)'; } }}
           >
-            <span style={{ fontSize: 13 }}>{icon}</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center' }}><Icon name={icon} size={13} /></span>
             <span>{label}</span>
 
             {/* Active-call indicator on Calls tab */}

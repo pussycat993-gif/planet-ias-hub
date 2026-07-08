@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useUIStore } from '../../store/uiStore';
 import { useChatStore } from '../../store/chatStore';
+import Icon, { IconName } from '@/components/ui/Icon';
 
 const BLUE = 'var(--blue-primary)';
 const BLUE_DARK = 'var(--blue-dark)';
@@ -39,30 +40,36 @@ export default function QuickCompose({ onScheduleMeeting }: QuickComposeProps) {
     return () => document.removeEventListener('keydown', h);
   }, [open]);
 
-  const actions = [
+  const actions: Array<{
+    icon: IconName;
+    label: string;
+    sublabel: string;
+    onClick: () => void;
+    enabled: boolean;
+  }> = [
     {
-      icon: '💬',
+      icon: 'message',
       label: 'New Message',
       sublabel: 'Start a direct message',
       onClick: () => { openModal('newMessage'); setOpen(false); },
       enabled: true,
     },
     {
-      icon: '👥',
+      icon: 'users',
       label: 'New Group',
       sublabel: 'Private group chat with several people',
       onClick: () => { openModal('newGroup'); setOpen(false); },
       enabled: true,
     },
     {
-      icon: '#',
+      icon: 'hash',
       label: 'New Channel',
       sublabel: 'Public or private channel',
       onClick: () => { openModal('newChannel'); setOpen(false); },
       enabled: true,
     },
     {
-      icon: '📅',
+      icon: 'calendar',
       label: 'Schedule Meeting',
       sublabel: activeChannelId ? 'In current channel' : 'Open a channel first',
       onClick: () => { if (activeChannelId) { onScheduleMeeting(); setOpen(false); } },
@@ -106,7 +113,7 @@ export default function QuickCompose({ onScheduleMeeting }: QuickComposeProps) {
               onMouseEnter={e => { if (a.enabled) e.currentTarget.style.background = 'var(--blue-xlight)'; }}
               onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
             >
-              <span style={{ fontSize: 18, width: 22, textAlign: 'center', flexShrink: 0 }}>{a.icon}</span>
+              <span style={{ width: 22, flexShrink: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><Icon name={a.icon} size={18} /></span>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 12, fontWeight: 600, color: BLUE_DARK }}>{a.label}</div>
                 <div style={{ fontSize: 10, color: 'var(--text3)', marginTop: 1 }}>{a.sublabel}</div>
@@ -130,9 +137,6 @@ export default function QuickCompose({ onScheduleMeeting }: QuickComposeProps) {
           border: 'none',
           boxShadow: '0 4px 14px rgba(25,118,210,.4)',
           cursor: 'pointer',
-          fontSize: 26,
-          fontFamily: 'inherit',
-          fontWeight: 300,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -141,7 +145,7 @@ export default function QuickCompose({ onScheduleMeeting }: QuickComposeProps) {
         }}
         onMouseEnter={e => (e.currentTarget.style.filter = 'brightness(1.08)')}
         onMouseLeave={e => (e.currentTarget.style.filter = 'none')}
-      >+</button>
+      ><Icon name="add" size={26} /></button>
     </div>
   );
 }

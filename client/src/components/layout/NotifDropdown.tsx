@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useChatStore } from '../../store/chatStore';
+import Icon, { type IconName } from '@/components/ui/Icon';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 const BLUE = 'var(--blue-primary)';
@@ -15,12 +16,12 @@ export interface Notif {
   channel_id?: number;
 }
 
-export const NOTIF_ICONS: Record<string, string> = {
-  message: '💬',
-  meeting: '📅',
-  dwm: '🔄',
-  automation: '⚡',
-  call_missed: '📞',
+export const NOTIF_ICONS: Record<string, IconName> = {
+  message: 'message',
+  meeting: 'calendar',
+  dwm: 'refresh',
+  automation: 'zap',
+  call_missed: 'phone-missed',
 };
 
 interface NotifDropdownProps {
@@ -68,7 +69,7 @@ export default function NotifDropdown({ onClose, onUnreadChange }: NotifDropdown
           <div style={{ padding: 20, textAlign: 'center', color: 'var(--text3)', fontSize: 13 }}>Loading...</div>
         ) : notifs.length === 0 ? (
           <div style={{ padding: '24px 16px', textAlign: 'center', color: 'var(--text3)' }}>
-            <div style={{ fontSize: 26, marginBottom: 6 }}>🔔</div>
+            <div style={{ marginBottom: 6 }}><Icon name="bell" size={26} /></div>
             <div style={{ fontSize: 12 }}>No notifications yet</div>
           </div>
         ) : notifs.map(n => (
@@ -76,7 +77,7 @@ export default function NotifDropdown({ onClose, onUnreadChange }: NotifDropdown
             style={{ display: 'flex', gap: 9, padding: '9px 14px', borderBottom: '1px solid var(--neutral-light-active)', cursor: 'pointer', background: n.read ? 'var(--surface)' : 'var(--blue-xlight)' }}
             onMouseEnter={e => (e.currentTarget.style.background = 'var(--blue-xlight)')}
             onMouseLeave={e => (e.currentTarget.style.background = n.read ? 'var(--surface)' : 'var(--blue-xlight)')}>
-            <span style={{ fontSize: 16, flexShrink: 0 }}>{NOTIF_ICONS[n.type] || '🔔'}</span>
+            <span style={{ flexShrink: 0, display: 'inline-flex' }}><Icon name={NOTIF_ICONS[n.type] || 'bell'} size={16} /></span>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontWeight: n.read ? 400 : 700, fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{n.title}</div>
               <div style={{ fontSize: 11, color: 'var(--text3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{n.body}</div>

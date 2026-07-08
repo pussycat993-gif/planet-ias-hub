@@ -9,6 +9,7 @@ import CallBar from '../calls/CallBar';
 import EndCallModal from '../calls/EndCallModal';
 import PCIContextPanel from '../pci/PCIContextPanel';
 import AIPanel from '../ai/AIPanel';
+import Icon, { type IconName } from '@/components/ui/Icon';
 import { useChatStore } from '../../store/chatStore';
 import { useUIStore } from '../../store/uiStore';
 import { useCallStore } from '../../store/callStore';
@@ -144,31 +145,35 @@ function ChatTitleBar() {
   );
 
   const isDM = activeChannel.type === 'dm';
-  const icon = isDM ? '💬' : activeChannel.type === 'group' ? '⬡' : '#';
+  const iconName: IconName = isDM ? 'message' : activeChannel.type === 'group' ? 'hexagon' : 'hash';
 
   return (
     <div style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)', padding: '5px 12px', display: 'flex', alignItems: 'center', gap: 7, flexShrink: 0 }}>
-      <span style={{ color: 'var(--text3)', fontSize: 15 }}>{icon}</span>
+      <span style={{ color: 'var(--text3)', display: 'inline-flex' }}><Icon name={iconName} size={15} /></span>
       <span style={{ fontWeight: 700, color: 'var(--blue-dark)', fontSize: 14 }}>
         {isDM ? activeChannel.other_user?.name : activeChannel.name}
       </span>
-      <span style={{ color: 'var(--text3)', fontSize: 11 }}>
-        {isDM ? `● ${activeChannel.other_user?.status || 'offline'}` : `— ${activeChannel.type}`}
+      <span style={{ color: 'var(--text3)', fontSize: 11, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+        {isDM
+          ? <><Icon name="circle" size={7} fill="currentColor" />{activeChannel.other_user?.status || 'offline'}</>
+          : `— ${activeChannel.type}`}
       </span>
       <div style={{ marginLeft: 'auto', display: 'flex', gap: 4 }}>
-        {[
-          { label: '📌 Pinned', onClick: () => {} },
-          { label: '👥 Members', onClick: () => {} },
-          { label: '🔗 Log to PCI', onClick: () => {} },
-          { label: '📞 Audio', green: true, onClick: () => activeChannelId && startCall(activeChannelId, 'audio') },
-          { label: '📹 Video', green: true, onClick: () => activeChannelId && startCall(activeChannelId, 'video') },
-        ].map(({ label, green, onClick }) => (
+        {([
+          { icon: 'pin', label: 'Pinned', onClick: () => {} },
+          { icon: 'users', label: 'Members', onClick: () => {} },
+          { icon: 'link', label: 'Log to PCI', onClick: () => {} },
+          { icon: 'phone', label: 'Audio', green: true, onClick: () => activeChannelId && startCall(activeChannelId, 'audio') },
+          { icon: 'video', label: 'Video', green: true, onClick: () => activeChannelId && startCall(activeChannelId, 'video') },
+        ] as { icon: IconName; label: string; green?: boolean; onClick: () => void }[]).map(({ icon, label, green, onClick }) => (
           <button key={label} onClick={onClick} style={{
             padding: '4px 10px',
             border: `1px solid ${green ? '#a5d6a7' : 'var(--border)'}`,
             background: 'var(--surface)', color: green ? 'var(--green)' : 'var(--text2)',
             cursor: 'pointer', fontSize: 11, borderRadius: 6, fontFamily: 'inherit',
+            display: 'inline-flex', alignItems: 'center', gap: 5,
           }}>
+            <Icon name={icon} size={11} />
             {label}
           </button>
         ))}

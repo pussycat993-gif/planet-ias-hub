@@ -4,7 +4,7 @@ import { useChatStore, Channel } from '../../store/chatStore';
 import { useAuthStore } from '../../store/authStore';
 import { useUIStore } from '../../store/uiStore';
 import { useFavorites } from '../../hooks/useFavorites';
-import { Search, X, Video, Phone } from '@/components/ui/Icon';
+import Icon, { fileTypeIcon, IconName } from '@/components/ui/Icon';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 const BLUE = 'var(--blue-primary)';
@@ -60,19 +60,19 @@ function ChannelRow({ ch, isSelected, isFav, onClick, onToggleFav }: {
         <span style={{ background: 'var(--red)', color: '#fff', fontSize: 9, padding: '1px 5px', borderRadius: 8, fontWeight: 700, flexShrink: 0 }}>{ch.unread_count}</span>
       )}
       {(hovered || isFav) && (
-        <span onClick={onToggleFav} style={{ fontSize: 13, cursor: 'pointer', color: isFav ? '#f9a825' : 'var(--text3)', flexShrink: 0, lineHeight: 1 }}
+        <span onClick={onToggleFav} style={{ fontSize: 13, cursor: 'pointer', color: isFav ? '#f9a825' : 'var(--text3)', flexShrink: 0, lineHeight: 1, display: 'inline-flex' }}
           onMouseEnter={e => (e.currentTarget.style.color = '#f9a825')}
-          onMouseLeave={e => (e.currentTarget.style.color = isFav ? '#f9a825' : 'var(--text3)')}>★</span>
+          onMouseLeave={e => (e.currentTarget.style.color = isFav ? '#f9a825' : 'var(--text3)')}><Icon name="star" size={13} fill={isFav ? 'currentColor' : 'none'} /></span>
       )}
     </div>
   );
 }
 
-function SectionHeader({ label, onAdd }: { label: string; onAdd?: () => void }) {
+function SectionHeader({ label, onAdd, icon }: { label: string; onAdd?: () => void; icon?: IconName }) {
   return (
     <div style={{ padding: '8px 10px 3px', fontSize: 10, fontWeight: 700, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '.06em', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-      <span>{label}</span>
-      {onAdd && <span onClick={onAdd} style={{ cursor: 'pointer', fontSize: 16, color: 'var(--text3)' }} onMouseEnter={e => (e.currentTarget.style.color = BLUE)} onMouseLeave={e => (e.currentTarget.style.color = 'var(--text3)')}>+</span>}
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>{icon && <Icon name={icon} size={10} />}{label}</span>
+      {onAdd && <span onClick={onAdd} style={{ cursor: 'pointer', color: 'var(--text3)', display: 'inline-flex' }} onMouseEnter={e => (e.currentTarget.style.color = BLUE)} onMouseLeave={e => (e.currentTarget.style.color = 'var(--text3)')}><Icon name="add" size={16} /></span>}
     </div>
   );
 }
@@ -121,17 +121,17 @@ function CallHistoryList() {
             {call.name.split(' ').map(w => w[0]).join('').slice(0, 2)}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 12, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: call.missed ? 'var(--red)' : 'var(--text)' }}>
-              {call.missed && '↗ '}{call.name}
+            <div style={{ fontSize: 12, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: call.missed ? 'var(--red)' : 'var(--text)', display: 'flex', alignItems: 'center', gap: 4 }}>
+              {call.missed && <Icon name="phone-missed" size={11} />}{call.name}
             </div>
             <div style={{ fontSize: 10, color: 'var(--text3)' }}>
-              {call.type === 'video' ? <Video size={12} style={{ verticalAlign: '-2px' }} /> : <Phone size={12} style={{ verticalAlign: '-2px' }} />} {call.missed ? 'Missed' : fmtDuration(call.duration)} · {fmtAgo(call.minsAgo)}
+              {call.type === 'video' ? <Icon name="video" size={12} style={{ verticalAlign: '-2px' }} /> : <Icon name="phone" size={12} style={{ verticalAlign: '-2px' }} />} {call.missed ? 'Missed' : fmtDuration(call.duration)} · {fmtAgo(call.minsAgo)}
             </div>
           </div>
           <span style={{ fontSize: 14, cursor: 'pointer', color: 'var(--text3)' }} title="Call back"
             onMouseEnter={e => (e.currentTarget.style.color = 'var(--green)')}
             onMouseLeave={e => (e.currentTarget.style.color = 'var(--text3)')}>
-            {call.type === 'video' ? <Video size={15} /> : <Phone size={15} />}
+            {call.type === 'video' ? <Icon name="video" size={15} /> : <Icon name="phone" size={15} />}
           </span>
         </div>
       ))}
@@ -150,21 +150,6 @@ interface GlobalFile {
   basename: string;
   uploader: { id: number; name: string; avatar_url?: string } | null;
   channel: { id: number; name: string; type: string; logo_color?: string; logo_abbr?: string };
-}
-
-function fileIcon(name: string, mime?: string): string {
-  if (mime?.startsWith('image/')) return '🖼️';
-  if (mime?.startsWith('video/')) return '🎬';
-  if (mime?.startsWith('audio/')) return '🎙️';
-  const ext = name.split('.').pop()?.toLowerCase() || '';
-  const map: Record<string, string> = {
-    pdf: '📄', doc: '📝', docx: '📝', xls: '📊', xlsx: '📊',
-    png: '🖼️', jpg: '🖼️', jpeg: '🖼️', gif: '🖼️', webp: '🖼️',
-    sql: '🗄️', md: '📋', txt: '📋', fig: '🎨', zip: '🗜️',
-    webm: '🎙️', ogg: '🎙️', mp3: '🎙️', wav: '🎙️', m4a: '🎙️',
-    mp4: '🎬', mov: '🎬',
-  };
-  return map[ext] || '📎';
 }
 
 function fmtBytes(b: number): string {
@@ -217,11 +202,11 @@ function GlobalFilesList() {
     .filter(f => matchesType(f, typeFilter))
     .filter(f => !search.trim() || f.file_name.toLowerCase().includes(search.trim().toLowerCase()));
 
-  const FILTER_CHIPS: { key: FileFilterType; label: string }[] = [
+  const FILTER_CHIPS: { key: FileFilterType; label: string; icon?: IconName }[] = [
     { key: 'all',    label: 'All' },
-    { key: 'images', label: '🖼 Images' },
-    { key: 'docs',   label: '📄 Docs' },
-    { key: 'media',  label: '🎬 Media' },
+    { key: 'images', label: 'Images', icon: 'image' },
+    { key: 'docs',   label: 'Docs',   icon: 'file-text' },
+    { key: 'media',  label: 'Media',  icon: 'film' },
   ];
 
   return (
@@ -229,14 +214,14 @@ function GlobalFilesList() {
       {/* Search */}
       <div style={{ padding: '6px 8px', borderBottom: '1px solid var(--neutral-light-active)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'var(--grey-light)', borderRadius: 8, padding: '4px 9px', border: '1px solid var(--neutral-light-active)' }}>
-          <span style={{ color: 'var(--text3)', display: 'inline-flex' }}><Search size={14} /></span>
+          <span style={{ color: 'var(--text3)', display: 'inline-flex' }}><Icon name="search" size={14} /></span>
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search files..."
             style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: 12, flex: 1, color: 'var(--text)', fontFamily: 'inherit' }}
           />
-          {search && <span onClick={() => setSearch('')} style={{ color: 'var(--text3)', cursor: 'pointer', display: 'inline-flex' }}><X size={14} /></span>}
+          {search && <span onClick={() => setSearch('')} style={{ color: 'var(--text3)', cursor: 'pointer', display: 'inline-flex' }}><Icon name="close" size={14} /></span>}
         </div>
       </div>
 
@@ -246,13 +231,14 @@ function GlobalFilesList() {
           <span key={c.key} onClick={() => setTypeFilter(c.key)}
             style={{
               fontSize: 10, padding: '3px 8px', borderRadius: 10, cursor: 'pointer',
+              display: 'inline-flex', alignItems: 'center', gap: 3,
               background: typeFilter === c.key ? BLUE : 'var(--grey-light)',
               color: typeFilter === c.key ? '#fff' : 'var(--text2)',
               fontWeight: typeFilter === c.key ? 700 : 500,
               border: `1px solid ${typeFilter === c.key ? BLUE : 'var(--neutral-light-active)'}`,
               transition: 'all .12s',
             }}>
-            {c.label}
+            {c.icon && <Icon name={c.icon} size={11} />}{c.label}
           </span>
         ))}
       </div>
@@ -262,7 +248,7 @@ function GlobalFilesList() {
         <div style={{ padding: '24px 12px', textAlign: 'center', color: 'var(--text3)', fontSize: 12 }}>Loading files…</div>
       ) : filtered.length === 0 ? (
         <div style={{ padding: '20px 12px', textAlign: 'center', color: 'var(--text3)', fontSize: 12 }}>
-          <div style={{ fontSize: 24, marginBottom: 8 }}>📁</div>
+          <div style={{ marginBottom: 8, color: 'var(--text3)' }}><Icon name="folder-open" size={24} /></div>
           {search ? 'No files match your search' : 'No files yet'}
         </div>
       ) : (
@@ -285,8 +271,8 @@ function GlobalFilesList() {
                     <img src={streamUrl} alt={f.file_name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </div>
                 ) : (
-                  <span style={{ fontSize: 22, flexShrink: 0, width: 32, textAlign: 'center' }}>
-                    {fileIcon(f.file_name, f.mime_type)}
+                  <span style={{ flexShrink: 0, width: 32, display: 'inline-flex', justifyContent: 'center', color: 'var(--text2)' }}>
+                    <Icon name={fileTypeIcon(f.file_name, f.mime_type)} size={20} />
                   </span>
                 )}
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -303,9 +289,9 @@ function GlobalFilesList() {
                 <a href={downloadUrl} download={f.file_name}
                   onClick={e => e.stopPropagation()}
                   title="Download"
-                  style={{ fontSize: 12, color: 'var(--text3)', textDecoration: 'none', padding: '2px 4px', flexShrink: 0 }}
+                  style={{ color: 'var(--text3)', textDecoration: 'none', padding: '2px 4px', flexShrink: 0, display: 'inline-flex' }}
                   onMouseEnter={e => (e.currentTarget.style.color = BLUE)}
-                  onMouseLeave={e => (e.currentTarget.style.color = 'var(--text3)')}>⬇</a>
+                  onMouseLeave={e => (e.currentTarget.style.color = 'var(--text3)')}><Icon name="download" size={12} /></a>
               </div>
             );
           })}
@@ -325,7 +311,7 @@ export default function Sidebar() {
   const [search, setSearch] = useState('');
 
   const statusColor = myStatus === 'online' ? 'var(--green)' : myStatus === 'away' ? '#BA7517' : 'var(--text3)';
-  const statusLabel = myStatus === 'online' ? '● Online' : myStatus === 'away' ? '● Away' : '● Offline';
+  const statusLabel = myStatus === 'online' ? 'Online' : myStatus === 'away' ? 'Away' : 'Offline';
 
   const allChannels = [...channels.public, ...channels.private, ...channels.groups, ...channels.dms];
   const favorites = allChannels.filter(ch => favs.includes(ch.id));
@@ -364,9 +350,9 @@ export default function Sidebar() {
       <div style={{ background: BLUE, color: '#fff', padding: '5px 10px', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span>{headerLabels[mainTab] || 'All'}</span>
         {headerAdd[mainTab] && (
-          <div onClick={headerAdd[mainTab]} style={{ width: 22, height: 22, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}
+          <div onClick={headerAdd[mainTab]} style={{ width: 22, height: 22, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,.2)')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>+</div>
+            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}><Icon name="add" size={16} /></div>
         )}
       </div>
 
@@ -374,14 +360,14 @@ export default function Sidebar() {
       {mainTab !== 'calls' && mainTab !== 'files' && (
         <div style={{ padding: '6px 8px', borderBottom: '1px solid var(--neutral-light-active)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'var(--grey-light)', borderRadius: 8, padding: '4px 9px', border: '1px solid var(--neutral-light-active)' }}>
-            <span style={{ color: 'var(--text3)', display: 'inline-flex' }}><Search size={14} /></span>
+            <span style={{ color: 'var(--text3)', display: 'inline-flex' }}><Icon name="search" size={14} /></span>
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search..."
               style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: 12, flex: 1, color: 'var(--text)', fontFamily: 'inherit' }}
             />
-            {search && <span onClick={() => setSearch('')} style={{ color: 'var(--text3)', cursor: 'pointer', display: 'inline-flex' }}><X size={14} /></span>}
+            {search && <span onClick={() => setSearch('')} style={{ color: 'var(--text3)', cursor: 'pointer', display: 'inline-flex' }}><Icon name="close" size={14} /></span>}
           </div>
 
           {/* Unread-only filter toggle */}
@@ -396,7 +382,7 @@ export default function Sidebar() {
             onMouseEnter={e => { if (!showUnreadOnly) e.currentTarget.style.background = 'var(--grey-light)'; }}
             onMouseLeave={e => { if (!showUnreadOnly) e.currentTarget.style.background = 'transparent'; }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: showUnreadOnly ? BLUE_DARK : 'var(--text2)', fontWeight: showUnreadOnly ? 600 : 400 }}>
-              <span style={{ fontSize: 12 }}>{showUnreadOnly ? '●' : '○'}</span>
+              <Icon name={showUnreadOnly ? 'circle-dot' : 'circle'} size={12} />
               Unread only
             </span>
             {totalUnread > 0 && (
@@ -419,7 +405,7 @@ export default function Sidebar() {
           <>
             {favorites.length > 0 && (
               <>
-                <SectionHeader label="⭐ Favorites" />
+                <SectionHeader label="Favorites" icon="star" />
                 {filterCh(favorites).map(renderRow)}
               </>
             )}
@@ -443,7 +429,7 @@ export default function Sidebar() {
             )}
             {allChannels.length === 0 && (
               <div style={{ padding: '20px 12px', textAlign: 'center', color: 'var(--text3)', fontSize: 12 }}>
-                <div style={{ fontSize: 24, marginBottom: 8 }}>💬</div>
+                <div style={{ marginBottom: 8, color: 'var(--text3)' }}><Icon name="message" size={24} /></div>
                 No channels yet.
                 <div onClick={() => openModal('newChannel')} style={{ color: BLUE, cursor: 'pointer', marginTop: 6 }}>+ Create one</div>
               </div>
@@ -456,7 +442,7 @@ export default function Sidebar() {
           <>
             {filterCh(favorites.filter(ch => ch.type === 'dm')).length > 0 && (
               <>
-                <SectionHeader label="⭐ Favorites" />
+                <SectionHeader label="Favorites" icon="star" />
                 {filterCh(favorites.filter(ch => ch.type === 'dm')).map(renderRow)}
               </>
             )}
@@ -467,7 +453,7 @@ export default function Sidebar() {
               </>
             ) : (
               <div style={{ padding: '20px 12px', textAlign: 'center', color: 'var(--text3)', fontSize: 12 }}>
-                <div style={{ fontSize: 24, marginBottom: 8 }}>💬</div>
+                <div style={{ marginBottom: 8, color: 'var(--text3)' }}><Icon name="message" size={24} /></div>
                 {search ? 'No results' : 'No direct messages'}
                 {!search && <div onClick={() => openModal('newMessage')} style={{ color: BLUE, cursor: 'pointer', marginTop: 6 }}>+ New Message</div>}
               </div>
@@ -496,11 +482,11 @@ export default function Sidebar() {
         )}
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontWeight: 700, fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.name}</div>
-          <div style={{ fontSize: 10, color: statusColor }}>{myStatusMessage || statusLabel}</div>
+          <div style={{ fontSize: 10, color: statusColor, display: 'flex', alignItems: 'center', gap: 4 }}><Icon name="circle" size={7} fill="currentColor" />{myStatusMessage || statusLabel}</div>
         </div>
 
         {/* Logout */}
-        <span style={{ cursor: 'pointer', color: 'var(--text3)', fontSize: 14 }} title="Logout" onClick={logout}>⎋</span>
+        <span style={{ cursor: 'pointer', color: 'var(--text3)', display: 'inline-flex' }} title="Logout" onClick={logout}><Icon name="logout" size={14} /></span>
       </div>
     </div>
   );
