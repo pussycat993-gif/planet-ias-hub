@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react';
+import Icon from '@/components/ui/Icon';
 
 interface VideoTileProps {
   stream: MediaStream | null;
@@ -67,7 +68,7 @@ function VideoTile({ stream, label, muted = false, isLocal = false, isCameraOff 
       }}>
         {isLocal && <span style={{ color: '#90caf9' }}>You</span>}
         {label}
-        {isRaisingHand && <span title="Raising hand">✋</span>}
+        {isRaisingHand && <span title="Raising hand" style={{ display: 'inline-flex', alignItems: 'center' }}><Icon name="hand" size={12} color="#fff" /></span>}
       </div>
 
       {/* Muted indicator */}
@@ -78,7 +79,7 @@ function VideoTile({ stream, label, muted = false, isLocal = false, isCameraOff 
           width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: 11,
         }}>
-          🔇
+          <Icon name="mic-off" size={12} color="#fff" />
         </div>
       )}
 

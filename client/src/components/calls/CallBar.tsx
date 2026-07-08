@@ -1,6 +1,7 @@
 import React from 'react';
 import { useCallStore } from '../../store/callStore';
 import { useUIStore } from '../../store/uiStore';
+import Icon from '@/components/ui/Icon';
 
 function fmt(secs: number) {
   const h = Math.floor(secs / 3600);
@@ -34,31 +35,41 @@ export default function CallBar() {
       display: 'flex', alignItems: 'center', gap: 7,
       fontSize: 12, flexShrink: 0,
     }}>
-      <span>{callType === 'video' ? '📹' : '📞'}</span>
+      <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+        {callType === 'video'
+          ? <Icon name="video" size={14} color="#fff" />
+          : <Icon name="phone" size={14} color="#fff" />}
+      </span>
       <span>{callType === 'video' ? 'Video' : 'Audio'} call in progress</span>
 
-      <button style={cbBtn(isMuted)} onClick={toggleMute}>
-        {isMuted ? '🔇 Unmute' : '🎤 Mute'}
+      <button style={{ ...cbBtn(isMuted), display: 'inline-flex', alignItems: 'center', gap: 4 }} onClick={toggleMute}>
+        {isMuted
+          ? <><Icon name="mic-off" size={14} color="#fff" /> Unmute</>
+          : <><Icon name="mic" size={14} color="#fff" /> Mute</>}
       </button>
 
       {callType === 'video' && (
-        <button style={cbBtn(isCameraOff)} onClick={toggleCamera}>
-          {isCameraOff ? '📷 Off' : '📷 Camera'}
+        <button style={{ ...cbBtn(isCameraOff), display: 'inline-flex', alignItems: 'center', gap: 4 }} onClick={toggleCamera}>
+          {isCameraOff
+            ? <><Icon name="video-off" size={14} color="#fff" /> Off</>
+            : <><Icon name="video" size={14} color="#fff" /> Camera</>}
         </button>
       )}
 
       <button
-        style={{ ...cbBtn(isSharing), background: isSharing ? 'rgba(100,200,255,.25)' : 'transparent', borderColor: isSharing ? 'rgba(100,200,255,.5)' : 'rgba(255,255,255,.4)' }}
+        style={{ ...cbBtn(isSharing), display: 'inline-flex', alignItems: 'center', gap: 4, background: isSharing ? 'rgba(100,200,255,.25)' : 'transparent', borderColor: isSharing ? 'rgba(100,200,255,.5)' : 'rgba(255,255,255,.4)' }}
         onClick={toggleShare}
       >
-        {isSharing ? '🖥 Stop Share' : '🖥 Share Screen'}
+        {isSharing
+          ? <><Icon name="screen-share-off" size={14} color="#fff" /> Stop Share</>
+          : <><Icon name="screen-share" size={14} color="#fff" /> Share Screen</>}
       </button>
 
       <button
-        style={{ ...cbBtn(), background: '#c62828', borderColor: '#c62828', fontWeight: 700 }}
+        style={{ ...cbBtn(), display: 'inline-flex', alignItems: 'center', gap: 4, background: '#c62828', borderColor: '#c62828', fontWeight: 700 }}
         onClick={handleEnd}
       >
-        End Call
+        <Icon name="phone-off" size={14} color="#fff" /> End Call
       </button>
 
       <span style={{ marginLeft: 'auto', fontWeight: 700, fontSize: 14, fontFamily: 'monospace', letterSpacing: 1 }}>

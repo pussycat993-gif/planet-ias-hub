@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
-import { Zap, X, Check, Calendar, Building2, User, Tag, Mic, Video, Phone } from '@/components/ui/Icon';
+import Icon from '@/components/ui/Icon';
 import EntityPickerModal, { PickerKind, PickerItem } from '../modals/EntityPickerModal';
 import { MOCK_ENTITIES, MOCK_PEOPLE, MOCK_TAGS } from '../../utils/pickerData';
 
@@ -128,7 +128,7 @@ function LogToPCIForm({ transcript, participants, callType, duration, onClose }:
   if (saved) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 300, gap: 12 }}>
-        <div style={{ color: '#2e7d32' }}><Check size={48} /></div>
+        <div style={{ color: '#2e7d32' }}><Icon name="check" size={48} /></div>
         <div style={{ fontWeight: 700, fontSize: 16, color: '#2e7d32' }}>Logged to PLANet IAS!</div>
         <div style={{ fontSize: 13, color: 'var(--text3)' }}>Activity saved successfully</div>
       </div>
@@ -141,9 +141,9 @@ function LogToPCIForm({ transcript, participants, callType, duration, onClose }:
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', fontFamily: 'var(--font-sans)' }}>
       {/* Header bar */}
       <div style={{ background: BLUE, color: '#fff', padding: '10px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-        <span style={{ fontWeight: 700, fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 6 }}><Zap size={15} /> New Activity</span>
+        <span style={{ fontWeight: 700, fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 6 }}><Icon name="zap" size={15} /> New Activity</span>
         <span style={{ fontSize: 12, opacity: .8 }}>AI Functionality In Development</span>
-        <span onClick={onClose} style={{ cursor: 'pointer', opacity: .8, display: 'inline-flex' }}><X size={18} /></span>
+        <span onClick={onClose} style={{ cursor: 'pointer', opacity: .8, display: 'inline-flex' }}><Icon name="close" size={18} /></span>
       </div>
 
       {pickerOpen && (
@@ -170,7 +170,7 @@ function LogToPCIForm({ transcript, participants, callType, duration, onClose }:
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 5, flex: 1, border: '1px solid var(--border)', borderRadius: 6, padding: '4px 8px', background: 'var(--surface)' }}>
                     <div style={{ width: 22, height: 22, borderRadius: '50%', background: BLUE, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, flexShrink: 0 }}>I</div>
                     <span style={{ fontSize: 12 }}>{name}</span>
-                    <span style={{ marginLeft: 'auto', color: 'var(--text3)', fontSize: 14 }}>▾</span>
+                    <span style={{ marginLeft: 'auto', color: 'var(--text3)', display: 'inline-flex' }}><Icon name="chevron-down" size={14} /></span>
                   </div>
                 ))}
               </div>
@@ -192,13 +192,13 @@ function LogToPCIForm({ transcript, participants, callType, duration, onClose }:
               <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span style={{ fontSize: 12, color: 'var(--text2)', width: 80, flexShrink: 0 }}>Start Date</span>
                 <div style={{ flex: 1, border: '1px solid var(--border)', borderRadius: 6, padding: '6px 8px', background: 'var(--surface)', fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  {today} <Calendar size={14} style={{ flexShrink: 0 }} />
+                  {today} <Icon name="calendar" size={14} style={{ flexShrink: 0 }} />
                 </div>
               </div>
               <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span style={{ fontSize: 12, color: 'var(--text2)', width: 70, flexShrink: 0 }}>End Date</span>
                 <div style={{ flex: 1, border: '1px solid var(--border)', borderRadius: 6, padding: '6px 8px', background: 'var(--surface)', fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  {today} <Calendar size={14} style={{ flexShrink: 0 }} />
+                  {today} <Icon name="calendar" size={14} style={{ flexShrink: 0 }} />
                 </div>
               </div>
             </div>
@@ -242,15 +242,15 @@ function LogToPCIForm({ transcript, participants, callType, duration, onClose }:
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--grey-light)', padding: '6px 10px', borderRadius: '6px 6px 0 0', fontWeight: 700, fontSize: 12, color: 'var(--text2)', flexShrink: 0 }}>
               <span>Entity</span>
-              <span onClick={() => setPickerOpen('entity')} style={{ width: 20, height: 20, borderRadius: '50%', background: BLUE, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, cursor: 'pointer' }}>+</span>
+              <span onClick={() => setPickerOpen('entity')} style={{ width: 20, height: 20, borderRadius: '50%', background: BLUE, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Icon name="add" size={14} /></span>
             </div>
             <div style={{ border: '1px solid var(--border)', borderTop: 'none', borderRadius: '0 0 6px 6px', flex: 1, padding: 8, overflowY: 'auto', minHeight: 0 }}>
               {entities.length === 0
                 ? <div style={{ fontSize: 11, color: 'var(--text3)', fontStyle: 'italic', textAlign: 'center', paddingTop: 8 }}>Click + to add entities</div>
                 : entities.map(e => (
                   <div key={e} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '3px 0', fontSize: 12 }}>
-                    <span style={{ color: BLUE, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}><Building2 size={13} style={{ verticalAlign: '-2px', marginRight: 4 }} />{e}</span>
-                    <span onClick={() => removeEntity(e)} style={{ cursor: 'pointer', color: 'var(--text3)', flexShrink: 0, marginLeft: 6, display: 'inline-flex' }}><X size={14} /></span>
+                    <span style={{ color: BLUE, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}><Icon name="building" size={13} style={{ verticalAlign: '-2px', marginRight: 4 }} />{e}</span>
+                    <span onClick={() => removeEntity(e)} style={{ cursor: 'pointer', color: 'var(--text3)', flexShrink: 0, marginLeft: 6, display: 'inline-flex' }}><Icon name="close" size={14} /></span>
                   </div>
                 ))
               }
@@ -267,15 +267,15 @@ function LogToPCIForm({ transcript, participants, callType, duration, onClose }:
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--grey-light)', padding: '6px 10px', borderRadius: '6px 6px 0 0', fontWeight: 700, fontSize: 12, color: 'var(--text2)', flexShrink: 0 }}>
               <span>People</span>
-              <span onClick={() => setPickerOpen('people')} style={{ width: 20, height: 20, borderRadius: '50%', background: BLUE, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, cursor: 'pointer' }}>+</span>
+              <span onClick={() => setPickerOpen('people')} style={{ width: 20, height: 20, borderRadius: '50%', background: BLUE, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Icon name="add" size={14} /></span>
             </div>
             <div style={{ border: '1px solid var(--border)', borderTop: 'none', borderRadius: '0 0 6px 6px', flex: 1, padding: 8, overflowY: 'auto', minHeight: 0 }}>
               {people.length === 0
                 ? <div style={{ fontSize: 11, color: 'var(--text3)', fontStyle: 'italic', textAlign: 'center', paddingTop: 8 }}>Click + to add people</div>
                 : people.map(p => (
                   <div key={p} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '3px 0', fontSize: 12 }}>
-                    <span style={{ color: BLUE, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}><User size={13} style={{ verticalAlign: '-2px', marginRight: 4 }} />{p}</span>
-                    <span onClick={() => removePerson(p)} style={{ cursor: 'pointer', color: 'var(--text3)', flexShrink: 0, marginLeft: 6, display: 'inline-flex' }}><X size={14} /></span>
+                    <span style={{ color: BLUE, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}><Icon name="user" size={13} style={{ verticalAlign: '-2px', marginRight: 4 }} />{p}</span>
+                    <span onClick={() => removePerson(p)} style={{ cursor: 'pointer', color: 'var(--text3)', flexShrink: 0, marginLeft: 6, display: 'inline-flex' }}><Icon name="close" size={14} /></span>
                   </div>
                 ))
               }
@@ -286,15 +286,15 @@ function LogToPCIForm({ transcript, participants, callType, duration, onClose }:
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--grey-light)', padding: '6px 10px', borderRadius: '6px 6px 0 0', fontWeight: 700, fontSize: 12, color: 'var(--text2)', flexShrink: 0 }}>
               <span>Tag</span>
-              <span onClick={() => setPickerOpen('tag')} style={{ width: 20, height: 20, borderRadius: '50%', background: BLUE, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, cursor: 'pointer' }}>+</span>
+              <span onClick={() => setPickerOpen('tag')} style={{ width: 20, height: 20, borderRadius: '50%', background: BLUE, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Icon name="add" size={14} /></span>
             </div>
             <div style={{ border: '1px solid var(--border)', borderTop: 'none', borderRadius: '0 0 6px 6px', flex: 1, padding: 8, overflowY: 'auto', minHeight: 0 }}>
               {tags.length === 0
                 ? <div style={{ fontSize: 11, color: 'var(--text3)', fontStyle: 'italic', textAlign: 'center', paddingTop: 6 }}>Click + to add tags</div>
                 : tags.map(t => (
                   <div key={t} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '3px 0', fontSize: 12 }}>
-                    <span style={{ color: BLUE, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}><Tag size={13} style={{ verticalAlign: '-2px', marginRight: 4 }} />{t}</span>
-                    <span onClick={() => removeTag(t)} style={{ cursor: 'pointer', color: 'var(--text3)', flexShrink: 0, marginLeft: 6, display: 'inline-flex' }}><X size={14} /></span>
+                    <span style={{ color: BLUE, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}><Icon name="tag" size={13} style={{ verticalAlign: '-2px', marginRight: 4 }} />{t}</span>
+                    <span onClick={() => removeTag(t)} style={{ cursor: 'pointer', color: 'var(--text3)', flexShrink: 0, marginLeft: 6, display: 'inline-flex' }}><Icon name="close" size={14} /></span>
                   </div>
                 ))
               }
@@ -305,10 +305,10 @@ function LogToPCIForm({ transcript, participants, callType, duration, onClose }:
 
       {/* Footer */}
       <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 16px', borderTop: '1px solid var(--border)', flexShrink: 0 }}>
-        <button onClick={onClose} style={{ padding: '8px 20px', border: '1px solid var(--border)', borderRadius: 6, background: 'var(--surface)', cursor: 'pointer', fontSize: 13, fontFamily: 'inherit' }}><X size={14} style={{ verticalAlign: '-2px', marginRight: 4 }} />Cancel</button>
+        <button onClick={onClose} style={{ padding: '8px 20px', border: '1px solid var(--border)', borderRadius: 6, background: 'var(--surface)', cursor: 'pointer', fontSize: 13, fontFamily: 'inherit' }}><Icon name="close" size={14} style={{ verticalAlign: '-2px', marginRight: 4 }} />Cancel</button>
         <button onClick={handleSave} disabled={saving}
           style={{ padding: '8px 24px', background: saving ? 'var(--blue-300)' : BLUE, color: '#fff', border: 'none', borderRadius: 6, cursor: saving ? 'not-allowed' : 'pointer', fontSize: 13, fontFamily: 'inherit', fontWeight: 700 }}>
-          {saving ? 'Saving...' : <><Check size={14} style={{ verticalAlign: '-2px', marginRight: 4 }} />Save</>}
+          {saving ? 'Saving...' : <><Icon name="check" size={14} style={{ verticalAlign: '-2px', marginRight: 4 }} />Save</>}
         </button>
       </div>
     </div>
@@ -356,21 +356,21 @@ export default function PostCallModal({ callType, duration, participants, transc
             <div style={{ padding: '16px 20px 12px', borderBottom: '1px solid var(--border)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                 <div style={{ fontWeight: 700, fontSize: 16, color: BLUE_DARK, display: 'flex', alignItems: 'center', gap: 6 }}>
-                  {callType === 'video' ? <Video size={18} /> : <Phone size={18} />} Call Ended — Review & Save
+                  {callType === 'video' ? <Icon name="video" size={18} /> : <Icon name="phone" size={18} />} Call Ended — Review & Save
                 </div>
-                <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text3)', display: 'inline-flex' }}><X size={20} /></button>
+                <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text3)', display: 'inline-flex' }}><Icon name="close" size={20} /></button>
               </div>
               <div style={{ display: 'flex', gap: 16, fontSize: 12, color: 'var(--text3)' }}>
-                <span>⏱ Duration: <strong style={{ color: 'var(--text)' }}>{fmtDur(duration)}</strong></span>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><User size={13} /> Participants: <strong style={{ color: 'var(--text)' }}>{participants.join(', ')}</strong></span>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Calendar size={13} /> {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Icon name="clock" size={13} /> Duration: <strong style={{ color: 'var(--text)' }}>{fmtDur(duration)}</strong></span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Icon name="user" size={13} /> Participants: <strong style={{ color: 'var(--text)' }}>{participants.join(', ')}</strong></span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Icon name="calendar" size={13} /> {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
               </div>
             </div>
 
             {/* Transcript editor */}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: '12px 20px' }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text2)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '.05em' }}>
-                📝 Transcription — Review & Edit
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text2)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '.05em', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Icon name="file-text" size={13} /> Transcription — Review & Edit
               </div>
 
               {/* Transcript as editable blocks */}
@@ -388,7 +388,7 @@ export default function PostCallModal({ callType, duration, participants, transc
                 ))}
                 {transcript.length === 0 && (
                   <div style={{ padding: 24, textAlign: 'center', color: 'var(--text3)', fontSize: 13 }}>
-                    <div style={{ marginBottom: 8 }}><Mic size={28} /></div>
+                    <div style={{ marginBottom: 8 }}><Icon name="mic" size={28} /></div>
                     No transcription available.<br />
                     <span style={{ fontSize: 11 }}>Enable Whisper AI transcription before the call to generate transcripts.</span>
                   </div>
@@ -411,12 +411,12 @@ export default function PostCallModal({ callType, duration, participants, transc
                 Discard
               </button>
               <button onClick={handleSaveFile}
-                style={{ padding: '8px 18px', border: `1px solid ${BLUE}`, borderRadius: 7, background: 'var(--surface)', cursor: 'pointer', fontSize: 13, fontFamily: 'inherit', color: BLUE, fontWeight: 600 }}>
-                💾 Save File
+                style={{ padding: '8px 18px', border: `1px solid ${BLUE}`, borderRadius: 7, background: 'var(--surface)', cursor: 'pointer', fontSize: 13, fontFamily: 'inherit', color: BLUE, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <Icon name="save" size={13} /> Save File
               </button>
               <button onClick={() => setTab('logpci')}
-                style={{ padding: '8px 20px', background: BLUE, color: '#fff', border: 'none', borderRadius: 7, cursor: 'pointer', fontSize: 13, fontFamily: 'inherit', fontWeight: 700 }}>
-                ↗ Log into PLANet IAS
+                style={{ padding: '8px 20px', background: BLUE, color: '#fff', border: 'none', borderRadius: 7, cursor: 'pointer', fontSize: 13, fontFamily: 'inherit', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <Icon name="open-external" size={13} /> Log into PLANet IAS
               </button>
             </div>
           </>

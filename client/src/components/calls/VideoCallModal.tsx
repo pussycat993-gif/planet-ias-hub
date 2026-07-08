@@ -4,6 +4,7 @@ import { useAuthStore } from '../../store/authStore';
 import { useMediasoup } from '../../hooks/useMediasoup';
 import { useChatStore } from '../../store/chatStore';
 import { getSocket } from '../../hooks/useSocket';
+import Icon from '@/components/ui/Icon';
 
 function fmt(secs: number) {
   const m = Math.floor(secs / 60);
@@ -171,7 +172,7 @@ export default function VideoCallModal() {
         <div style={{ background: '#0d0d1a', borderRadius: 16, width: 400, boxShadow: '0 16px 60px rgba(0,0,0,.7)', border: '1px solid rgba(255,255,255,.12)', overflow: 'hidden' }}>
 
           <div style={{ background: 'rgba(255,255,255,.05)', padding: '24px 24px 18px', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,.08)' }}>
-            <div style={{ fontSize: 42, marginBottom: 8 }}>{isVideo ? '📹' : '📞'}</div>
+            <div style={{ marginBottom: 8 }}><Icon name={isVideo ? 'video' : 'phone'} size={42} color="#fff" /></div>
             <div style={{ color: '#fff', fontWeight: 700, fontSize: 18 }}>{isVideo ? 'Video Call' : 'Audio Call'}</div>
             <div style={{ color: 'rgba(255,255,255,.45)', fontSize: 12, marginTop: 4 }}>
               with {remoteName}
@@ -183,7 +184,7 @@ export default function VideoCallModal() {
             <div onClick={() => setTranscriptionEnabled(t => !t)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderRadius: 10, cursor: 'pointer', marginBottom: 16, background: transcriptionEnabled ? 'rgba(33,150,243,.15)' : 'rgba(255,255,255,.06)', border: `1px solid ${transcriptionEnabled ? 'rgba(33,150,243,.4)' : 'rgba(255,255,255,.1)'}`, transition: 'all .2s' }}>
               <div>
                 <div style={{ color: '#fff', fontWeight: 600, fontSize: 13, display: 'flex', alignItems: 'center', gap: 7 }}>
-                  <span>🎙️</span> Enable Transcription
+                  <Icon name="mic" size={16} color="#fff" /> Enable Transcription
                 </div>
                 <div style={{ color: 'rgba(255,255,255,.4)', fontSize: 11, marginTop: 3 }}>
                   Whisper AI · Auto-detect speakers · Log to PCI
@@ -197,16 +198,17 @@ export default function VideoCallModal() {
 
             {transcriptionEnabled && (
               <div style={{ background: 'rgba(33,150,243,.1)', border: '1px solid rgba(33,150,243,.25)', borderRadius: 8, padding: '8px 12px', marginBottom: 16, fontSize: 11, color: 'rgba(255,255,255,.55)' }}>
+                <Icon name="clipboard" size={13} style={{ verticalAlign: 'middle', marginRight: 5 }} />
                 {isVideo
-                  ? '📋 Screen splits into 3 panels: your camera, participant, and live transcript'
-                  : '📋 Live transcript will appear during the call'}
+                  ? 'Screen splits into 3 panels: your camera, participant, and live transcript'
+                  : 'Live transcript will appear during the call'}
               </div>
             )}
 
             <button onClick={handleJoin} style={{ width: '100%', padding: '14px', background: '#2e7d32', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 15, fontWeight: 700, fontFamily: 'inherit', marginBottom: 8 }}
               onMouseEnter={e => (e.currentTarget.style.background = '#1b5e20')}
               onMouseLeave={e => (e.currentTarget.style.background = '#2e7d32')}>
-              {isVideo ? '📹' : '📞'} Join Call
+              <Icon name={isVideo ? 'video' : 'phone'} size={16} color="#fff" style={{ verticalAlign: 'middle', marginRight: 6 }} /> Join Call
             </button>
 
             <button onClick={async () => { await endCall(); }}
@@ -227,13 +229,13 @@ export default function VideoCallModal() {
         {/* Top bar */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 20px', background: 'rgba(255,255,255,.04)', borderBottom: '1px solid rgba(255,255,255,.07)', flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ color: '#fff', fontWeight: 700, fontSize: 14 }}>📹 Video Call</span>
-            <span style={{ background: '#2e7d32', color: '#fff', padding: '2px 8px', borderRadius: 8, fontSize: 10, fontWeight: 700 }}>● LIVE</span>
+            <span style={{ color: '#fff', fontWeight: 700, fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 6 }}><Icon name="video" size={16} color="#fff" /> Video Call</span>
+            <span style={{ background: '#2e7d32', color: '#fff', padding: '2px 8px', borderRadius: 8, fontSize: 10, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 }}><Icon name="circle" size={7} color="#fff" fill="#fff" /> LIVE</span>
             <span style={{ color: 'rgba(255,255,255,.35)', fontSize: 11 }}>{totalParticipants} participants</span>
           </div>
           <div style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: '#81c784', letterSpacing: 2 }}>{fmt(elapsedSeconds)}</div>
-          <span style={{ background: 'rgba(33,150,243,.2)', color: '#90caf9', padding: '3px 10px', borderRadius: 12, fontSize: 11, fontWeight: 600, border: '1px solid rgba(33,150,243,.35)' }}>
-            🎙️ Transcription ON
+          <span style={{ background: 'rgba(33,150,243,.2)', color: '#90caf9', padding: '3px 10px', borderRadius: 12, fontSize: 11, fontWeight: 600, border: '1px solid rgba(33,150,243,.35)', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+            <Icon name="mic" size={14} /> Transcription ON
           </span>
         </div>
 
@@ -254,7 +256,7 @@ export default function VideoCallModal() {
               </div>
             )}
             <div style={{ position: 'absolute', bottom: 12, left: 12, background: 'rgba(0,0,0,.6)', color: '#fff', padding: '4px 10px', borderRadius: 6, fontSize: 12, fontWeight: 600 }}>
-              {user?.name || 'You'} {isMuted ? '🔇' : ''}
+              {user?.name || 'You'} {isMuted ? <Icon name="mic-off" size={12} color="#fff" style={{ verticalAlign: 'middle' }} /> : null}
             </div>
           </div>
 
@@ -279,7 +281,7 @@ export default function VideoCallModal() {
           {/* Col 3: Live transcript */}
           <div style={{ width: 320, background: '#111827', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
             <div style={{ padding: '12px 14px', borderBottom: '1px solid rgba(255,255,255,.07)', display: 'flex', alignItems: 'center', gap: 7 }}>
-              <span style={{ color: '#90caf9', fontSize: 14 }}>🎙️</span>
+              <Icon name="mic" size={16} color="#90caf9" />
               <span style={{ color: '#90caf9', fontWeight: 700, fontSize: 13 }}>Live Transcript</span>
               <div style={{ marginLeft: 'auto', display: 'flex', gap: 3 }}>
                 {[0, 1, 2].map(i => (
@@ -291,7 +293,7 @@ export default function VideoCallModal() {
             <div ref={transcriptRef} style={{ flex: 1, overflowY: 'auto', padding: '8px 0' }}>
               {transcript.length === 0 ? (
                 <div style={{ padding: '24px 14px', textAlign: 'center', color: 'rgba(255,255,255,.2)', fontSize: 12 }}>
-                  <div style={{ fontSize: 28, marginBottom: 8 }}>🎤</div>
+                  <div style={{ marginBottom: 8 }}><Icon name="mic" size={28} /></div>
                   Listening for speech...
                 </div>
               ) : transcript.map((line, i) => {
@@ -315,12 +317,12 @@ export default function VideoCallModal() {
 
         {/* Controls */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, padding: '14px', background: 'rgba(255,255,255,.04)', borderTop: '1px solid rgba(255,255,255,.07)', flexShrink: 0 }}>
-          <button style={cbBtn(isMuted)} onClick={toggleMute}><span style={{ fontSize: 18 }}>{isMuted ? '🔇' : '🎤'}</span><span style={{ fontSize: 9 }}>{isMuted ? 'Unmute' : 'Mute'}</span></button>
-          <button style={cbBtn(isCameraOff)} onClick={toggleCamera}><span style={{ fontSize: 18 }}>{isCameraOff ? '📷' : '📹'}</span><span style={{ fontSize: 9 }}>Camera</span></button>
-          <button style={cbBtn(isSharing)} onClick={handleShareToggle}><span style={{ fontSize: 18 }}>🖥</span><span style={{ fontSize: 9 }}>{isSharing ? 'Stop' : 'Share'}</span></button>
-          <button style={cbBtn(isRaisingHand)} onClick={handleRaiseHand}><span style={{ fontSize: 18 }}>✋</span><span style={{ fontSize: 9 }}>Hand</span></button>
+          <button style={cbBtn(isMuted)} onClick={toggleMute}><Icon name={isMuted ? 'mic-off' : 'mic'} size={18} color="#fff" /><span style={{ fontSize: 9 }}>{isMuted ? 'Unmute' : 'Mute'}</span></button>
+          <button style={cbBtn(isCameraOff)} onClick={toggleCamera}><Icon name={isCameraOff ? 'video-off' : 'video'} size={18} color="#fff" /><span style={{ fontSize: 9 }}>Camera</span></button>
+          <button style={cbBtn(isSharing)} onClick={handleShareToggle}><Icon name={isSharing ? 'screen-share-off' : 'screen-share'} size={18} color="#fff" /><span style={{ fontSize: 9 }}>{isSharing ? 'Stop' : 'Share'}</span></button>
+          <button style={cbBtn(isRaisingHand)} onClick={handleRaiseHand}><Icon name="hand" size={18} color="#fff" /><span style={{ fontSize: 9 }}>Hand</span></button>
           <button style={{ ...cbBtn(false, true), padding: '8px 28px', fontWeight: 700, minWidth: 110 }} onClick={handleEnd}>
-            <span style={{ fontSize: 18 }}>📵</span><span style={{ fontSize: 9 }}>End Call</span>
+            <Icon name="phone-off" size={18} color="#fff" /><span style={{ fontSize: 9 }}>End Call</span>
           </button>
         </div>
 
@@ -338,12 +340,12 @@ export default function VideoCallModal() {
 
       <div onMouseDown={onMouseDown} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: 'rgba(255,255,255,.05)', borderBottom: '1px solid rgba(255,255,255,.08)', cursor: 'grab' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-          <span style={{ color: '#fff', fontWeight: 700, fontSize: 12 }}>{isVideo ? '📹' : '📞'} {isVideo ? 'Video Call' : 'Audio Call'}</span>
-          <span style={{ background: '#2e7d32', color: '#fff', padding: '1px 6px', borderRadius: 8, fontSize: 9, fontWeight: 700 }}>● LIVE</span>
+          <span style={{ color: '#fff', fontWeight: 700, fontSize: 12, display: 'inline-flex', alignItems: 'center', gap: 6 }}><Icon name={isVideo ? 'video' : 'phone'} size={14} color="#fff" /> {isVideo ? 'Video Call' : 'Audio Call'}</span>
+          <span style={{ background: '#2e7d32', color: '#fff', padding: '1px 6px', borderRadius: 8, fontSize: 9, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 }}><Icon name="circle" size={6} color="#fff" fill="#fff" /> LIVE</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={{ fontFamily: 'monospace', fontSize: 13, fontWeight: 700, color: '#81c784', letterSpacing: 1 }}>{fmt(elapsedSeconds)}</span>
-          <span style={{ color: 'rgba(255,255,255,.4)', fontSize: 10 }}>{totalParticipants} 👤</span>
+          <span style={{ color: 'rgba(255,255,255,.4)', fontSize: 10, display: 'inline-flex', alignItems: 'center', gap: 4 }}>{totalParticipants} <Icon name="user" size={12} /></span>
         </div>
       </div>
 
@@ -365,11 +367,11 @@ export default function VideoCallModal() {
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '8px 10px', background: 'rgba(255,255,255,.04)', borderTop: '1px solid rgba(255,255,255,.08)' }}>
-        <button style={cbBtn(isMuted)} onClick={toggleMute}><span style={{ fontSize: 16 }}>{isMuted ? '🔇' : '🎤'}</span><span style={{ fontSize: 9 }}>{isMuted ? 'Unmute' : 'Mute'}</span></button>
-        {isVideo && <button style={cbBtn(isCameraOff)} onClick={toggleCamera}><span style={{ fontSize: 16 }}>{isCameraOff ? '📷' : '📹'}</span><span style={{ fontSize: 9 }}>Camera</span></button>}
-        <button style={cbBtn(isSharing)} onClick={handleShareToggle}><span style={{ fontSize: 16 }}>🖥</span><span style={{ fontSize: 9 }}>{isSharing ? 'Stop' : 'Share'}</span></button>
-        <button style={cbBtn(isRaisingHand)} onClick={handleRaiseHand}><span style={{ fontSize: 16 }}>✋</span><span style={{ fontSize: 9 }}>Hand</span></button>
-        <button style={{ ...cbBtn(false, true), minWidth: 64, fontWeight: 700 }} onClick={handleEnd}><span style={{ fontSize: 16 }}>📵</span><span style={{ fontSize: 9 }}>End</span></button>
+        <button style={cbBtn(isMuted)} onClick={toggleMute}><Icon name={isMuted ? 'mic-off' : 'mic'} size={16} color="#fff" /><span style={{ fontSize: 9 }}>{isMuted ? 'Unmute' : 'Mute'}</span></button>
+        {isVideo && <button style={cbBtn(isCameraOff)} onClick={toggleCamera}><Icon name={isCameraOff ? 'video-off' : 'video'} size={16} color="#fff" /><span style={{ fontSize: 9 }}>Camera</span></button>}
+        <button style={cbBtn(isSharing)} onClick={handleShareToggle}><Icon name={isSharing ? 'screen-share-off' : 'screen-share'} size={16} color="#fff" /><span style={{ fontSize: 9 }}>{isSharing ? 'Stop' : 'Share'}</span></button>
+        <button style={cbBtn(isRaisingHand)} onClick={handleRaiseHand}><Icon name="hand" size={16} color="#fff" /><span style={{ fontSize: 9 }}>Hand</span></button>
+        <button style={{ ...cbBtn(false, true), minWidth: 64, fontWeight: 700 }} onClick={handleEnd}><Icon name="phone-off" size={16} color="#fff" /><span style={{ fontSize: 9 }}>End</span></button>
       </div>
 
       <style>{`@keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(76,175,80,.4); } 50% { box-shadow: 0 0 0 10px rgba(76,175,80,0); } }`}</style>

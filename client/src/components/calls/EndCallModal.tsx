@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useCallStore } from '../../store/callStore';
 import { useUIStore } from '../../store/uiStore';
 import axios from 'axios';
-import { Clipboard, X, Mic, Check, Sparkles } from '@/components/ui/Icon';
+import Icon from '@/components/ui/Icon';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 const BLUE = 'var(--blue-primary)';
@@ -119,8 +119,8 @@ export default function EndCallModal() {
       }}>
         {/* Header */}
         <div style={{ background: '#2e7d32', color: '#fff', padding: '10px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span style={{ fontWeight: 700, fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 6 }}><Clipboard size={14} /> Log Call to PCI</span>
-          <span style={{ cursor: 'pointer', opacity: .8, display: 'inline-flex' }} onClick={() => closeModal()}><X size={16} /></span>
+          <span style={{ fontWeight: 700, fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 6 }}><Icon name="clipboard" size={14} /> Log Call to PCI</span>
+          <span style={{ cursor: 'pointer', opacity: .8, display: 'inline-flex' }} onClick={() => closeModal()}><Icon name="close" size={16} /></span>
         </div>
 
         <div style={{ overflowY: 'auto', padding: 16, flex: 1 }}>
@@ -166,7 +166,7 @@ export default function EndCallModal() {
           {/* Transcription section */}
           <div style={{ border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden' }}>
             <div style={{ background: 'rgba(176,124,214,.14)', padding: '7px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: 12, fontWeight: 700, color: PURPLE, display: 'inline-flex', alignItems: 'center', gap: 6 }}><Mic size={13} /> Transcription — Whisper AI</span>
+              <span style={{ fontSize: 12, fontWeight: 700, color: PURPLE, display: 'inline-flex', alignItems: 'center', gap: 6 }}><Icon name="mic" size={13} /> Transcription — Whisper AI</span>
               <button
                 onClick={handleTranscribe}
                 disabled={transcribing || transcriptLines.length > 0}
@@ -177,7 +177,7 @@ export default function EndCallModal() {
                   fontFamily: 'inherit',
                 }}
               >
-                {transcribing ? '⏳ Processing...' : transcriptLines.length > 0 ? <><Check size={12} style={{ verticalAlign: '-2px', marginRight: 3 }} />Done</> : 'Transcribe'}
+                {transcribing ? <><Icon name="loader" size={12} style={{ verticalAlign: '-2px', marginRight: 3 }} />Processing...</> : transcriptLines.length > 0 ? <><Icon name="check" size={12} style={{ verticalAlign: '-2px', marginRight: 3 }} />Done</> : 'Transcribe'}
               </button>
             </div>
 
@@ -201,7 +201,7 @@ export default function EndCallModal() {
             {summary && (
               <div style={{ borderTop: '1px solid var(--border)', padding: '10px 12px', background: 'var(--grey-light)' }}>
                 <div style={{ fontSize: 10, fontWeight: 700, color: PURPLE, marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.04em' }}>
-                  <Sparkles size={12} style={{ verticalAlign: '-2px', marginRight: 4 }} />AI Summary
+                  <Icon name="sparkles" size={12} style={{ verticalAlign: '-2px', marginRight: 4 }} />AI Summary
                 </div>
                 <div style={{ fontSize: 12, color: 'var(--text)', lineHeight: 1.6 }}>
                   <div><strong>Topic:</strong> {summary.topic}</div>
@@ -215,11 +215,11 @@ export default function EndCallModal() {
                 <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
                   <button onClick={copyToClipboard}
                     style={{ padding: '3px 10px', border: '1px solid var(--border)', borderRadius: 5, fontSize: 11, cursor: 'pointer', background: 'var(--surface)', fontFamily: 'inherit' }}>
-                    <Clipboard size={12} style={{ verticalAlign: '-2px', marginRight: 4 }} />Copy
+                    <Icon name="clipboard" size={12} style={{ verticalAlign: '-2px', marginRight: 4 }} />Copy
                   </button>
                   <button onClick={() => {/* adds to note field */}}
                     style={{ padding: '3px 10px', border: `1px solid ${BLUE}`, color: BLUE, borderRadius: 5, fontSize: 11, cursor: 'pointer', background: 'var(--surface)', fontFamily: 'inherit' }}>
-                    + Add to PCI Note
+                    <Icon name="add" size={11} style={{ verticalAlign: '-2px', marginRight: 4 }} />Add to PCI Note
                   </button>
                 </div>
               </div>
@@ -242,7 +242,7 @@ export default function EndCallModal() {
               background: logged ? '#4caf50' : BLUE, color: '#fff', fontWeight: 700,
             }}
           >
-            {logging ? 'Logging...' : logged ? <><Check size={12} style={{ verticalAlign: '-2px', marginRight: 3 }} />Logged to PCI</> : 'Log to PCI'}
+            {logging ? 'Logging...' : logged ? <><Icon name="check" size={12} style={{ verticalAlign: '-2px', marginRight: 3 }} />Logged to PCI</> : 'Log to PCI'}
           </button>
         </div>
       </div>
